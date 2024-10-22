@@ -12,14 +12,20 @@
         tools:layout="@layout/fragment_home" />
 
     <fragment
+        android:id="@+id/CameraFragment"
+        android:name="com.example.single_lottery.ui.scan.CameraFragment"
+        android:label="Camera Fragment" />
+
+
+    <fragment
         android:id="@+id/navigation_dashboard"
-        android:name="com.example.single_lottery.ui.dashboard.DashboardFragment"
+        android:name="com.example.single_lottery.ui.events.EventsFragment"
         android:label="@string/title_dashboard"
         tools:layout="@layout/fragment_dashboard" />
 
     <fragment
         android:id="@+id/navigation_notifications"
-        android:name="com.example.single_lottery.ui.notifications.NotificationsFragment"
+        android:name="com.example.single_lottery.ui.profile.ProfileFragment"
         android:label="@string/title_notifications"
         tools:layout="@layout/fragment_notifications" />
 </navigation>
