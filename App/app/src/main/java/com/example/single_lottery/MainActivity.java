@@ -33,7 +33,7 @@ public class MainActivity extends AppCompatActivity {
         NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
         NavigationUI.setupWithNavController(binding.navView, navController);
 
-        navController.navigate(R.id.CameraFragment);
+        navController.navigate(R.id.RoleFragment);
     }
 
     @Override
