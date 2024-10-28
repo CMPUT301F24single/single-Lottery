@@ -25,6 +25,17 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <activity
+            android:name="com.example.single_lottery.ui.organizer.OrganizerActivity"
+            android:exported="true" />
+
+        <activity
+            android:name=".ui.organizer.OrganizerEventCreateActivity"
+            android:exported="false"/>
+
+
+
     </application>
 
 </manifest>

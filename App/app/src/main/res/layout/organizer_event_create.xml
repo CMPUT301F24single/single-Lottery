@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="16dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Event Poster" />
+
+        <ImageView
+            android:id="@+id/eventPosterImageView"
+            android:layout_width="match_parent"
+            android:layout_height="200dp"
+            android:layout_marginTop="8dp"
+            android:background="@android:color/darker_gray"
+            android:contentDescription="Event Poster" />
+
+        <Button
+            android:id="@+id/uploadPosterButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Upload Poster" />
+
+        <EditText
+            android:id="@+id/eventNameEditText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Event Name" />
+
+        <EditText
+            android:id="@+id/eventDescriptionEditText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Event Description" />
+
+        <EditText
+            android:id="@+id/eventTimeEditText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Event Time" />
+
+        <EditText
+            android:id="@+id/registrationDeadlineEditText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Registration Deadline" />
+
+        <EditText
+            android:id="@+id/waitingListCountEditText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Waiting List Count" />
+
+        <EditText
+            android:id="@+id/lotteryCountEditText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Lottery Count" />
+
+        <EditText
+            android:id="@+id/lotteryTimeEditText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Lottery Time" />
+
+        <Button
+            android:id="@+id/createEventButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Create Event" />
+    </LinearLayout>
+</ScrollView>
