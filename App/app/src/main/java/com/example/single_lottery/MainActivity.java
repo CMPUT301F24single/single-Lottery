@@ -70,9 +70,9 @@ public class MainActivity extends AppCompatActivity {
             NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
             NavigationUI.setupWithNavController(binding.navView, navController);
 
-            // Navigate to HomeFragment by default after landing screen
-            navController.navigate(R.id.navigation_home);
-        }
+        navController.navigate(R.id.RoleFragment);
+
+           
     }
 
     @Override
