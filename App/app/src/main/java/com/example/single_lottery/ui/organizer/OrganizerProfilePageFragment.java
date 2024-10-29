@@ -86,7 +86,7 @@ public class OrganizerProfilePageFragment extends Fragment {
     }
 
     private void loadOrganizerProfile(String installationId) {
-        DocumentReference docRef = firestore.collection("users").document(installationId);
+        DocumentReference docRef = firestore.collection("organizers").document(installationId);
         docRef.get().addOnCompleteListener(task -> {
             if (task.isSuccessful() && task.getResult() != null && task.getResult().exists()) {
                 organizerName = task.getResult().getString("name");
@@ -104,12 +104,6 @@ public class OrganizerProfilePageFragment extends Fragment {
             }
         }).addOnFailureListener(e -> {
             Log.e("OrganizerProfilePageFragment", "failed to load user profile: " + e.getMessage());
-            Log.d("OrganizerProfilePageFragment", "Loaded company info: " + companyInfo);
-            Log.d("OrganizerProfilePageFragment", "Loaded values: " +
-                    "Name: " + organizerName + 
-                    ", Email: " + organizerEmail + 
-                    ", Phone: " + organizerPhone + 
-                    ", Company Info: " + companyInfo);
         });
     }
 
@@ -121,11 +115,11 @@ public class OrganizerProfilePageFragment extends Fragment {
         if (profileImageUrl != null) {
             Glide.with(this)
                     .load(profileImageUrl)
-                    .placeholder(R.drawable.ic_placeholder)
-                    .error(R.drawable.ic_placeholder)
+                    .placeholder(R.drawable.org)
+                    .error(R.drawable.org)
                     .into(profileImageView);
         } else {
-            profileImageView.setImageResource(R.drawable.ic_placeholder);
+            profileImageView.setImageResource(R.drawable.org);
         }
     }
 
@@ -152,7 +146,6 @@ public class OrganizerProfilePageFragment extends Fragment {
                     companyInfo = infoInput.getText().toString().trim();
                     updateOrganizerDetails(null);
                     saveOrganizerDataToFirestore(installationId, null);
-                    loadOrganizerProfile(installationId);
                 })
                 .setNegativeButton("cancel", (dialog, which) -> dialog.dismiss());
 
