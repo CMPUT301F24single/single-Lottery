@@ -36,6 +36,7 @@ android {
 }
 
 dependencies {
+    implementation ("androidx.recyclerview:recyclerview:1.2.1")
 
     implementation(libs.appcompat)
     implementation(libs.material)
@@ -52,6 +53,7 @@ dependencies {
     implementation(libs.firebase.installations)
     implementation(libs.firebase.storage)
     implementation(libs.glide)
+    implementation(libs.recyclerview)
     annotationProcessor(libs.compiler)
     implementation(libs.picasso)
     testImplementation(libs.junit)

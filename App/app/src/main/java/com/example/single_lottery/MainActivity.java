@@ -4,6 +4,9 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.widget.Button;
 
+import com.example.single_lottery.ui.organizer.OrganizerActivity;
+import com.example.single_lottery.ui.role.RoleFragment;
+import com.example.single_lottery.ui.user.UserActivity;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -16,7 +19,6 @@ import com.example.single_lottery.databinding.ActivityMainBinding;
 
 public class MainActivity extends AppCompatActivity {
 
-    private ActivityMainBinding binding;
     private boolean showLandingScreen;
 
     @Override
@@ -27,57 +29,43 @@ public class MainActivity extends AppCompatActivity {
         showLandingScreen = getIntent().getBooleanExtra("showLandingScreen", true);
 
         if (showLandingScreen) {
-            // Use the new landing layout with User, Organizer, and Admin buttons
+            // Use the landing layout with User, Organizer, and Admin buttons
             setContentView(R.layout.activity_landing);
 
-            // Get references to the buttons
             Button buttonUser = findViewById(R.id.button_user);
             Button buttonOrganizer = findViewById(R.id.button_organizer);
             Button buttonAdmin = findViewById(R.id.button_admin);
 
-            // Set click events for each button
             buttonUser.setOnClickListener(v -> {
-                // Start a new instance of MainActivity with showLandingScreen as false
+                // Start RoleFragment for User
                 Intent intent = new Intent(MainActivity.this, MainActivity.class);
                 intent.putExtra("showLandingScreen", false);
+                intent.putExtra("role", "user");
                 startActivity(intent);
-                finish(); // Close current instance
+                finish();
             });
 
             buttonOrganizer.setOnClickListener(v -> {
-                // Start a new instance of MainActivity with showLandingScreen as false
-                Intent intent = new Intent(MainActivity.this, MainActivity.class);
+                // Start OrganizerActivity for Organizer
+                Intent intent = new Intent(MainActivity.this, OrganizerActivity.class);
                 intent.putExtra("showLandingScreen", false);
+                intent.putExtra("role", "user");
                 startActivity(intent);
-                finish(); // Close current instance
+                finish();
             });
 
             buttonAdmin.setOnClickListener(v -> {
                 // Handle Admin logic here
             });
         } else {
-            // Original code to show the main interface with bottom navigation and fragments
-            binding = ActivityMainBinding.inflate(getLayoutInflater());
-            setContentView(binding.getRoot());
-
-            BottomNavigationView navView = findViewById(R.id.nav_view);
-
-            // Configure AppBar with top-level destinations
-            AppBarConfiguration appBarConfiguration = new AppBarConfiguration.Builder(
-                    R.id.navigation_home, R.id.navigation_dashboard, R.id.navigation_notifications)
-                    .build();
-            NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_activity_main);
-            NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
-            NavigationUI.setupWithNavController(binding.navView, navController);
-
-        navController.navigate(R.id.RoleFragment);
-
-           
-    }
-
-    @Override
-    public boolean onSupportNavigateUp() {
-        NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_activity_main);
-        return navController.navigateUp() || super.onSupportNavigateUp();
+            // Load RoleFragment for User role
+            setContentView(R.layout.activity_main); // Ensure you have an empty container for fragments
+            String role = getIntent().getStringExtra("role");
+            if ("user".equals(role)) {
+                getSupportFragmentManager().beginTransaction()
+                        .replace(R.id.nav_host_fragment_activity_main, new RoleFragment())
+                        .commit();
+            }
+        }
     }
 }
