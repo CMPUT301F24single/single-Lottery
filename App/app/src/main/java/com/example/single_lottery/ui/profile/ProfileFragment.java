@@ -177,21 +177,43 @@ public class ProfileFragment extends Fragment {
 
     private void uploadProfileImage() {
         if (profileImageUri != null) {
-            final StorageReference profileImageRef = storageReference.child("profileImages/" + UUID.randomUUID().toString() + ".jpg");
-            Log.d("OrganizerEventCreateActivity", "Uploading poster to Firebase Storage");
-            profileImageRef.putFile(profileImageUri)
-                    .addOnSuccessListener(taskSnapshot -> {
-                        profileImageRef.getDownloadUrl().addOnSuccessListener(uri -> {
-                            String profileImageUrl = uri.toString();
-                            saveUserDataToFirestore(installationId, profileImageUrl);
+            DocumentReference docRef = firestore.collection("users").document(installationId);
+            docRef.get().addOnCompleteListener(task -> {
+                if (task.isSuccessful() && task.getResult() != null && task.getResult().exists()) {
+                    String oldImageUri = task.getResult().getString("profileImageUrl");
+                    if (oldImageUri != null) {
+                        StorageReference oldImageRef = FirebaseStorage.getInstance().getReferenceFromUrl(oldImageUri);
+                        oldImageRef.delete().addOnSuccessListener(aVoid -> {
+                            Log.d("ProfileFragment", "Old image deleted successfully.");
+                            uploadNewImage();
+                        }).addOnFailureListener(e -> {
+                            Log.e("ProfileFragment", "Failed to delete old image: " + e.getMessage());
+                            uploadNewImage();
                         });
-                    })
-                    .addOnFailureListener(e -> {
-                        Log.e("ProfileFragment", "failed to upload image: " + e.getMessage());
-                    });
+                    } else {
+                        uploadNewImage();
+                    }
+                }
+            }).addOnFailureListener(e -> {
+                Log.e("ProfileFragment", "Failed to get user profile: " + e.getMessage());
+            });
         } else {
             Log.e("ProfileFragment", "profileImageUri is null");
         }
+    }
+
+    private void uploadNewImage() {
+        final StorageReference profileImageRef = storageReference.child("profileImages/" + UUID.randomUUID().toString() + ".jpg");
+        profileImageRef.putFile(profileImageUri)
+                .addOnSuccessListener(taskSnapshot -> {
+                    profileImageRef.getDownloadUrl().addOnSuccessListener(uri -> {
+                        String profileImageUrl = uri.toString();
+                        saveUserDataToFirestore(installationId, profileImageUrl);
+                    });
+                })
+                .addOnFailureListener(e -> {
+                    Log.e("ProfileFragment", "Failed to upload new image: " + e.getMessage());
+                });
     }
 
     private void saveUserDataToFirestore(String installationId, String profileImageUri) {
