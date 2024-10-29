@@ -1,14 +1,17 @@
 package com.example.single_lottery.ui.organizer;
 
-import android.app.DatePickerDialog;
-import android.app.TimePickerDialog;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.Toast;
+import android.widget.Toolbar;
+
+
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import com.example.single_lottery.R;
@@ -16,7 +19,6 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
-import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -33,7 +35,21 @@ public class OrganizerEventCreateActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.organizer_event_create);
+        setContentView(R.layout.organizer_event_create_fragment);
+
+//        Toolbar toolbar = findViewById(R.id.toolbar);
+//
+//        if (toolbar != null) {
+//            // 设置返回图标
+//            toolbar.setNavigationIcon(R.drawable.ic_back); // 替换为你的返回图标资源ID
+//            // 为 Toolbar 添加返回点击事件
+//            toolbar.setNavigationOnClickListener(v -> {
+//                finish(); // 返回上一个 Activity
+//            });
+//        }
+
+        ImageButton backButton = findViewById(R.id.backButton);
+        backButton.setOnClickListener(v -> finish());
 
         // 初始化 Firebase 实例
         db = FirebaseFirestore.getInstance();
@@ -73,58 +89,87 @@ public class OrganizerEventCreateActivity extends AppCompatActivity {
 
     private void uploadEventToFirebase() {
         // 检查必填字段是否为空
-        if (!validateInputs()) return;
+        Log.d("OrganizerEventCreateActivity", "uploadEventToFirebase() called");
 
-        if (posterUri != null) {
-            // 上传海报到 Firebase Storage
-            StorageReference posterRef = storageRef.child(System.currentTimeMillis() + ".jpg");
-            posterRef.putFile(posterUri).addOnSuccessListener(taskSnapshot ->
-                    posterRef.getDownloadUrl().addOnSuccessListener(uri ->
-                            saveEventData(uri.toString())
-                    )
-            ).addOnFailureListener(e ->
-                    Toast.makeText(this, "Failed to upload poster", Toast.LENGTH_SHORT).show()
-            );
-        } else {
-            saveEventData(null);
-        }
-    }
+        String eventName = eventNameEditText.getText().toString().trim();
+        String eventTime = eventTimeEditText.getText().toString().trim();
+        String registrationDeadline = registrationDeadlineEditText.getText().toString().trim();
+        String lotteryTime = lotteryTimeEditText.getText().toString().trim();
 
-    private void saveEventData(String posterUrl) {
-        String eventName = eventNameEditText.getText().toString();
-        String eventDescription = eventDescriptionEditText.getText().toString();
-        String eventTime = eventTimeEditText.getText().toString();
-        String registrationDeadline = registrationDeadlineEditText.getText().toString();
-
-        int waitingListCount;
-        int lotteryCount;
-
-        try {
-            waitingListCount = Integer.parseInt(waitingListCountEditText.getText().toString());
-            lotteryCount = Integer.parseInt(lotteryCountEditText.getText().toString());
-        } catch (NumberFormatException e) {
-            Toast.makeText(this, "Please enter valid numbers for waiting list and lottery count", Toast.LENGTH_SHORT).show();
+        // 检查必填字段
+        if (eventName.isEmpty() || eventTime.isEmpty() || registrationDeadline.isEmpty() || lotteryTime.isEmpty()) {
+            Toast.makeText(this, "Please fill in all required fields", Toast.LENGTH_SHORT).show();
+            Log.d("OrganizerEventCreateActivity", "Required fields are missing");
             return;
         }
 
-        String lotteryTime = lotteryTimeEditText.getText().toString();
+        int waitingListCount;
+        int lotteryCount;
+        try {
+            String waitingListStr = waitingListCountEditText.getText().toString().trim();
+            String lotteryCountStr = lotteryCountEditText.getText().toString().trim();
+
+            // 设置等待列表和彩票数量的默认值
+            waitingListCount = waitingListStr.isEmpty() ? Integer.MAX_VALUE : Integer.parseInt(waitingListStr);
+            lotteryCount = lotteryCountStr.isEmpty() ? waitingListCount : Integer.parseInt(lotteryCountStr);
+
+            // 检查彩票数量是否小于或等于等待列表数量
+            if (lotteryCount > waitingListCount) {
+                Toast.makeText(this, "Lottery count cannot exceed waiting list count", Toast.LENGTH_SHORT).show();
+                Log.d("OrganizerEventCreateActivity", "Lottery count exceeds waiting list count");
+                return;
+            }
+        } catch (NumberFormatException e) {
+            Toast.makeText(this, "Please enter valid numbers for waiting list and lottery count", Toast.LENGTH_SHORT).show();
+            Log.d("OrganizerEventCreateActivity", "Invalid number format for waiting list or lottery count");
+            return;
+        }
+
+        // 检查海报上传
+        if (posterUri != null) {
+            StorageReference posterRef = storageRef.child(System.currentTimeMillis() + ".jpg");
+            Log.d("OrganizerEventCreateActivity", "Uploading poster to Firebase Storage");
+            posterRef.putFile(posterUri).addOnSuccessListener(taskSnapshot ->
+                    posterRef.getDownloadUrl().addOnSuccessListener(uri -> {
+                        Log.d("OrganizerEventCreateActivity", "Poster uploaded, URL: " + uri.toString());
+                        saveEventData(uri.toString(), eventName, eventTime, registrationDeadline, lotteryTime, waitingListCount, lotteryCount);
+                    })
+            ).addOnFailureListener(e -> {
+                Toast.makeText(this, "Failed to upload poster", Toast.LENGTH_SHORT).show();
+                Log.d("OrganizerEventCreateActivity", "Poster upload failed: " + e.getMessage());
+            });
+        } else {
+            Log.d("OrganizerEventCreateActivity", "No poster, saving event data directly");
+            saveEventData(null, eventName, eventTime, registrationDeadline, lotteryTime, waitingListCount, lotteryCount);
+        }
+    }
+
+    private void saveEventData(String posterUrl, String eventName, String eventTime,
+                               String registrationDeadline, String lotteryTime,
+                               int waitingListCount, int lotteryCount) {
 
         Map<String, Object> event = new HashMap<>();
         event.put("name", eventName);
-        event.put("description", eventDescription);
         event.put("time", eventTime);
         event.put("registrationDeadline", registrationDeadline);
+        event.put("lotteryTime", lotteryTime);
         event.put("waitingListCount", waitingListCount);
         event.put("lotteryCount", lotteryCount);
-        event.put("lotteryTime", lotteryTime);
         event.put("posterUrl", posterUrl);
 
-        db.collection("events").add(event).addOnSuccessListener(documentReference ->
-                Toast.makeText(this, "Event created successfully", Toast.LENGTH_SHORT).show()
-        ).addOnFailureListener(e ->
-                Toast.makeText(this, "Failed to create event", Toast.LENGTH_SHORT).show()
+        Log.d("OrganizerEventCreateActivity", "Saving event data to Firebase Firestore");
+        db.collection("events").add(event).addOnSuccessListener(documentReference -> {
+                    Toast.makeText(this, "Event created successfully", Toast.LENGTH_SHORT).show();
+                    Log.d("OrganizerEventCreateActivity", "Event created successfully with ID: " + documentReference.getId());
+                }
+        ).addOnFailureListener(e -> {
+                    Toast.makeText(this, "Failed to create event", Toast.LENGTH_SHORT).show();
+                    Log.d("OrganizerEventCreateActivity", "Failed to create event: " + e.getMessage());
+                }
         );
     }
+
+
 
     private boolean validateInputs() {
         if (eventNameEditText.getText().toString().isEmpty()) {

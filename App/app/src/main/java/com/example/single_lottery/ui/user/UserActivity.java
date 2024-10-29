@@ -1,47 +1,46 @@
-package com.example.single_lottery.ui.organizer;
+package com.example.single_lottery.ui.user;
 
-import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 
-
 import com.example.single_lottery.R;
+import com.example.single_lottery.ui.events.EventsFragment;
+import com.example.single_lottery.ui.home.HomeFragment;
+import com.example.single_lottery.ui.profile.ProfileFragment;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
-public class OrganizerActivity extends AppCompatActivity {
+public class UserActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.organizer_activity);
+        setContentView(R.layout.user_homepage); // 使用新的布局文件
 
-        BottomNavigationView navView = findViewById(R.id.nav_view_organizer);
+        BottomNavigationView navView = findViewById(R.id.nav_view_user);
 
         navView.setOnItemSelectedListener(item -> {
             Fragment selectedFragment = null;
             if (item.getItemId() == R.id.navigation_home) {
-                selectedFragment = new OrganizerHomeFragment();
-            } else if (item.getItemId() == R.id.navigation_new) {
-                Intent intent = new Intent(OrganizerActivity.this, OrganizerEventCreateActivity.class);
-                startActivity(intent);
-                return true;
+                selectedFragment = new HomeFragment();
+            } else if (item.getItemId() == R.id.navigation_dashboard) {
+                selectedFragment = new EventsFragment();
             } else if (item.getItemId() == R.id.navigation_profile) {
-                selectedFragment = new OrganizerProfilePageFragment();
+                selectedFragment = new ProfileFragment();
             }
 
             if (selectedFragment != null) {
                 getSupportFragmentManager().beginTransaction()
-                        .replace(R.id.nav_host_fragment_organizer, selectedFragment)
+                        .replace(R.id.nav_host_fragment_user, selectedFragment)
                         .commit();
             }
             return true;
         });
 
-        // 默认加载 OrganizerHomepageFragment
+        // 默认加载 Home Fragment
         getSupportFragmentManager().beginTransaction()
-                .replace(R.id.nav_host_fragment_organizer, new OrganizerHomeFragment())
+                .replace(R.id.nav_host_fragment_user, new HomeFragment())
                 .commit();
     }
 }
