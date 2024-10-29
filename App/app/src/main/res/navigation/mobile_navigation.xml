@@ -16,21 +16,6 @@
         android:name="com.example.single_lottery.ui.scan.CameraFragment"
         android:label="Camera Fragment" />
 
-    <fragment
-        android:id="@+id/RoleFragment"
-        android:name="com.example.single_lottery.ui.role.RoleFragment"
-        android:label="Role Fragment" />
-
-<!--    <fragment-->
-<!--        android:id="@+id/EntrantFragment"-->
-<!--        android:name="com.example.single_lottery.ui.profile.ProfileFragment"-->
-<!--        android:label="Entrant Fragment" />-->
-
-<!--    <fragment-->
-<!--        android:id="@+id/OrganizerFragment"-->
-<!--        android:name="com.example.single_lottery.ui.events.EventsFragment"-->
-<!--        android:label="Organizer Fragment" />-->
-
 
     <fragment
         android:id="@+id/navigation_dashboard"

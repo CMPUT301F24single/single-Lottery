@@ -24,4 +24,9 @@
         android:layout_height="wrap_content"
         android:hint="Phone" />
 
+    <EditText
+        android:id="@+id/infoInput"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Info" />
 </LinearLayout>
