@@ -1,3 +1,4 @@
+
 package com.example.single_lottery.ui.organizer;
 
 import android.content.Intent;
@@ -39,7 +40,7 @@ public class OrganizerActivity extends AppCompatActivity {
             return true;
         });
 
-        // 默认加载 OrganizerHomepageFragment
+
         getSupportFragmentManager().beginTransaction()
                 .replace(R.id.nav_host_fragment_organizer, new OrganizerHomeFragment())
                 .commit();

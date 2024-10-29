@@ -1,3 +1,4 @@
+
 package com.example.single_lottery;
 
 import android.content.Intent;
@@ -5,21 +6,16 @@ import android.os.Bundle;
 import android.widget.Button;
 
 import com.example.single_lottery.ui.organizer.OrganizerActivity;
-import com.example.single_lottery.ui.role.RoleFragment;
+
 import com.example.single_lottery.ui.user.UserActivity;
-import com.google.android.material.bottomnavigation.BottomNavigationView;
+
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.navigation.NavController;
-import androidx.navigation.Navigation;
-import androidx.navigation.ui.AppBarConfiguration;
-import androidx.navigation.ui.NavigationUI;
-
-import com.example.single_lottery.databinding.ActivityMainBinding;
 
 public class MainActivity extends AppCompatActivity {
 
     private boolean showLandingScreen;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,6 +53,11 @@ public class MainActivity extends AppCompatActivity {
             buttonAdmin.setOnClickListener(v -> {
                 // Handle Admin logic here
             });
+
+
+
+
         }
     }
 }
+

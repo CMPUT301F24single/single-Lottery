@@ -1,46 +1,47 @@
 package com.example.single_lottery.ui.user;
 
 import android.os.Bundle;
-import android.content.Intent;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.fragment.app.Fragment;
 
-import com.example.single_lottery.R;
-import com.example.single_lottery.ui.events.EventsFragment;
-import com.example.single_lottery.ui.home.HomeFragment;
-import com.example.single_lottery.ui.profile.ProfileFragment;
+
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.navigation.NavController;
+import androidx.navigation.Navigation;
+import androidx.navigation.ui.AppBarConfiguration;
+import androidx.navigation.ui.NavigationUI;
+import com.example.single_lottery.R;
+
+import com.example.single_lottery.databinding.ActivityMainBinding;
+
 public class UserActivity extends AppCompatActivity {
+
+    private ActivityMainBinding binding;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.user_homepage); // 使用新的布局文件
 
-        BottomNavigationView navView = findViewById(R.id.nav_view_user);
+        binding = ActivityMainBinding.inflate(getLayoutInflater());
+        setContentView(binding.getRoot());
 
-        navView.setOnItemSelectedListener(item -> {
-            Fragment selectedFragment = null;
-            if (item.getItemId() == R.id.navigation_home) {
-                selectedFragment = new HomeFragment();
-            } else if (item.getItemId() == R.id.navigation_dashboard) {
-                selectedFragment = new EventsFragment();
-            } else if (item.getItemId() == R.id.navigation_profile) {
-                selectedFragment = new ProfileFragment();
-            }
+        BottomNavigationView navView = findViewById(R.id.nav_view);
+        // Passing each menu ID as a set of Ids because each
+        // menu should be considered as top level destinations.
+        AppBarConfiguration appBarConfiguration = new AppBarConfiguration.Builder(
+                R.id.navigation_home, R.id.navigation_dashboard, R.id.navigation_notifications)
+                .build();
+        NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_activity_main);
+        NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
+        NavigationUI.setupWithNavController(binding.navView, navController);
 
-            if (selectedFragment != null) {
-                getSupportFragmentManager().beginTransaction()
-                        .replace(R.id.nav_host_fragment_user, selectedFragment)
-                        .commit();
-            }
-            return true;
-        });
+        navController.navigate(R.id.navigation_home);
+    }
 
-        // 默认加载 Home Fragment
-        getSupportFragmentManager().beginTransaction()
-                .replace(R.id.nav_host_fragment_user, new HomeFragment())
-                .commit();
+    @Override
+    public boolean onSupportNavigateUp() {
+        NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_activity_main);
+        return navController.navigateUp() || super.onSupportNavigateUp();
     }
 }
+
