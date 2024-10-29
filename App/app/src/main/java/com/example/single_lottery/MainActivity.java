@@ -1,8 +1,7 @@
+
 package com.example.single_lottery;
 
-import android.content.Intent;
 import android.os.Bundle;
-import android.widget.Button;
 
 import com.example.single_lottery.ui.organizer.OrganizerActivity;
 import com.example.single_lottery.ui.role.RoleFragment;
@@ -20,6 +19,7 @@ import com.example.single_lottery.databinding.ActivityMainBinding;
 public class MainActivity extends AppCompatActivity {
 
     private boolean showLandingScreen;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
