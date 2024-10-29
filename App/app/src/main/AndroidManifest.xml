@@ -29,6 +29,9 @@
         <activity
             android:name="com.example.single_lottery.ui.organizer.OrganizerActivity"
             android:exported="true" />
+        <activity
+            android:name="com.example.single_lottery.ui.user.UserActivity"
+            android:exported="true" />
 
         <activity
             android:name=".ui.organizer.OrganizerEventCreateActivity"

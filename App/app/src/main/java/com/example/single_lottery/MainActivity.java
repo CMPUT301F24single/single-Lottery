@@ -38,7 +38,7 @@ public class MainActivity extends AppCompatActivity {
 
             buttonUser.setOnClickListener(v -> {
                 // Start RoleFragment for User
-                Intent intent = new Intent(MainActivity.this, MainActivity.class);
+                Intent intent = new Intent(MainActivity.this, UserActivity.class);
                 intent.putExtra("showLandingScreen", false);
                 intent.putExtra("role", "user");
                 startActivity(intent);
@@ -57,15 +57,6 @@ public class MainActivity extends AppCompatActivity {
             buttonAdmin.setOnClickListener(v -> {
                 // Handle Admin logic here
             });
-        } else {
-            // Load RoleFragment for User role
-            setContentView(R.layout.activity_main); // Ensure you have an empty container for fragments
-            String role = getIntent().getStringExtra("role");
-            if ("user".equals(role)) {
-                getSupportFragmentManager().beginTransaction()
-                        .replace(R.id.nav_host_fragment_activity_main, new RoleFragment())
-                        .commit();
-            }
         }
     }
 }

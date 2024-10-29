@@ -1,7 +1,7 @@
 package com.example.single_lottery.ui.user;
 
 import android.os.Bundle;
-
+import android.content.Intent;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 
