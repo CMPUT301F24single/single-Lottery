@@ -183,14 +183,8 @@ public class OrganizerProfilePageFragment extends Fragment {
     }
 
     private void uploadProfileImage() {
-        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-        if (user == null) {
-            Log.e("OrganizerProfilePageFragment", "user is null.");
-            return;
-        }
-
         if (profileImageUri != null) {
-            final StorageReference profileImageRef = storageReference.child("profileImages/" + UUID.randomUUID().toString() + ".jpg");
+            final StorageReference profileImageRef = storageReference.child("organizer_profileImages/" + UUID.randomUUID().toString() + ".jpg");
 
             profileImageRef.putFile(profileImageUri)
                     .addOnSuccessListener(taskSnapshot -> {
