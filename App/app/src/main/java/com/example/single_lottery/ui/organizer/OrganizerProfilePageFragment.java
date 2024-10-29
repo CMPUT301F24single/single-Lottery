@@ -184,21 +184,43 @@ public class OrganizerProfilePageFragment extends Fragment {
 
     private void uploadProfileImage() {
         if (profileImageUri != null) {
-            final StorageReference profileImageRef = storageReference.child("organizer_profileImages/" + UUID.randomUUID().toString() + ".jpg");
-
-            profileImageRef.putFile(profileImageUri)
-                    .addOnSuccessListener(taskSnapshot -> {
-                        profileImageRef.getDownloadUrl().addOnSuccessListener(uri -> {
-                            String profileImageUrl = uri.toString();
-                            saveOrganizerDataToFirestore(installationId, profileImageUrl);
+            DocumentReference docRef = firestore.collection("organizers").document(installationId);
+            docRef.get().addOnCompleteListener(task -> {
+                if (task.isSuccessful() && task.getResult() != null && task.getResult().exists()) {
+                    String oldImageUri = task.getResult().getString("profileImageUrl");
+                    if (oldImageUri != null) {
+                        StorageReference oldImageRef = FirebaseStorage.getInstance().getReferenceFromUrl(oldImageUri);
+                        oldImageRef.delete().addOnSuccessListener(aVoid -> {
+                            Log.d("ProfileFragment", "Old image deleted successfully.");
+                            uploadNewImage();
+                        }).addOnFailureListener(e -> {
+                            Log.e("ProfileFragment", "Failed to delete old image: " + e.getMessage());
+                            uploadNewImage();
                         });
-                    })
-                    .addOnFailureListener(e -> {
-                        Log.e("OrganizerProfilePageFragment", "failed to upload image: " + e.getMessage());
-                    });
+                    } else {
+                        uploadNewImage();
+                    }
+                }
+            }).addOnFailureListener(e -> {
+                Log.e("ProfileFragment", "Failed to get organizer profile: " + e.getMessage());
+            });
         } else {
-            Log.e("OrganizerProfilePageFragment", "profileImageUri is null");
+            Log.e("ProfileFragment", "profileImageUri is null");
         }
+    }
+
+    private void uploadNewImage() {
+        final StorageReference profileImageRef = storageReference.child("organizer_profileImages/" + UUID.randomUUID().toString() + ".jpg");
+        profileImageRef.putFile(profileImageUri)
+                .addOnSuccessListener(taskSnapshot -> {
+                    profileImageRef.getDownloadUrl().addOnSuccessListener(uri -> {
+                        String profileImageUrl = uri.toString();
+                        saveOrganizerDataToFirestore(installationId, profileImageUrl);
+                    });
+                })
+                .addOnFailureListener(e -> {
+                    Log.e("ProfileFragment", "Failed to upload new image: " + e.getMessage());
+                });
     }
 
     private void saveOrganizerDataToFirestore(String installationId, String profileImageUri) {
