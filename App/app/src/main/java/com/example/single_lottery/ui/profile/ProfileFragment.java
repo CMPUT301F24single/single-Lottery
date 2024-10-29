@@ -1,5 +1,7 @@
 package com.example.single_lottery.ui.profile;
 
+import static android.app.Activity.RESULT_OK;
+
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -151,14 +153,14 @@ public class ProfileFragment extends Fragment {
     }
 
     @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == 1 && resultCode == getActivity().RESULT_OK && data != null && data.getData() != null) {
+        if (requestCode == 1 && resultCode == RESULT_OK && data != null && data.getData() != null) {
             profileImageUri = data.getData();
             try {
                 Bitmap bitmap = MediaStore.Images.Media.getBitmap(getActivity().getContentResolver(), profileImageUri);
                 profileImageView.setImageBitmap(bitmap);
-                uploadProfileImage(); 
+                uploadProfileImage();
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -174,15 +176,9 @@ public class ProfileFragment extends Fragment {
     }
 
     private void uploadProfileImage() {
-        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-        if (user == null) {
-            Log.e("ProfileFragment", "user is null.");
-            return;
-        }
-
         if (profileImageUri != null) {
             final StorageReference profileImageRef = storageReference.child("profileImages/" + UUID.randomUUID().toString() + ".jpg");
-
+            Log.d("OrganizerEventCreateActivity", "Uploading poster to Firebase Storage");
             profileImageRef.putFile(profileImageUri)
                     .addOnSuccessListener(taskSnapshot -> {
                         profileImageRef.getDownloadUrl().addOnSuccessListener(uri -> {
