@@ -2,12 +2,12 @@ package com.example.single_lottery.ui.organizer;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.Fragment;
+
+
 import com.example.single_lottery.R;
-import com.example.single_lottery.ui.home.HomeFragment;
-import com.example.single_lottery.ui.profile.ProfileFragment;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 public class OrganizerActivity extends AppCompatActivity {
@@ -15,23 +15,38 @@ public class OrganizerActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Log.d("OrganizerEventCreateActivity", "onCreate called");
-        setContentView(R.layout.organizer_homepage);
+
+        setContentView(R.layout.organizer_activity);
+
 
         BottomNavigationView navView = findViewById(R.id.nav_view_organizer);
 
         navView.setOnItemSelectedListener(item -> {
-            if (item.getItemId() == R.id.navigation_new) {
+
+            Fragment selectedFragment = null;
+            if (item.getItemId() == R.id.navigation_home) {
+                selectedFragment = new OrganizerHomeFragment();
+            } else if (item.getItemId() == R.id.navigation_new) {
+
+
                 Intent intent = new Intent(OrganizerActivity.this, OrganizerEventCreateActivity.class);
                 startActivity(intent);
                 return true;
-            } else if (item.getItemId() == R.id.navigation_home) {
-                loadHomeFragment();
-                return true;
             } else if (item.getItemId() == R.id.navigation_profile) {
-                loadProfileFragment();
-                return true;
+                selectedFragment = new OrganizerProfilePageFragment();
             }
+
+
+            if (selectedFragment != null) {
+                getSupportFragmentManager().beginTransaction()
+                        .replace(R.id.nav_host_fragment_organizer, selectedFragment)
+                        .commit();
+            }
+            return true;
+        });
+
+        // 默认加载 OrganizerHomepageFragment
+
             return false;
         });
 
@@ -43,7 +58,7 @@ public class OrganizerActivity extends AppCompatActivity {
     }
     private void loadProfileFragment() {
         getSupportFragmentManager().beginTransaction()
-                .replace(R.id.nav_host_fragment_organizer, new ProfileFragment())
+                .replace(R.id.nav_host_fragment_organizer, new OrganizerHomeFragment())
                 .commit();
     }
 }

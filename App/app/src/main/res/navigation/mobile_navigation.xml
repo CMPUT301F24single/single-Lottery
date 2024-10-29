@@ -21,26 +21,26 @@
         android:name="com.example.single_lottery.ui.role.RoleFragment"
         android:label="Role Fragment" />
 
-    <fragment
-        android:id="@+id/EntrantFragment"
-        android:name="com.example.single_lottery.ui.profile.ProfileFragment"
-        android:label="Entrant Fragment" />
+<!--    <fragment-->
+<!--        android:id="@+id/EntrantFragment"-->
+<!--        android:name="com.example.single_lottery.ui.profile.ProfileFragment"-->
+<!--        android:label="Entrant Fragment" />-->
 
-    <fragment
-        android:id="@+id/OrganizerFragment"
-        android:name="com.example.single_lottery.ui.events.EventsFragment"
-        android:label="Organizer Fragment" />
+<!--    <fragment-->
+<!--        android:id="@+id/OrganizerFragment"-->
+<!--        android:name="com.example.single_lottery.ui.events.EventsFragment"-->
+<!--        android:label="Organizer Fragment" />-->
 
 
     <fragment
         android:id="@+id/navigation_dashboard"
         android:name="com.example.single_lottery.ui.events.EventsFragment"
         android:label="@string/title_dashboard"
-        tools:layout="@layout/fragment_dashboard" />
+        tools:layout="@layout/fragment_events" />
 
     <fragment
         android:id="@+id/navigation_notifications"
         android:name="com.example.single_lottery.ui.profile.ProfileFragment"
         android:label="@string/title_notifications"
-        tools:layout="@layout/fragment_notifications" />
+        tools:layout="@layout/fragment_profile" />
 </navigation>

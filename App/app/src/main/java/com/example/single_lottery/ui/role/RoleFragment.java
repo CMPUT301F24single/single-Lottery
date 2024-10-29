@@ -20,18 +20,18 @@ public class RoleFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_role, container, false);
 
-        Button entrantButton = view.findViewById(R.id.button_entrant);
-        Button organizerButton = view.findViewById(R.id.button_organizer);
+//        Button entrantButton = view.findViewById(R.id.button_entrant);
+//        Button organizerButton = view.findViewById(R.id.button_organizer);
 
-        entrantButton.setOnClickListener(v -> {
-            NavController navController = Navigation.findNavController(requireActivity(), R.id.nav_host_fragment_activity_main);
-            navController.navigate(R.id.EntrantFragment);
-        });
-
-        organizerButton.setOnClickListener(v -> {
-            NavController navController = Navigation.findNavController(requireActivity(), R.id.nav_host_fragment_activity_main);
-            navController.navigate(R.id.OrganizerFragment);
-        });
+//        entrantButton.setOnClickListener(v -> {
+//            NavController navController = Navigation.findNavController(requireActivity(), R.id.nav_host_fragment_activity_main);
+//            navController.navigate(R.id.EntrantFragment);
+//        });
+//
+//        organizerButton.setOnClickListener(v -> {
+//            NavController navController = Navigation.findNavController(requireActivity(), R.id.nav_host_fragment_activity_main);
+//            navController.navigate(R.id.OrganizerFragment);
+//        });
 
         return view;
     }
