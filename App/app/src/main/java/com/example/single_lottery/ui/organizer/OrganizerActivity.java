@@ -1,3 +1,4 @@
+
 package com.example.single_lottery.ui.organizer;
 
 import android.content.Intent;
@@ -15,27 +16,21 @@ public class OrganizerActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         setContentView(R.layout.organizer_activity);
-
 
         BottomNavigationView navView = findViewById(R.id.nav_view_organizer);
 
         navView.setOnItemSelectedListener(item -> {
-
             Fragment selectedFragment = null;
             if (item.getItemId() == R.id.navigation_home) {
                 selectedFragment = new OrganizerHomeFragment();
             } else if (item.getItemId() == R.id.navigation_new) {
-
-
                 Intent intent = new Intent(OrganizerActivity.this, OrganizerEventCreateActivity.class);
                 startActivity(intent);
                 return true;
             } else if (item.getItemId() == R.id.navigation_profile) {
                 selectedFragment = new OrganizerProfilePageFragment();
             }
-
 
             if (selectedFragment != null) {
                 getSupportFragmentManager().beginTransaction()
@@ -45,18 +40,6 @@ public class OrganizerActivity extends AppCompatActivity {
             return true;
         });
 
-        // 默认加载 OrganizerHomepageFragment
-
-            return false;
-        });
-
-    }
-    private void loadHomeFragment() {
-        getSupportFragmentManager().beginTransaction()
-                .replace(R.id.nav_host_fragment_organizer, new HomeFragment())
-                .commit();
-    }
-    private void loadProfileFragment() {
         getSupportFragmentManager().beginTransaction()
                 .replace(R.id.nav_host_fragment_organizer, new OrganizerHomeFragment())
                 .commit();
