@@ -6,7 +6,9 @@ import android.os.Bundle;
 import android.widget.Button;
 
 import com.example.single_lottery.ui.organizer.OrganizerActivity;
+
 import com.example.single_lottery.ui.user.UserActivity;
+
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -53,6 +55,9 @@ public class MainActivity extends AppCompatActivity {
             });
 
 
+
+
         }
     }
 }
+

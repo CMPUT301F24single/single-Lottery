@@ -2,6 +2,7 @@ package com.example.single_lottery.ui.user;
 
 import android.os.Bundle;
 
+
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -43,3 +44,4 @@ public class UserActivity extends AppCompatActivity {
         return navController.navigateUp() || super.onSupportNavigateUp();
     }
 }
+

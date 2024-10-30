@@ -52,9 +52,11 @@ public class OrganizerProfilePageFragment extends Fragment {
     private FirebaseStorage storage;
     private StorageReference storageReference;
 
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+
         View view = inflater.inflate(R.layout.fragment_organizer_profile, container, false);
 
         nameTextView = view.findViewById(R.id.nameTextView);
@@ -237,5 +239,6 @@ public class OrganizerProfilePageFragment extends Fragment {
                         Log.d("OrganizerProfilePageFragment", "profile updated successfully"))
                 .addOnFailureListener(e ->
                         Log.e("OrganizerProfilePageFragment", "profile update failed: " + e.getMessage()));
+
     }
 }

@@ -40,6 +40,7 @@ public class OrganizerActivity extends AppCompatActivity {
             return true;
         });
 
+
         getSupportFragmentManager().beginTransaction()
                 .replace(R.id.nav_host_fragment_organizer, new OrganizerHomeFragment())
                 .commit();

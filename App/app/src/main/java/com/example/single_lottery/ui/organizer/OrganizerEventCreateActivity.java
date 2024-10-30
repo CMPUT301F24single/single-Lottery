@@ -1,8 +1,10 @@
 package com.example.single_lottery.ui.organizer;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.util.Log;
 import android.widget.Button;
 import android.widget.EditText;
@@ -96,6 +98,12 @@ public class OrganizerEventCreateActivity extends AppCompatActivity {
         String registrationDeadline = registrationDeadlineEditText.getText().toString().trim();
         String lotteryTime = lotteryTimeEditText.getText().toString().trim();
 
+
+        // 获取设备码
+        SharedPreferences prefs = getSharedPreferences("MyPrefs", MODE_PRIVATE);
+        String organizerDeviceID = Settings.Secure.getString(getContentResolver(), Settings.Secure.ANDROID_ID);
+
+
         // 检查必填字段
         if (eventName.isEmpty() || eventTime.isEmpty() || registrationDeadline.isEmpty() || lotteryTime.isEmpty()) {
             Toast.makeText(this, "Please fill in all required fields", Toast.LENGTH_SHORT).show();
@@ -132,7 +140,7 @@ public class OrganizerEventCreateActivity extends AppCompatActivity {
             posterRef.putFile(posterUri).addOnSuccessListener(taskSnapshot ->
                     posterRef.getDownloadUrl().addOnSuccessListener(uri -> {
                         Log.d("OrganizerEventCreateActivity", "Poster uploaded, URL: " + uri.toString());
-                        saveEventData(uri.toString(), eventName, eventTime, registrationDeadline, lotteryTime, waitingListCount, lotteryCount);
+                        saveEventData(uri.toString(), eventName, eventTime, registrationDeadline, lotteryTime, waitingListCount, lotteryCount, organizerDeviceID);
                     })
             ).addOnFailureListener(e -> {
                 Toast.makeText(this, "Failed to upload poster", Toast.LENGTH_SHORT).show();
@@ -140,13 +148,14 @@ public class OrganizerEventCreateActivity extends AppCompatActivity {
             });
         } else {
             Log.d("OrganizerEventCreateActivity", "No poster, saving event data directly");
-            saveEventData(null, eventName, eventTime, registrationDeadline, lotteryTime, waitingListCount, lotteryCount);
+            saveEventData(null, eventName, eventTime, registrationDeadline, lotteryTime, waitingListCount, lotteryCount,organizerDeviceID);
         }
     }
 
     private void saveEventData(String posterUrl, String eventName, String eventTime,
                                String registrationDeadline, String lotteryTime,
-                               int waitingListCount, int lotteryCount) {
+                               int waitingListCount, int lotteryCount,String organizerDeviceID) {
+
 
         Map<String, Object> event = new HashMap<>();
         event.put("name", eventName);
@@ -156,15 +165,13 @@ public class OrganizerEventCreateActivity extends AppCompatActivity {
         event.put("waitingListCount", waitingListCount);
         event.put("lotteryCount", lotteryCount);
         event.put("posterUrl", posterUrl);
+        event.put("organizerDeviceID", organizerDeviceID); // 添加 organizerDeviceID 字段
 
-        Log.d("OrganizerEventCreateActivity", "Saving event data to Firebase Firestore");
         db.collection("events").add(event).addOnSuccessListener(documentReference -> {
                     Toast.makeText(this, "Event created successfully", Toast.LENGTH_SHORT).show();
-                    Log.d("OrganizerEventCreateActivity", "Event created successfully with ID: " + documentReference.getId());
                 }
         ).addOnFailureListener(e -> {
                     Toast.makeText(this, "Failed to create event", Toast.LENGTH_SHORT).show();
-                    Log.d("OrganizerEventCreateActivity", "Failed to create event: " + e.getMessage());
                 }
         );
     }

@@ -17,6 +17,7 @@
         android:label="Camera Fragment" />
 
 
+
     <fragment
         android:id="@+id/navigation_dashboard"
         android:name="com.example.single_lottery.ui.events.EventsFragment"
