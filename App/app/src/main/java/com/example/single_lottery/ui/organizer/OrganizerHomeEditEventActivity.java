@@ -91,13 +91,14 @@ public class OrganizerHomeEditEventActivity extends AppCompatActivity {
     private void updateEventData(String eventId) {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         db.collection("events").document(eventId).update(
-                "eventName", editTextEventName.getText().toString(),
-                "eventTime", editTextEventTime.getText().toString(),
+                "name", editTextEventName.getText().toString(),
+                "time", editTextEventTime.getText().toString(),
                 "registrationDeadline", editTextRegistrationDeadline.getText().toString(),
                 "lotteryTime", editTextLotteryTime.getText().toString(),
                 "waitingListCount", Integer.parseInt(editTextWaitingListCount.getText().toString()),
                 "lotteryCount", Integer.parseInt(editTextLotteryCount.getText().toString()),
                 "description", editTextEventDescription.getText().toString()
+
         ).addOnSuccessListener(aVoid -> {
             // 更新成功提示
         }).addOnFailureListener(e -> {
