@@ -63,10 +63,10 @@ public class OrganizerHomeFragment extends Fragment {
                     eventList.clear();
                     for (DocumentSnapshot document : queryDocumentSnapshots) {
                         OrganizerHomeEventModel event = document.toObject(OrganizerHomeEventModel.class);
-                        Log.d("OrganizerHomeFragment", "Event loaded: " + event.getEventName());
+                        Log.d("OrganizerHomeFragment", "Event loaded: " + event.getName());
 
                         if (event != null) {
-                            Log.d("OrganizerHomeFragment", "Event loaded: " + event.getEventName());
+                            Log.d("OrganizerHomeFragment", "Event loaded: " + event.getName());
                             event.setEventId(document.getId());
                             eventList.add(event);
                         }

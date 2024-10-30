@@ -1,6 +1,7 @@
 package com.example.single_lottery.ui.organizer;
 
 import android.os.Bundle;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -20,6 +21,10 @@ public class OrganizerHomeViewEventActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home_view_event);
+
+        ImageButton backButton = findViewById(R.id.backButton);
+        backButton.setOnClickListener(v -> finish()); // 结束当前 Activity，返回上一个页面
+
 
         // 初始化视图
         textViewEventName = findViewById(R.id.textViewEventName);
@@ -53,7 +58,7 @@ public class OrganizerHomeViewEventActivity extends AppCompatActivity {
                     if (documentSnapshot.exists()) {
                         OrganizerHomeEventModel event = documentSnapshot.toObject(OrganizerHomeEventModel.class);
                         if (event != null) {
-                            textViewEventName.setText(event.getEventName());
+                            textViewEventName.setText(event.getName());
                             textViewEventDescription.setText(event.getDescription());
                             textViewEventTime.setText(event.getEventTime());
                             textViewRegistrationDeadline.setText(event.getRegistrationDeadline());

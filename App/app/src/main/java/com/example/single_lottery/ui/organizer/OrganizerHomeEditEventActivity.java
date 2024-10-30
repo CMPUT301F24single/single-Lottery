@@ -1,21 +1,16 @@
 package com.example.single_lottery.ui.organizer;
 
-import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.Toast;
 
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.bumptech.glide.Glide;
 import com.example.single_lottery.R;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.storage.FirebaseStorage;
-import com.google.firebase.storage.StorageReference;
 
 public class OrganizerHomeEditEventActivity extends AppCompatActivity {
 
@@ -28,6 +23,9 @@ public class OrganizerHomeEditEventActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home_edit_event);
+
+        ImageButton backButton = findViewById(R.id.backButton);
+        backButton.setOnClickListener(v -> finish());
 
         // 初始化视图
         editTextEventName = findViewById(R.id.editTextEventName);
@@ -67,7 +65,7 @@ public class OrganizerHomeEditEventActivity extends AppCompatActivity {
                     if (documentSnapshot.exists()) {
                         OrganizerHomeEventModel event = documentSnapshot.toObject(OrganizerHomeEventModel.class);
                         if (event != null) {
-                            editTextEventName.setText(event.getEventName());
+                            editTextEventName.setText(event.getName());
                             editTextEventDescription.setText(event.getDescription());
                             editTextEventTime.setText(event.getEventTime());
                             editTextRegistrationDeadline.setText(event.getRegistrationDeadline());
