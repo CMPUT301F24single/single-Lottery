@@ -38,7 +38,7 @@ import java.util.UUID;
 
 public class OrganizerProfilePageFragment extends Fragment {
     private TextView nameTextView, emailTextView, phoneTextView, infoTextView;
-    private Button editButton, uploadButton;
+    private Button editButton, uploadButton, removeImageButton;
     private ImageView profileImageView;
 
     private String organizerName;
@@ -65,6 +65,7 @@ public class OrganizerProfilePageFragment extends Fragment {
         infoTextView = view.findViewById(R.id.infoTextView);
         editButton = view.findViewById(R.id.editButton);
         uploadButton = view.findViewById(R.id.uploadButton);
+        removeImageButton = view.findViewById(R.id.removeImageButton);
         profileImageView = view.findViewById(R.id.profileImageView);
 
         firestore = FirebaseFirestore.getInstance();
@@ -83,6 +84,7 @@ public class OrganizerProfilePageFragment extends Fragment {
 
         editButton.setOnClickListener(v -> showEditDialog());
         uploadButton.setOnClickListener(v -> selectImage());
+        removeImageButton.setOnClickListener(v -> removeProfileImage());
 
         return view;
     }
@@ -193,10 +195,10 @@ public class OrganizerProfilePageFragment extends Fragment {
                     if (oldImageUri != null) {
                         StorageReference oldImageRef = FirebaseStorage.getInstance().getReferenceFromUrl(oldImageUri);
                         oldImageRef.delete().addOnSuccessListener(aVoid -> {
-                            Log.d("ProfileFragment", "Old image deleted successfully.");
+                            Log.d("OrgProfileFragment", "Old image deleted successfully.");
                             uploadNewImage();
                         }).addOnFailureListener(e -> {
-                            Log.e("ProfileFragment", "Failed to delete old image: " + e.getMessage());
+                            Log.e("OrgProfileFragment", "Failed to delete old image: " + e.getMessage());
                             uploadNewImage();
                         });
                     } else {
@@ -204,10 +206,10 @@ public class OrganizerProfilePageFragment extends Fragment {
                     }
                 }
             }).addOnFailureListener(e -> {
-                Log.e("ProfileFragment", "Failed to get organizer profile: " + e.getMessage());
+                Log.e("OrgProfileFragment", "Failed to get organizer profile: " + e.getMessage());
             });
         } else {
-            Log.e("ProfileFragment", "profileImageUri is null");
+            Log.e("OrgProfileFragment", "profileImageUri is null");
         }
     }
 
@@ -223,6 +225,32 @@ public class OrganizerProfilePageFragment extends Fragment {
                 .addOnFailureListener(e -> {
                     Log.e("ProfileFragment", "Failed to upload new image: " + e.getMessage());
                 });
+    }
+
+    private void removeProfileImage() {
+        DocumentReference docRef = firestore.collection("organizers").document(installationId);
+        docRef.get().addOnCompleteListener(task -> {
+            if (task.isSuccessful() && task.getResult() != null && task.getResult().exists()) {
+                String oldImageUri = task.getResult().getString("profileImageUrl");
+                if (oldImageUri != null) {
+                    StorageReference oldImageRef = FirebaseStorage.getInstance().getReferenceFromUrl(oldImageUri);
+                    oldImageRef.delete().addOnSuccessListener(aVoid -> {
+                        Log.d("OrgProfileFragment", "Old image deleted successfully.");
+                        saveOrganizerDataToFirestore(installationId, null);
+                        loadOrganizerProfile(installationId);
+                    }).addOnFailureListener(e -> {
+                        Log.e("OrgProfileFragment", "Failed to delete old image: " + e.getMessage());
+                    });
+                } else {
+                    saveOrganizerDataToFirestore(installationId, null);
+                    loadOrganizerProfile(installationId);
+                }
+            } else {
+                Log.e("OrgProfileFragment", "No existing user document found.");
+            }
+        }).addOnFailureListener(e -> {
+            Log.e("OrgProfileFragment", "Failed to get user profile: " + e.getMessage());
+        });
     }
 
     private void saveOrganizerDataToFirestore(String installationId, String profileImageUri) {
