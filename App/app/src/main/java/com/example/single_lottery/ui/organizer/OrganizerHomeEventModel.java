@@ -1,13 +1,13 @@
 package com.example.single_lottery.ui.organizer;
 
 public class OrganizerHomeEventModel {
-    private String name;
+    private String eventname;
     private String organizerDeviceID;
     private int waitingListCount;
     private int lotteryCount;
     private String lotteryTime;
     private String registrationDeadline;
-    private String time;
+    private String eventtime;
     private String posterUrl;
     private String eventId;
     private String description;
@@ -17,12 +17,12 @@ public class OrganizerHomeEventModel {
     }
 
     // 所有字段的 getter 和 setter
-    public String getName() {
-        return name;
+    public String getEventName() {
+        return eventname;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setEventName(String name) {
+        this.eventname = name;
     }
 
     public String getOrganizerDeviceID() {
@@ -33,12 +33,12 @@ public class OrganizerHomeEventModel {
         this.organizerDeviceID = organizerDeviceID;
     }
 
-    public String getTime() {
-        return time;
+    public String getEventTime() {
+        return eventtime;
     }
 
-    public void setTime(String time) {
-        this.time = time;
+    public void setEventTime(String time) {
+        this.eventtime = time;
     }
 
     public String getRegistrationDeadline() {

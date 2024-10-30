@@ -67,9 +67,9 @@ public class OrganizerHomeEditEventActivity extends AppCompatActivity {
                     if (documentSnapshot.exists()) {
                         OrganizerHomeEventModel event = documentSnapshot.toObject(OrganizerHomeEventModel.class);
                         if (event != null) {
-                            editTextEventName.setText(event.getName());
+                            editTextEventName.setText(event.getEventName());
                             editTextEventDescription.setText(event.getDescription());
-                            editTextEventTime.setText(event.getTime());
+                            editTextEventTime.setText(event.getEventTime());
                             editTextRegistrationDeadline.setText(event.getRegistrationDeadline());
                             editTextLotteryTime.setText(event.getLotteryTime());
                             editTextWaitingListCount.setText(String.valueOf(event.getWaitingListCount()));
