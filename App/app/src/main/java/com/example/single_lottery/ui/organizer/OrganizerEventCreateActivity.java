@@ -39,16 +39,7 @@ public class OrganizerEventCreateActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.organizer_event_create_fragment);
 
-//        Toolbar toolbar = findViewById(R.id.toolbar);
-//
-//        if (toolbar != null) {
-//            // 设置返回图标
-//            toolbar.setNavigationIcon(R.drawable.ic_back); // 替换为你的返回图标资源ID
-//            // 为 Toolbar 添加返回点击事件
-//            toolbar.setNavigationOnClickListener(v -> {
-//                finish(); // 返回上一个 Activity
-//            });
-//        }
+
 
         ImageButton backButton = findViewById(R.id.backButton);
         backButton.setOnClickListener(v -> finish());
@@ -97,6 +88,7 @@ public class OrganizerEventCreateActivity extends AppCompatActivity {
         String eventTime = eventTimeEditText.getText().toString().trim();
         String registrationDeadline = registrationDeadlineEditText.getText().toString().trim();
         String lotteryTime = lotteryTimeEditText.getText().toString().trim();
+        String eventDescription = eventDescriptionEditText.getText().toString().trim(); // 获取活动描述
 
 
         // 获取设备码
@@ -140,7 +132,7 @@ public class OrganizerEventCreateActivity extends AppCompatActivity {
             posterRef.putFile(posterUri).addOnSuccessListener(taskSnapshot ->
                     posterRef.getDownloadUrl().addOnSuccessListener(uri -> {
                         Log.d("OrganizerEventCreateActivity", "Poster uploaded, URL: " + uri.toString());
-                        saveEventData(uri.toString(), eventName, eventTime, registrationDeadline, lotteryTime, waitingListCount, lotteryCount, organizerDeviceID);
+                        saveEventData(uri.toString(), eventName, eventTime, registrationDeadline, lotteryTime, waitingListCount, lotteryCount, organizerDeviceID,eventDescription);
                     })
             ).addOnFailureListener(e -> {
                 Toast.makeText(this, "Failed to upload poster", Toast.LENGTH_SHORT).show();
@@ -148,13 +140,13 @@ public class OrganizerEventCreateActivity extends AppCompatActivity {
             });
         } else {
             Log.d("OrganizerEventCreateActivity", "No poster, saving event data directly");
-            saveEventData(null, eventName, eventTime, registrationDeadline, lotteryTime, waitingListCount, lotteryCount,organizerDeviceID);
+            saveEventData(null, eventName, eventTime, registrationDeadline, lotteryTime, waitingListCount, lotteryCount,organizerDeviceID,eventDescription);
         }
     }
 
     private void saveEventData(String posterUrl, String eventName, String eventTime,
                                String registrationDeadline, String lotteryTime,
-                               int waitingListCount, int lotteryCount,String organizerDeviceID) {
+                               int waitingListCount, int lotteryCount,String organizerDeviceID,String eventDescription) {
 
 
         Map<String, Object> event = new HashMap<>();
@@ -166,6 +158,8 @@ public class OrganizerEventCreateActivity extends AppCompatActivity {
         event.put("lotteryCount", lotteryCount);
         event.put("posterUrl", posterUrl);
         event.put("organizerDeviceID", organizerDeviceID); // 添加 organizerDeviceID 字段
+        event.put("description", eventDescription);
+
 
         db.collection("events").add(event).addOnSuccessListener(documentReference -> {
                     Toast.makeText(this, "Event created successfully", Toast.LENGTH_SHORT).show();

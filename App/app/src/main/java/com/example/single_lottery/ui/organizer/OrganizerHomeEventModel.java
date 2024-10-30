@@ -8,6 +8,9 @@ public class OrganizerHomeEventModel {
     private String lotteryTime;
     private String registrationDeadline;
     private String time;
+    private String posterUrl;
+    private String eventId;
+    private String description;
 
     public OrganizerHomeEventModel() {
         // 无参数构造函数，Firestore 数据绑定需要
@@ -70,7 +73,27 @@ public class OrganizerHomeEventModel {
         this.lotteryCount = lotteryCount;
     }
 
+    public String getPosterUrl() {
+        return posterUrl;
+    }
 
+    public void setPosterUrl(String posterUrl) {
+        this.posterUrl = posterUrl;
+    }
 
+    public String getEventId() {
+        return eventId;
+    }
 
+    public void setEventId(String eventId) {
+        this.eventId = eventId;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
 }
