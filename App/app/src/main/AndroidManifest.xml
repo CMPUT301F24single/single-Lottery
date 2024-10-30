@@ -37,6 +37,9 @@
             android:name=".ui.organizer.OrganizerEventCreateActivity"
             android:exported="false"/>
 
+        <activity android:name=".ui.organizer.OrganizerHomeViewEventActivity" />
+        <activity android:name=".ui.organizer.OrganizerHomeEditEventActivity" />
+
 
 
     </application>

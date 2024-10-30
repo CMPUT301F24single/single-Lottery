@@ -1,6 +1,6 @@
 package com.example.single_lottery.ui.organizer;
 
-import android.media.metrics.Event;
+import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.util.Log;
@@ -15,11 +15,9 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.single_lottery.EventAdapter;
 import com.example.single_lottery.R;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.example.single_lottery.ui.organizer.OrganizerHomeEventModel;
 
 
 import java.util.ArrayList;
@@ -27,7 +25,7 @@ import java.util.List;
 
 public class OrganizerHomeFragment extends Fragment {
     private RecyclerView recyclerView;
-    private EventAdapter eventAdapter;
+    private OrganizerEventAdapter eventAdapter;
     private List<OrganizerHomeEventModel> eventList;
 
     @Nullable
@@ -39,7 +37,7 @@ public class OrganizerHomeFragment extends Fragment {
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
         eventList = new ArrayList<>();
-        eventAdapter = new EventAdapter(eventList);
+        eventAdapter = new OrganizerEventAdapter(eventList);
         recyclerView.setAdapter(eventAdapter);
 
         loadEvents();
@@ -47,6 +45,13 @@ public class OrganizerHomeFragment extends Fragment {
         return view;
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        loadEvents();  // 每次返回页面时重新加载活动数据
+    }
+
+    @SuppressLint("NotifyDataSetChanged")
     private void loadEvents() {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         String deviceID = Settings.Secure.getString(getContext().getContentResolver(), Settings.Secure.ANDROID_ID);
@@ -62,10 +67,12 @@ public class OrganizerHomeFragment extends Fragment {
 
                         if (event != null) {
                             Log.d("OrganizerHomeFragment", "Event loaded: " + event.getName());
+                            event.setEventId(document.getId());
                             eventList.add(event);
                         }
                     }
                     eventAdapter.notifyDataSetChanged();
+
                 })
                 .addOnFailureListener(e -> {
                     Log.e("OrganizerHomeFragment", "Failed to load events: " + e.getMessage());
