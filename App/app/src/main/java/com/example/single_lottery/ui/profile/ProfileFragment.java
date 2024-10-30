@@ -39,7 +39,7 @@ import java.util.UUID;
 
 public class ProfileFragment extends Fragment {
     private TextView nameTextView, emailTextView, phoneTextView;
-    private Button editButton, uploadButton;
+    private Button editButton, uploadButton, removeImageButton;
     private ImageView profileImageView;
 
     private String userName;
@@ -62,6 +62,7 @@ public class ProfileFragment extends Fragment {
         phoneTextView = view.findViewById(R.id.phoneTextView);
         editButton = view.findViewById(R.id.editButton);
         uploadButton = view.findViewById(R.id.uploadButton);
+        removeImageButton = view.findViewById(R.id.removeImageButton);
         profileImageView = view.findViewById(R.id.profileImageView);
 
         firestore = FirebaseFirestore.getInstance();
@@ -80,6 +81,7 @@ public class ProfileFragment extends Fragment {
 
         editButton.setOnClickListener(v -> showEditDialog());
         uploadButton.setOnClickListener(v -> selectImage());
+        removeImageButton.setOnClickListener(v -> removeProfileImage());
 
         return view;
     }
@@ -214,6 +216,32 @@ public class ProfileFragment extends Fragment {
                 .addOnFailureListener(e -> {
                     Log.e("ProfileFragment", "Failed to upload new image: " + e.getMessage());
                 });
+    }
+
+    private void removeProfileImage() {
+        DocumentReference docRef = firestore.collection("users").document(installationId);
+        docRef.get().addOnCompleteListener(task -> {
+            if (task.isSuccessful() && task.getResult() != null && task.getResult().exists()) {
+                String oldImageUri = task.getResult().getString("profileImageUrl");
+                if (oldImageUri != null) {
+                    StorageReference oldImageRef = FirebaseStorage.getInstance().getReferenceFromUrl(oldImageUri);
+                    oldImageRef.delete().addOnSuccessListener(aVoid -> {
+                        Log.d("ProfileFragment", "Old image deleted successfully.");
+                        saveUserDataToFirestore(installationId, null);
+                        loadUserProfile(installationId);
+                    }).addOnFailureListener(e -> {
+                        Log.e("ProfileFragment", "Failed to delete old image: " + e.getMessage());
+                    });
+                } else {
+                    saveUserDataToFirestore(installationId, null);
+                    loadUserProfile(installationId);
+                }
+            } else {
+                Log.e("ProfileFragment", "No existing user document found.");
+            }
+        }).addOnFailureListener(e -> {
+            Log.e("ProfileFragment", "Failed to get user profile: " + e.getMessage());
+        });
     }
 
     private void saveUserDataToFirestore(String installationId, String profileImageUri) {
