@@ -49,7 +49,7 @@ public class OrganizerHomeFragment extends Fragment {
 
     private void loadEvents() {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
-        String deviceID = "ba89cacd1b83b485";
+        String deviceID = Settings.Secure.getString(getContext().getContentResolver(), Settings.Secure.ANDROID_ID);
 
         db.collection("events")
                 .whereEqualTo("organizerDeviceID", deviceID)
