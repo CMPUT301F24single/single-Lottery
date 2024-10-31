@@ -33,11 +33,11 @@ public class EventModel {
         this.organizerDeviceID = organizerDeviceID;
     }
 
-    public String getEventTime() {
+    public String getTime() {
         return time;
     }
 
-    public void setEventTime(String time) {
+    public void setTime(String time) {
         this.time = time;
     }
 

@@ -122,7 +122,7 @@ public class OrganizerHomeEditEventActivity extends AppCompatActivity {
                         if (event != null) {
                             editTextEventName.setText(event.getName());
                             editTextEventDescription.setText(event.getDescription());
-                            editTextEventTime.setText(event.getEventTime());
+                            editTextEventTime.setText(event.getTime());
                             editTextRegistrationDeadline.setText(event.getRegistrationDeadline());
                             editTextLotteryTime.setText(event.getLotteryTime());
                             editTextWaitingListCount.setText(String.valueOf(event.getWaitingListCount()));

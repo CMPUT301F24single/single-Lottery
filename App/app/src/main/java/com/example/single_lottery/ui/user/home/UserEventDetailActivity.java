@@ -1,8 +1,6 @@
 package com.example.single_lottery.ui.user.home;
 
 import android.os.Bundle;
-import android.util.Log;
-import android.view.View;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -61,7 +59,7 @@ public class UserEventDetailActivity extends AppCompatActivity {
                         if (event != null) {
                             textViewEventName.setText(event.getName());
                             textViewEventDescription.setText(event.getDescription());
-                            textViewEventTime.setText(event.getEventTime());
+                            textViewEventTime.setText(event.getTime());
                             textViewRegistrationDeadline.setText(event.getRegistrationDeadline());
                             textViewLotteryTime.setText(event.getLotteryTime());
                             textViewWaitingListCount.setText(String.valueOf(event.getWaitingListCount()));

@@ -4,7 +4,6 @@
     android:layout_height="match_parent"
     android:padding="16dp">
 
-    <!-- 包含所有控件的 LinearLayout -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -27,54 +26,102 @@
             android:scaleType="centerCrop"
             android:contentDescription="Event Poster"/>
 
+        <!-- Event Name -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Event Name:"
+            android:textStyle="bold" />
         <TextView
             android:id="@+id/textViewEventName"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Event Name"
-            android:textSize="18sp"
-            android:textStyle="bold" />
+            android:paddingTop="4dp" />
 
+        <!-- Event Time -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Event Time:"
+            android:textStyle="bold"
+            android:paddingTop="8dp" />
         <TextView
             android:id="@+id/textViewEventTime"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Event Time"
-            android:paddingTop="8dp" />
+            android:paddingTop="4dp" />
 
+        <!-- Registration Deadline -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Registration Deadline:"
+            android:textStyle="bold"
+            android:paddingTop="8dp" />
         <TextView
             android:id="@+id/textViewRegistrationDeadline"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Registration Deadline"
-            android:paddingTop="8dp" />
+            android:paddingTop="4dp" />
 
+        <!-- Lottery Time -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Lottery Time:"
+            android:textStyle="bold"
+            android:paddingTop="8dp" />
         <TextView
             android:id="@+id/textViewLotteryTime"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Lottery Time"
-            android:paddingTop="8dp" />
+            android:paddingTop="4dp" />
 
+        <!-- Waiting List Count -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Waiting List Count:"
+            android:textStyle="bold"
+            android:paddingTop="8dp" />
         <TextView
             android:id="@+id/textViewWaitingListCount"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Waiting List Count"
-            android:paddingTop="8dp" />
+            android:paddingTop="4dp" />
 
+        <!-- Lottery Count -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Lottery Count:"
+            android:textStyle="bold"
+            android:paddingTop="8dp" />
         <TextView
             android:id="@+id/textViewLotteryCount"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Lottery Count"
-            android:paddingTop="8dp" />
+            android:paddingTop="4dp" />
 
+        <!-- Event Description -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Event Description:"
+            android:textStyle="bold"
+            android:paddingTop="8dp" />
         <TextView
             android:id="@+id/textViewEventDescription"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Event Description"
-            android:paddingTop="8dp" />
+            android:paddingTop="4dp" />
+
     </LinearLayout>
 </ScrollView>

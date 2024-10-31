@@ -61,7 +61,7 @@ public class OrganizerHomeViewEventActivity extends AppCompatActivity {
                         if (event != null) {
                             textViewEventName.setText(event.getName());
                             textViewEventDescription.setText(event.getDescription());
-                            textViewEventTime.setText(event.getEventTime());
+                            textViewEventTime.setText(event.getTime());
                             textViewRegistrationDeadline.setText(event.getRegistrationDeadline());
                             textViewLotteryTime.setText(event.getLotteryTime());
                             textViewWaitingListCount.setText(String.valueOf(event.getWaitingListCount()));
