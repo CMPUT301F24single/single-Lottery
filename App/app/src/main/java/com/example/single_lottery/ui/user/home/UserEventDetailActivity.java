@@ -13,6 +13,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.bumptech.glide.Glide;
 import com.example.single_lottery.R;
 import com.example.single_lottery.EventModel;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 
@@ -64,25 +66,28 @@ public class UserEventDetailActivity extends AppCompatActivity {
 
     private void signUpForEvent() {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
-        Map<String, Object> signUpData = new HashMap<>();
-
-        // 添加用户ID或设备ID等唯一标识
         String userId = Settings.Secure.getString(getContentResolver(), Settings.Secure.ANDROID_ID);
-        signUpData.put("userId", userId);
-        signUpData.put("eventId", eventId);
-        signUpData.put("signUpTimestamp", FieldValue.serverTimestamp());
 
-        // 保存到数据库的 signups 集合中
-        db.collection("signups")
-                .add(signUpData)
-                .addOnSuccessListener(documentReference -> {
-                    Toast.makeText(this, "Successfully signed up for the event!", Toast.LENGTH_SHORT).show();
-                    buttonSignUp.setEnabled(false); // 禁用按钮以防止重复报名
-                })
-                .addOnFailureListener(e -> {
-                    Toast.makeText(this, "Failed to sign up. Please try again.", Toast.LENGTH_SHORT).show();
-                });
+        db.runTransaction(transaction -> {
+            DocumentReference eventRef = db.collection("events").document(eventId);
+            DocumentSnapshot snapshot = transaction.get(eventRef);
+
+            // 获取当前报名数量
+            long currentCount = snapshot.getLong("currentSignUpCount") != null ? snapshot.getLong("currentSignUpCount") : 0;
+
+            // 增加报名数量
+            transaction.update(eventRef, "currentSignUpCount", currentCount + 1);
+
+            return null;
+        }).addOnSuccessListener(aVoid -> {
+            Toast.makeText(this, "Successfully signed up for the event!", Toast.LENGTH_SHORT).show();
+            buttonSignUp.setEnabled(false);
+            loadEventData(eventId); // 更新页面显示
+        }).addOnFailureListener(e -> {
+            Toast.makeText(this, "Failed to sign up. Please try again.", Toast.LENGTH_SHORT).show();
+        });
     }
+
 
 
     private void loadEventData(String eventId) {
@@ -99,6 +104,15 @@ public class UserEventDetailActivity extends AppCompatActivity {
                             textViewLotteryTime.setText(event.getLotteryTime());
                             textViewWaitingListCount.setText(String.valueOf(event.getWaitingListCount()));
                             textViewLotteryCount.setText(String.valueOf(event.getLotteryCount()));
+
+                            // 获取当前报名数量和最大等待人数
+                            int currentSignUpCount = documentSnapshot.getLong("currentSignUpCount") != null
+                                    ? documentSnapshot.getLong("currentSignUpCount").intValue() : 0;
+                            int maxWaitingListCount = event.getWaitingListCount();
+
+                            // 设置“报名数量/最大数量”格式
+                            textViewWaitingListCount.setText(currentSignUpCount + "/" + maxWaitingListCount);
+
 
                             if (event.getPosterUrl() != null) {
                                 Glide.with(this).load(event.getPosterUrl()).into(imageViewPoster);
