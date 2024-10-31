@@ -1,6 +1,6 @@
-package com.example.single_lottery.ui.organizer;
+package com.example.single_lottery;
 
-public class OrganizerHomeEventModel {
+public class EventModel {
     private String name;
     private String organizerDeviceID;
     private int waitingListCount;
@@ -12,7 +12,7 @@ public class OrganizerHomeEventModel {
     private String eventId;
     private String description;
 
-    public OrganizerHomeEventModel() {
+    public EventModel() {
         // 无参数构造函数，Firestore 数据绑定需要
     }
 
