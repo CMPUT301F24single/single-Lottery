@@ -1,31 +1,49 @@
-package com.example.single_lottery.ui.organizer;
+package com.example.single_lottery.ui.user.home;
 
 import android.os.Bundle;
+import android.provider.Settings;
+import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.bumptech.glide.Glide;
 import com.example.single_lottery.R;
 import com.example.single_lottery.EventModel;
+import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 
-public class OrganizerHomeViewEventActivity extends AppCompatActivity {
+import java.util.HashMap;
+import java.util.Map;
 
-    private TextView textViewEventName, textViewEventTime, textViewRegistrationDeadline,
-            textViewLotteryTime, textViewWaitingListCount, textViewLotteryCount, textViewEventDescription;
+public class UserEventDetailActivity extends AppCompatActivity {
+
+    private TextView textViewEventName, textViewEventDescription, textViewEventTime,
+            textViewRegistrationDeadline, textViewLotteryTime,
+            textViewWaitingListCount, textViewLotteryCount;
     private ImageView imageViewPoster;
+    private ImageButton backButton;
+    private Button buttonSignUp;
+    private String eventId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.organizer_home_view_event);
+        setContentView(R.layout.activity_user_home_event_detail);
 
-        ImageButton backButton = findViewById(R.id.backButton);
-        backButton.setOnClickListener(v -> finish()); // 结束当前 Activity，返回上一个页面
+        backButton = findViewById(R.id.backButton);
+        backButton.setOnClickListener(v -> finish());
 
+        // 获取传递的 event_id
+        eventId = getIntent().getStringExtra("event_id");
+        if (eventId == null) {
+            Toast.makeText(this, "Event ID is missing", Toast.LENGTH_SHORT).show();
+            finish();
+            return;
+        }
 
         // 初始化视图
         textViewEventName = findViewById(R.id.textViewEventName);
@@ -37,20 +55,35 @@ public class OrganizerHomeViewEventActivity extends AppCompatActivity {
         textViewLotteryCount = findViewById(R.id.textViewLotteryCount);
         imageViewPoster = findViewById(R.id.imageViewPoster);
 
-
-        // 获取传递的 event_id
-        String eventId = getIntent().getStringExtra("event_id");
-
-        // 从 Firestore 加载活动数据
         loadEventData(eventId);
+
+        // Initialize the Sign Up button
+        buttonSignUp = findViewById(R.id.buttonSignUp);
+        buttonSignUp.setOnClickListener(v -> signUpForEvent());
     }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-        String eventId = getIntent().getStringExtra("event_id");  // 确保传递了正确的 eventId
-        loadEventData(eventId);  // 每次返回页面时重新加载活动数据
+    private void signUpForEvent() {
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        Map<String, Object> signUpData = new HashMap<>();
+
+        // 添加用户ID或设备ID等唯一标识
+        String userId = Settings.Secure.getString(getContentResolver(), Settings.Secure.ANDROID_ID);
+        signUpData.put("userId", userId);
+        signUpData.put("eventId", eventId);
+        signUpData.put("signUpTimestamp", FieldValue.serverTimestamp());
+
+        // 保存到数据库的 signups 集合中
+        db.collection("signups")
+                .add(signUpData)
+                .addOnSuccessListener(documentReference -> {
+                    Toast.makeText(this, "Successfully signed up for the event!", Toast.LENGTH_SHORT).show();
+                    buttonSignUp.setEnabled(false); // 禁用按钮以防止重复报名
+                })
+                .addOnFailureListener(e -> {
+                    Toast.makeText(this, "Failed to sign up. Please try again.", Toast.LENGTH_SHORT).show();
+                });
     }
+
 
     private void loadEventData(String eventId) {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
@@ -67,7 +100,6 @@ public class OrganizerHomeViewEventActivity extends AppCompatActivity {
                             textViewWaitingListCount.setText(String.valueOf(event.getWaitingListCount()));
                             textViewLotteryCount.setText(String.valueOf(event.getLotteryCount()));
 
-                            // 使用 Glide 显示活动海报
                             if (event.getPosterUrl() != null) {
                                 Glide.with(this).load(event.getPosterUrl()).into(imageViewPoster);
                             }

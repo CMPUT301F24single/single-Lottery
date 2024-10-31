@@ -1,4 +1,4 @@
-package com.example.single_lottery.ui.profile;
+package com.example.single_lottery.ui.user.profile;
 
 public class User {
     public String name;

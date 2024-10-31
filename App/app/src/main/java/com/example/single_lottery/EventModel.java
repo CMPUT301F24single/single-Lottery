@@ -1,28 +1,28 @@
-package com.example.single_lottery.ui.organizer;
+package com.example.single_lottery;
 
-public class OrganizerHomeEventModel {
-    private String eventname;
+public class EventModel {
+    private String name;
     private String organizerDeviceID;
     private int waitingListCount;
     private int lotteryCount;
     private String lotteryTime;
     private String registrationDeadline;
-    private String eventtime;
+    private String time;
     private String posterUrl;
     private String eventId;
     private String description;
 
-    public OrganizerHomeEventModel() {
+    public EventModel() {
         // 无参数构造函数，Firestore 数据绑定需要
     }
 
     // 所有字段的 getter 和 setter
-    public String getEventName() {
-        return eventname;
+    public String getName() {
+        return name;
     }
 
     public void setEventName(String name) {
-        this.eventname = name;
+        this.name = name;
     }
 
     public String getOrganizerDeviceID() {
@@ -33,12 +33,12 @@ public class OrganizerHomeEventModel {
         this.organizerDeviceID = organizerDeviceID;
     }
 
-    public String getEventTime() {
-        return eventtime;
+    public String getTime() {
+        return time;
     }
 
-    public void setEventTime(String time) {
-        this.eventtime = time;
+    public void setTime(String time) {
+        this.time = time;
     }
 
     public String getRegistrationDeadline() {

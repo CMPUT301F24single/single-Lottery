@@ -1,13 +1,13 @@
 package com.example.single_lottery.ui.organizer;
 
-public class Organizer {
+public class OrganizerProfile {
     public String name;
     public String email;
     public String phone;
     public String info;
     public String profileImageUrl;
 
-    Organizer(String name, String email, String phone, String info, String profileImageUrl) {
+    OrganizerProfile(String name, String email, String phone, String info, String profileImageUrl) {
         this.name = name;
         this.email = email;
         this.phone = phone;

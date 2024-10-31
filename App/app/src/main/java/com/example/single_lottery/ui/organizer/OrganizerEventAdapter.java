@@ -11,13 +11,14 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.single_lottery.R;
+import com.example.single_lottery.EventModel;
 
 import java.util.List;
 
 public class OrganizerEventAdapter extends RecyclerView.Adapter<OrganizerEventAdapter.OrganizerEventViewHolder> {
-    private List<OrganizerHomeEventModel> eventList;
+    private List<EventModel> eventList;
 
-    public OrganizerEventAdapter(List<OrganizerHomeEventModel> eventList) {
+    public OrganizerEventAdapter(List<EventModel> eventList) {
         this.eventList = eventList;
     }
 
@@ -31,8 +32,8 @@ public class OrganizerEventAdapter extends RecyclerView.Adapter<OrganizerEventAd
 
     @Override
     public void onBindViewHolder(@NonNull OrganizerEventViewHolder holder, int position) {
-        OrganizerHomeEventModel event = eventList.get(position);
-        holder.eventNameTextView.setText(event.getEventName());  // 假设有 `getName()` 方法
+        EventModel event = eventList.get(position);
+        holder.eventNameTextView.setText(event.getName());  // 假设有 `getName()` 方法
 
         // View button click listener
         holder.viewButton.setOnClickListener(v -> {

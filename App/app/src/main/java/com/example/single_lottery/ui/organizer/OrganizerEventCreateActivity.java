@@ -40,7 +40,6 @@ public class OrganizerEventCreateActivity extends AppCompatActivity {
         setContentView(R.layout.organizer_event_create_fragment);
 
 
-
         ImageButton backButton = findViewById(R.id.backButton);
         backButton.setOnClickListener(v -> finish());
 

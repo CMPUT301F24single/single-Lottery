@@ -16,6 +16,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.single_lottery.R;
+import com.example.single_lottery.EventModel;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
@@ -26,7 +27,7 @@ import java.util.List;
 public class OrganizerHomeFragment extends Fragment {
     private RecyclerView recyclerView;
     private OrganizerEventAdapter eventAdapter;
-    private List<OrganizerHomeEventModel> eventList;
+    private List<EventModel> eventList;
 
     @Nullable
     @Override
@@ -62,11 +63,11 @@ public class OrganizerHomeFragment extends Fragment {
                 .addOnSuccessListener(queryDocumentSnapshots -> {
                     eventList.clear();
                     for (DocumentSnapshot document : queryDocumentSnapshots) {
-                        OrganizerHomeEventModel event = document.toObject(OrganizerHomeEventModel.class);
-                        Log.d("OrganizerHomeFragment", "Event loaded: " + event.getEventName());
+                        EventModel event = document.toObject(EventModel.class);
+                        Log.d("OrganizerHomeFragment", "Event loaded: " + event.getName());
 
                         if (event != null) {
-                            Log.d("OrganizerHomeFragment", "Event loaded: " + event.getEventName());
+                            Log.d("OrganizerHomeFragment", "Event loaded: " + event.getName());
                             event.setEventId(document.getId());
                             eventList.add(event);
                         }

@@ -1,4 +1,4 @@
-package com.example.single_lottery.ui.profile;
+package com.example.single_lottery.ui.user.profile;
 
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;

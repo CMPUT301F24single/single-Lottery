@@ -1,7 +1,6 @@
 package com.example.single_lottery.ui.organizer;
 
 import android.app.AlertDialog;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
@@ -21,12 +20,6 @@ import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.example.single_lottery.R;
-import com.example.single_lottery.ui.organizer.Organizer;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.installations.FirebaseInstallations;
@@ -259,10 +252,10 @@ public class OrganizerProfilePageFragment extends Fragment {
             return;
         }
 
-        Organizer organizer = new Organizer(organizerName, organizerEmail, organizerPhone, companyInfo, profileImageUri);
+        OrganizerProfile organizerProfile = new OrganizerProfile(organizerName, organizerEmail, organizerPhone, companyInfo, profileImageUri);
         firestore.collection("organizers")
                 .document(installationId)
-                .set(organizer)
+                .set(organizerProfile)
                 .addOnSuccessListener(aVoid ->
                         Log.d("OrganizerProfilePageFragment", "profile updated successfully"))
                 .addOnFailureListener(e ->
