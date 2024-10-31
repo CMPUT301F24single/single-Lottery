@@ -61,12 +61,30 @@ public class UserEventDetailActivity extends AppCompatActivity {
 
         // Initialize the Sign Up button
         buttonSignUp = findViewById(R.id.buttonSignUp);
-        buttonSignUp.setOnClickListener(v -> signUpForEvent());
+        buttonSignUp.setOnClickListener(v -> checkAndSignUpForEvent());
     }
 
-    private void signUpForEvent() {
+    private void checkAndSignUpForEvent() {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         String userId = Settings.Secure.getString(getContentResolver(), Settings.Secure.ANDROID_ID);
+        String registrationId = eventId + "_" + userId;
+
+        // 检查用户是否已经报名
+        db.collection("registered_events").document(registrationId)
+                .get()
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful() && task.getResult().exists()) {
+                        // 用户已报名
+                        Toast.makeText(this, "You are already signed up for this event!", Toast.LENGTH_SHORT).show();
+                    } else {
+                        // 用户尚未报名，执行报名操作
+                        signUpForEvent(userId, registrationId);
+                    }
+                });
+    }
+
+    private void signUpForEvent(String userId, String registrationId) {
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
 
         db.runTransaction(transaction -> {
             DocumentReference eventRef = db.collection("events").document(eventId);
@@ -78,6 +96,14 @@ public class UserEventDetailActivity extends AppCompatActivity {
             // 增加报名数量
             transaction.update(eventRef, "currentSignUpCount", currentCount + 1);
 
+            // 将报名信息添加到 registered_events 集合
+            DocumentReference registrationRef = db.collection("registered_events").document(registrationId);
+            Map<String, Object> registration = new HashMap<>();
+            registration.put("userId", userId);
+            registration.put("eventId", eventId);
+            registration.put("timestamp", FieldValue.serverTimestamp());
+            transaction.set(registrationRef, registration);
+
             return null;
         }).addOnSuccessListener(aVoid -> {
             Toast.makeText(this, "Successfully signed up for the event!", Toast.LENGTH_SHORT).show();
@@ -87,8 +113,6 @@ public class UserEventDetailActivity extends AppCompatActivity {
             Toast.makeText(this, "Failed to sign up. Please try again.", Toast.LENGTH_SHORT).show();
         });
     }
-
-
 
     private void loadEventData(String eventId) {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
@@ -102,7 +126,6 @@ public class UserEventDetailActivity extends AppCompatActivity {
                             textViewEventTime.setText(event.getTime());
                             textViewRegistrationDeadline.setText(event.getRegistrationDeadline());
                             textViewLotteryTime.setText(event.getLotteryTime());
-                            textViewWaitingListCount.setText(String.valueOf(event.getWaitingListCount()));
                             textViewLotteryCount.setText(String.valueOf(event.getLotteryCount()));
 
                             // 获取当前报名数量和最大等待人数
@@ -112,7 +135,6 @@ public class UserEventDetailActivity extends AppCompatActivity {
 
                             // 设置“报名数量/最大数量”格式
                             textViewWaitingListCount.setText(currentSignUpCount + "/" + maxWaitingListCount);
-
 
                             if (event.getPosterUrl() != null) {
                                 Glide.with(this).load(event.getPosterUrl()).into(imageViewPoster);

@@ -39,6 +39,7 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.UserEventVie
     public void onBindViewHolder(@NonNull UserEventViewHolder holder, int position) {
         EventModel event = eventList.get(position);
         holder.eventNameTextView.setText(event.getName());
+
         holder.viewButton.setOnClickListener(v -> {
             Intent intent = new Intent(context, UserEventDetailActivity.class);
             intent.putExtra("event_id", event.getEventId()); // 确保eventId非空
