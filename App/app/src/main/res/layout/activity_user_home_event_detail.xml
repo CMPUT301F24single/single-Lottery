@@ -123,5 +123,12 @@
             android:text="Event Description"
             android:paddingTop="4dp" />
 
+        <Button
+            android:id="@+id/buttonSignUp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Sign Up for Event"
+            android:layout_marginTop="16dp"/>
+
     </LinearLayout>
 </ScrollView>
