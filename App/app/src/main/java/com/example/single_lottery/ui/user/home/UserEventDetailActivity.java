@@ -61,57 +61,7 @@ public class UserEventDetailActivity extends AppCompatActivity {
 
         // Initialize the Sign Up button
         buttonSignUp = findViewById(R.id.buttonSignUp);
-        buttonSignUp.setOnClickListener(v -> checkAndSignUpForEvent());
-    }
-
-    private void checkAndSignUpForEvent() {
-        FirebaseFirestore db = FirebaseFirestore.getInstance();
-        String userId = Settings.Secure.getString(getContentResolver(), Settings.Secure.ANDROID_ID);
-        String registrationId = eventId + "_" + userId;
-
-        // 检查用户是否已经报名
-        db.collection("registered_events").document(registrationId)
-                .get()
-                .addOnCompleteListener(task -> {
-                    if (task.isSuccessful() && task.getResult().exists()) {
-                        // 用户已报名
-                        Toast.makeText(this, "You are already signed up for this event!", Toast.LENGTH_SHORT).show();
-                    } else {
-                        // 用户尚未报名，执行报名操作
-                        signUpForEvent(userId, registrationId);
-                    }
-                });
-    }
-
-    private void signUpForEvent(String userId, String registrationId) {
-        FirebaseFirestore db = FirebaseFirestore.getInstance();
-
-        db.runTransaction(transaction -> {
-            DocumentReference eventRef = db.collection("events").document(eventId);
-            DocumentSnapshot snapshot = transaction.get(eventRef);
-
-            // 获取当前报名数量
-            long currentCount = snapshot.getLong("currentSignUpCount") != null ? snapshot.getLong("currentSignUpCount") : 0;
-
-            // 增加报名数量
-            transaction.update(eventRef, "currentSignUpCount", currentCount + 1);
-
-            // 将报名信息添加到 registered_events 集合
-            DocumentReference registrationRef = db.collection("registered_events").document(registrationId);
-            Map<String, Object> registration = new HashMap<>();
-            registration.put("userId", userId);
-            registration.put("eventId", eventId);
-            registration.put("timestamp", FieldValue.serverTimestamp());
-            transaction.set(registrationRef, registration);
-
-            return null;
-        }).addOnSuccessListener(aVoid -> {
-            Toast.makeText(this, "Successfully signed up for the event!", Toast.LENGTH_SHORT).show();
-            buttonSignUp.setEnabled(false);
-            loadEventData(eventId); // 更新页面显示
-        }).addOnFailureListener(e -> {
-            Toast.makeText(this, "Failed to sign up. Please try again.", Toast.LENGTH_SHORT).show();
-        });
+        buttonSignUp.setOnClickListener(v -> signUpForEvent());
     }
 
     private void loadEventData(String eventId) {
@@ -128,22 +78,59 @@ public class UserEventDetailActivity extends AppCompatActivity {
                             textViewLotteryTime.setText(event.getLotteryTime());
                             textViewLotteryCount.setText(String.valueOf(event.getLotteryCount()));
 
-                            // 获取当前报名数量和最大等待人数
-                            int currentSignUpCount = documentSnapshot.getLong("currentSignUpCount") != null
-                                    ? documentSnapshot.getLong("currentSignUpCount").intValue() : 0;
-                            int maxWaitingListCount = event.getWaitingListCount();
-
-                            // 设置“报名数量/最大数量”格式
-                            textViewWaitingListCount.setText(currentSignUpCount + "/" + maxWaitingListCount);
-
                             if (event.getPosterUrl() != null) {
                                 Glide.with(this).load(event.getPosterUrl()).into(imageViewPoster);
                             }
+
+                            // 获取实时报名人数
+                            countRegistrations(eventId, event.getWaitingListCount());
                         }
                     }
                 })
                 .addOnFailureListener(e -> {
                     // 错误处理
                 });
+    }
+
+    private void countRegistrations(String eventId, int maxWaitingListCount) {
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+
+        // 查询registered_events集合中符合eventId条件的报名记录数
+        db.collection("registered_events")
+                .whereEqualTo("eventId", eventId)
+                .get()
+                .addOnSuccessListener(queryDocumentSnapshots -> {
+                    int currentSignUpCount = queryDocumentSnapshots.size(); // 获取文档数量即为报名人数
+
+                    // 设置“报名数量/最大数量”格式
+                    textViewWaitingListCount.setText(currentSignUpCount + "/" + maxWaitingListCount);
+                })
+                .addOnFailureListener(e -> {
+                    Toast.makeText(this, "Failed to load registration count.", Toast.LENGTH_SHORT).show();
+                });
+    }
+
+    private void signUpForEvent() {
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        String userId = Settings.Secure.getString(getContentResolver(), Settings.Secure.ANDROID_ID);
+
+        db.runTransaction(transaction -> {
+            DocumentReference eventRef = db.collection("events").document(eventId);
+            DocumentSnapshot snapshot = transaction.get(eventRef);
+
+            // 获取当前报名数量
+            long currentCount = snapshot.getLong("currentSignUpCount") != null ? snapshot.getLong("currentSignUpCount") : 0;
+
+            // 增加报名数量
+            transaction.update(eventRef, "currentSignUpCount", currentCount + 1);
+
+            return null;
+        }).addOnSuccessListener(aVoid -> {
+            Toast.makeText(this, "Successfully signed up for the event!", Toast.LENGTH_SHORT).show();
+            buttonSignUp.setEnabled(false);
+            loadEventData(eventId); // 更新页面显示
+        }).addOnFailureListener(e -> {
+            Toast.makeText(this, "Failed to sign up. Please try again.", Toast.LENGTH_SHORT).show();
+        });
     }
 }
