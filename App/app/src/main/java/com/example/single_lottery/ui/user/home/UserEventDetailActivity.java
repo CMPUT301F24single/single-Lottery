@@ -114,23 +114,38 @@ public class UserEventDetailActivity extends AppCompatActivity {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         String userId = Settings.Secure.getString(getContentResolver(), Settings.Secure.ANDROID_ID);
 
-        db.runTransaction(transaction -> {
-            DocumentReference eventRef = db.collection("events").document(eventId);
-            DocumentSnapshot snapshot = transaction.get(eventRef);
+        // 创建一个报名记录到 registered_events 集合中
+        Map<String, Object> registrationData = new HashMap<>();
+        registrationData.put("eventId", eventId);
+        registrationData.put("userId", userId);
+        registrationData.put("timestamp", System.currentTimeMillis()); // 可选：记录报名时间
 
-            // 获取当前报名数量
-            long currentCount = snapshot.getLong("currentSignUpCount") != null ? snapshot.getLong("currentSignUpCount") : 0;
-
-            // 增加报名数量
-            transaction.update(eventRef, "currentSignUpCount", currentCount + 1);
-
-            return null;
-        }).addOnSuccessListener(aVoid -> {
-            Toast.makeText(this, "Successfully signed up for the event!", Toast.LENGTH_SHORT).show();
-            buttonSignUp.setEnabled(false);
-            loadEventData(eventId); // 更新页面显示
-        }).addOnFailureListener(e -> {
-            Toast.makeText(this, "Failed to sign up. Please try again.", Toast.LENGTH_SHORT).show();
-        });
+        // 首先检查用户是否已经报名
+        db.collection("registered_events")
+                .whereEqualTo("eventId", eventId)
+                .whereEqualTo("userId", userId)
+                .get()
+                .addOnSuccessListener(queryDocumentSnapshots -> {
+                    if (queryDocumentSnapshots.isEmpty()) {
+                        // 如果用户还没有报名，则添加报名记录
+                        db.collection("registered_events").add(registrationData)
+                                .addOnSuccessListener(documentReference -> {
+                                    Toast.makeText(this, "Successfully signed up for the event!", Toast.LENGTH_SHORT).show();
+                                    buttonSignUp.setEnabled(false);
+                                    loadEventData(eventId); // 更新页面显示
+                                })
+                                .addOnFailureListener(e -> {
+                                    Toast.makeText(this, "Failed to sign up. Please try again.", Toast.LENGTH_SHORT).show();
+                                });
+                    } else {
+                        // 用户已经报名
+                        Toast.makeText(this, "You have already signed up for this event.", Toast.LENGTH_SHORT).show();
+                        buttonSignUp.setEnabled(false);
+                    }
+                })
+                .addOnFailureListener(e -> {
+                    Toast.makeText(this, "Failed to check registration status. Please try again.", Toast.LENGTH_SHORT).show();
+                });
     }
+
 }
