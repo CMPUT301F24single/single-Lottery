@@ -1,5 +1,7 @@
 plugins {
     alias(libs.plugins.android.application)
+    id("com.google.gms.google-services")
+    alias(libs.plugins.google.android.libraries.mapsplatform.secrets.gradle.plugin)
 }
 
 android {
@@ -35,6 +37,8 @@ android {
 }
 
 dependencies {
+    implementation ("androidx.recyclerview:recyclerview:1.3.2")
+
 
     implementation(libs.appcompat)
     implementation(libs.material)
@@ -43,6 +47,18 @@ dependencies {
     implementation(libs.lifecycle.viewmodel.ktx)
     implementation(libs.navigation.fragment)
     implementation(libs.navigation.ui)
+    implementation(platform(libs.firebase.bom))
+    implementation(libs.firebase.firestore)
+    implementation(libs.firebase.analytics)
+    implementation(libs.firebase.database.ktx)
+    implementation(libs.firebase.auth)
+    implementation(libs.firebase.installations)
+    implementation(libs.firebase.storage)
+    implementation(libs.glide)
+    implementation(libs.recyclerview)
+    implementation(libs.play.services.maps)
+    annotationProcessor(libs.compiler)
+    implementation(libs.picasso)
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)

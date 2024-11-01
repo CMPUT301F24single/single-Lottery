@@ -7,19 +7,26 @@
 
     <fragment
         android:id="@+id/navigation_home"
-        android:name="com.example.single_lottery.ui.home.HomeFragment"
+        android:name="com.example.single_lottery.ui.user.home.HomeFragment"
         android:label="@string/title_home"
         tools:layout="@layout/fragment_home" />
 
     <fragment
+        android:id="@+id/CameraFragment"
+        android:name="com.example.single_lottery.ui.scan.CameraFragment"
+        android:label="Camera Fragment" />
+
+
+
+    <fragment
         android:id="@+id/navigation_dashboard"
-        android:name="com.example.single_lottery.ui.dashboard.DashboardFragment"
+        android:name="com.example.single_lottery.ui.user.events.EventsFragment"
         android:label="@string/title_dashboard"
-        tools:layout="@layout/fragment_dashboard" />
+        tools:layout="@layout/fragment_events" />
 
     <fragment
         android:id="@+id/navigation_notifications"
-        android:name="com.example.single_lottery.ui.notifications.NotificationsFragment"
+        android:name="com.example.single_lottery.ui.user.profile.ProfileFragment"
         android:label="@string/title_notifications"
-        tools:layout="@layout/fragment_notifications" />
+        tools:layout="@layout/fragment_profile" />
 </navigation>

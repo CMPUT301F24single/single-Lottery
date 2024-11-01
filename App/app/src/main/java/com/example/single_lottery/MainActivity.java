@@ -1,37 +1,63 @@
+
 package com.example.single_lottery;
 
+import android.content.Intent;
 import android.os.Bundle;
+import android.widget.Button;
 
-import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.example.single_lottery.ui.organizer.OrganizerActivity;
+
+import com.example.single_lottery.ui.user.UserActivity;
+
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.navigation.NavController;
-import androidx.navigation.Navigation;
-import androidx.navigation.ui.AppBarConfiguration;
-import androidx.navigation.ui.NavigationUI;
-
-import com.example.single_lottery.databinding.ActivityMainBinding;
 
 public class MainActivity extends AppCompatActivity {
 
-    private ActivityMainBinding binding;
+    private boolean showLandingScreen;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        binding = ActivityMainBinding.inflate(getLayoutInflater());
-        setContentView(binding.getRoot());
+        // Check if we should show the landing screen
+        showLandingScreen = getIntent().getBooleanExtra("showLandingScreen", true);
 
-        BottomNavigationView navView = findViewById(R.id.nav_view);
-        // Passing each menu ID as a set of Ids because each
-        // menu should be considered as top level destinations.
-        AppBarConfiguration appBarConfiguration = new AppBarConfiguration.Builder(
-                R.id.navigation_home, R.id.navigation_dashboard, R.id.navigation_notifications)
-                .build();
-        NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_activity_main);
-        NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
-        NavigationUI.setupWithNavController(binding.navView, navController);
+        if (showLandingScreen) {
+            // Use the landing layout with User, Organizer, and Admin buttons
+            setContentView(R.layout.activity_landing);
+
+            Button buttonUser = findViewById(R.id.button_user);
+            Button buttonOrganizer = findViewById(R.id.button_organizer);
+            Button buttonAdmin = findViewById(R.id.button_admin);
+
+            buttonUser.setOnClickListener(v -> {
+                // Start RoleFragment for User
+                Intent intent = new Intent(MainActivity.this, UserActivity.class);
+                intent.putExtra("showLandingScreen", false);
+                intent.putExtra("role", "user");
+                startActivity(intent);
+                finish();
+            });
+
+            buttonOrganizer.setOnClickListener(v -> {
+                // Start OrganizerActivity for Organizer
+                Intent intent = new Intent(MainActivity.this, OrganizerActivity.class);
+                intent.putExtra("showLandingScreen", false);
+                intent.putExtra("role", "user");
+                startActivity(intent);
+                finish();
+            });
+
+            buttonAdmin.setOnClickListener(v -> {
+                // Handle Admin logic here
+            });
+
+
+
+
+        }
     }
-
 }
+
