@@ -5,6 +5,9 @@ import static android.app.Activity.RESULT_OK;
 import android.app.AlertDialog;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
 import android.net.Uri;
 import android.os.Bundle;
 import androidx.annotation.NonNull;
@@ -111,8 +114,32 @@ public class ProfileFragment extends Fragment {
                     .error(R.drawable.ic_placeholder)
                     .into(profileImageView);
         } else {
-            profileImageView.setImageResource(R.drawable.ic_placeholder);
+            generateLetterAvatar(userName);
         }
+    }
+
+    private void generateLetterAvatar(String name) {
+        String[] nameParts = name.split(" ");
+        String initials = "";
+        if (nameParts.length > 0) {
+            initials += nameParts[0].charAt(0); 
+        }
+        if (nameParts.length > 1) {
+            initials += nameParts[1].charAt(0); 
+        }
+    
+        Bitmap bitmap = Bitmap.createBitmap(100, 100, Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(bitmap);
+        Paint paint = new Paint();
+        paint.setColor(Color.GRAY);
+        canvas.drawCircle(50, 50, 50, paint); 
+    
+        paint.setColor(Color.WHITE);
+        paint.setTextSize(40);
+        paint.setTextAlign(Paint.Align.CENTER);
+        canvas.drawText(initials, 50, 65, paint); 
+    
+        profileImageView.setImageBitmap(bitmap);
     }
 
     private void showEditDialog() {
