@@ -21,6 +21,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Locale;
 
 public class UserEventDetailActivity extends AppCompatActivity {
     private TextView eventNameTextView, eventTimeTextView, registrationDeadlineTextView,
@@ -29,7 +30,8 @@ public class UserEventDetailActivity extends AppCompatActivity {
     private TextView eventStatusValueTextView;
     private Button cancelRegistrationButton;
 
-    private String registrationDeadline;  // 报名截止时间字符串
+    private String registrationDeadline; // 报名截止时间字符串
+    private String lotteryTime; // 抽奖时间字符串
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,9 +53,11 @@ public class UserEventDetailActivity extends AppCompatActivity {
         eventStatusValueTextView = findViewById(R.id.eventStatusValueTextView);
         cancelRegistrationButton = findViewById(R.id.cancelRegistrationButton);
 
+        // 获取传递的 eventId
         String eventId = getIntent().getStringExtra("event_id");
         loadEventDetails(eventId);
 
+        // 设置取消注册按钮的点击事件
         cancelRegistrationButton.setOnClickListener(v -> cancelRegistration(eventId));
     }
 
@@ -63,14 +67,16 @@ public class UserEventDetailActivity extends AppCompatActivity {
                 .get()
                 .addOnSuccessListener(documentSnapshot -> {
                     if (documentSnapshot.exists()) {
+                        // 从 documentSnapshot 获取数据
                         String eventName = documentSnapshot.getString("name");
                         String eventDescription = documentSnapshot.getString("description");
                         String eventTime = documentSnapshot.getString("time");
                         registrationDeadline = documentSnapshot.getString("registrationDeadline");
-                        String lotteryTime = documentSnapshot.getString("lotteryTime");
+                        lotteryTime = documentSnapshot.getString("lotteryTime");
                         String waitingListCount = documentSnapshot.getLong("waitingListCount") + "";
                         String lotteryCount = documentSnapshot.getLong("lotteryCount") + "";
 
+                        // 设置 TextViews 的文本
                         eventNameTextView.setText(eventName);
                         eventTimeTextView.setText(eventTime);
                         registrationDeadlineTextView.setText(registrationDeadline);
@@ -79,11 +85,13 @@ public class UserEventDetailActivity extends AppCompatActivity {
                         lotteryCountTextView.setText(lotteryCount);
                         eventDescriptionTextView.setText(eventDescription);
 
+                        // 加载图片
                         String posterUrl = documentSnapshot.getString("posterUrl");
                         if (posterUrl != null && !posterUrl.isEmpty()) {
                             Glide.with(this).load(posterUrl).into(eventPosterImageView);
                         }
 
+                        // 更新活动状态
                         updateEventStatus();
                     } else {
                         Toast.makeText(this, "Event not found", Toast.LENGTH_SHORT).show();
@@ -94,15 +102,23 @@ public class UserEventDetailActivity extends AppCompatActivity {
 
     private void updateEventStatus() {
         try {
-            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault());
             Date deadlineDate = dateFormat.parse(registrationDeadline);
+            Date lotteryDate = dateFormat.parse(lotteryTime);
             Date currentDate = new Date();
 
+            // 判断当前时间和截止时间、抽奖时间的关系
             if (currentDate.before(deadlineDate)) {
+                // 报名截止日期之前
                 eventStatusValueTextView.setText("Open for Registration");
                 cancelRegistrationButton.setVisibility(View.VISIBLE);  // 显示取消注册按钮
+            } else if (currentDate.after(deadlineDate) && currentDate.before(lotteryDate)) {
+                // 报名截止日期之后但抽奖时间之前
+                eventStatusValueTextView.setText("Registration Closed - Awaiting Lottery");
+                cancelRegistrationButton.setVisibility(View.GONE);  // 隐藏取消注册按钮
             } else {
-                eventStatusValueTextView.setText("Registration closed");
+                // 抽奖时间之后
+                eventStatusValueTextView.setText("Registration Closed");
                 cancelRegistrationButton.setVisibility(View.GONE);  // 隐藏取消注册按钮
             }
         } catch (Exception e) {
