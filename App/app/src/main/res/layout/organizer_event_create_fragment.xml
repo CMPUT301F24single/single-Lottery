@@ -50,17 +50,17 @@
             android:layout_height="wrap_content"
             android:hint="Event Description" />
 
-        <EditText
-            android:id="@+id/eventTimeEditText"
-            android:layout_width="match_parent"
+        <TextView
+            android:id="@+id/eventTimeTextView"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:hint="Event Time" />
+            android:text="Select Event Time" />
 
-        <EditText
-            android:id="@+id/registrationDeadlineEditText"
-            android:layout_width="match_parent"
+        <TextView
+            android:id="@+id/registrationDeadlineTextView"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:hint="Registration Deadline" />
+            android:text="Select Registration Deadline" />
 
         <EditText
             android:id="@+id/waitingListCountEditText"
@@ -74,11 +74,11 @@
             android:layout_height="wrap_content"
             android:hint="Lottery Count" />
 
-        <EditText
-            android:id="@+id/lotteryTimeEditText"
-            android:layout_width="match_parent"
+        <TextView
+            android:id="@+id/lotteryTimeTextView"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:hint="Lottery Time" />
+            android:text="Select Lottery Time" />
 
         <Button
             android:id="@+id/createEventButton"

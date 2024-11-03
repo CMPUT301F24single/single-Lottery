@@ -39,7 +39,7 @@ public class UserHomeAdapter extends RecyclerView.Adapter<UserHomeAdapter.UserHo
         holder.eventNameTextView.setText(event.getName());
 
         holder.viewButton.setOnClickListener(v -> {
-            Intent intent = new Intent(context, UserEventDetailActivity.class);
+            Intent intent = new Intent(context, UserHomeDetailActivity.class);
             intent.putExtra("event_id", event.getEventId());
             context.startActivity(intent);
         });

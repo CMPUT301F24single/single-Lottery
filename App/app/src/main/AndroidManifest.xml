@@ -66,8 +66,10 @@
             android:exported="false" />
         <activity android:name=".ui.organizer.OrganizerHomeViewEventActivity" />
         <activity android:name=".ui.organizer.OrganizerHomeEditEventActivity" />
-        <activity android:name=".ui.user.home.UserEventDetailActivity" />
-        <activity android:name=".ui.user.events.UserRegisteredEventsActivity" />
+        <activity android:name=".ui.user.home.UserHomeDetailActivity" />
+
+        <activity android:name=".ui.user.events.UserEventDetailActivity" />
+
 
 
 

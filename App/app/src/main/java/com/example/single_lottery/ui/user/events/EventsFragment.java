@@ -71,6 +71,7 @@ public class EventsFragment extends Fragment {
                                     .addOnSuccessListener(eventSnapshot -> {
                                         if (eventSnapshot.exists()) {
                                             EventModel event = eventSnapshot.toObject(EventModel.class);
+                                            event.setEventId(eventId); // 设置 eventId
                                             eventList.add(event);
                                             eventAdapter.notifyDataSetChanged();
                                         }
@@ -81,4 +82,7 @@ public class EventsFragment extends Fragment {
                 })
                 .addOnFailureListener(e -> Log.e("EventsFragment", "Error loading registered events", e));
     }
+
+
+
 }

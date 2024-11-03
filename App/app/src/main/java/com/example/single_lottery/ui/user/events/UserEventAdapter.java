@@ -14,7 +14,8 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.single_lottery.EventModel;
 import com.example.single_lottery.R;
 
-import com.example.single_lottery.ui.user.home.UserEventDetailActivity;
+import com.example.single_lottery.ui.user.home.UserHomeDetailActivity;
+import com.example.single_lottery.ui.user.home.UserHomeAdapter;
 
 import java.util.List;
 
@@ -40,13 +41,17 @@ public class UserEventAdapter extends RecyclerView.Adapter<UserEventAdapter.User
         EventModel event = eventList.get(position);
         holder.eventNameTextView.setText(event.getName());
 
-
         holder.viewButton.setOnClickListener(v -> {
             Intent intent = new Intent(context, UserEventDetailActivity.class);
-            intent.putExtra("event_id", event.getEventId());
+            intent.putExtra("event_id", event.getEventId()); // 确保 eventId 非空
             context.startActivity(intent);
         });
     }
+
+
+
+
+
 
     @Override
     public int getItemCount() {
@@ -55,7 +60,6 @@ public class UserEventAdapter extends RecyclerView.Adapter<UserEventAdapter.User
 
     public static class UserEventViewHolder extends RecyclerView.ViewHolder {
         public TextView eventNameTextView;
-        public TextView dateTextView;
         public Button viewButton;
 
         public UserEventViewHolder(@NonNull View itemView) {

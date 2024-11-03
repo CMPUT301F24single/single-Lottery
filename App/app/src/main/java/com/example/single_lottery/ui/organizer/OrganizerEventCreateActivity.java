@@ -1,5 +1,8 @@
 package com.example.single_lottery.ui.organizer;
 
+import android.annotation.SuppressLint;
+import android.app.DatePickerDialog;
+import android.app.TimePickerDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
@@ -10,6 +13,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.Toolbar;
 
@@ -21,24 +25,27 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 
 public class OrganizerEventCreateActivity extends AppCompatActivity {
 
     private ImageView eventPosterImageView;
-    private EditText eventNameEditText, eventDescriptionEditText, eventTimeEditText,
-            registrationDeadlineEditText, waitingListCountEditText, lotteryCountEditText, lotteryTimeEditText;
+    private EditText eventNameEditText, eventDescriptionEditText, waitingListCountEditText, lotteryCountEditText;
+    private TextView eventTimeTextView, registrationDeadlineTextView, lotteryTimeTextView;  // 改为 TextView
     private Uri posterUri;
 
     private FirebaseFirestore db;
     private StorageReference storageRef;
 
+    @SuppressLint("MissingInflatedId")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.organizer_event_create_fragment);
-
 
         ImageButton backButton = findViewById(R.id.backButton);
         backButton.setOnClickListener(v -> finish());
@@ -51,17 +58,22 @@ public class OrganizerEventCreateActivity extends AppCompatActivity {
         eventPosterImageView = findViewById(R.id.eventPosterImageView);
         eventNameEditText = findViewById(R.id.eventNameEditText);
         eventDescriptionEditText = findViewById(R.id.eventDescriptionEditText);
-        eventTimeEditText = findViewById(R.id.eventTimeEditText);
-        registrationDeadlineEditText = findViewById(R.id.registrationDeadlineEditText);
+        eventTimeTextView = findViewById(R.id.eventTimeTextView);  // 改为 TextView
+        registrationDeadlineTextView = findViewById(R.id.registrationDeadlineTextView);  // 改为 TextView
         waitingListCountEditText = findViewById(R.id.waitingListCountEditText);
         lotteryCountEditText = findViewById(R.id.lotteryCountEditText);
-        lotteryTimeEditText = findViewById(R.id.lotteryTimeEditText);
+        lotteryTimeTextView = findViewById(R.id.lotteryTimeTextView);  // 改为 TextView
 
         Button uploadPosterButton = findViewById(R.id.uploadPosterButton);
         Button createEventButton = findViewById(R.id.createEventButton);
 
         uploadPosterButton.setOnClickListener(v -> openImagePicker());
         createEventButton.setOnClickListener(v -> uploadEventToFirebase());
+
+        // 设置点击事件，弹出日期时间选择器
+        eventTimeTextView.setOnClickListener(v -> showDateTimePicker(eventTimeTextView));
+        registrationDeadlineTextView.setOnClickListener(v -> showDateTimePicker(registrationDeadlineTextView));
+        lotteryTimeTextView.setOnClickListener(v -> showDateTimePicker(lotteryTimeTextView));
     }
 
     private void openImagePicker() {
@@ -79,21 +91,35 @@ public class OrganizerEventCreateActivity extends AppCompatActivity {
         }
     }
 
+    private void showDateTimePicker(final TextView textView) {
+        final Calendar currentDate = Calendar.getInstance();
+        Calendar date = Calendar.getInstance();
+
+        new DatePickerDialog(this, (view, year, monthOfYear, dayOfMonth) -> {
+            date.set(year, monthOfYear, dayOfMonth);
+
+            new TimePickerDialog(this, (view1, hourOfDay, minute) -> {
+                date.set(Calendar.HOUR_OF_DAY, hourOfDay);
+                date.set(Calendar.MINUTE, minute);
+                // 格式化并设置日期时间
+                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault());
+                textView.setText(sdf.format(date.getTime()));
+            }, currentDate.get(Calendar.HOUR_OF_DAY), currentDate.get(Calendar.MINUTE), false).show();
+        }, currentDate.get(Calendar.YEAR), currentDate.get(Calendar.MONTH), currentDate.get(Calendar.DAY_OF_MONTH)).show();
+    }
+
     private void uploadEventToFirebase() {
         // 检查必填字段是否为空
         Log.d("OrganizerEventCreateActivity", "uploadEventToFirebase() called");
 
         String eventName = eventNameEditText.getText().toString().trim();
-        String eventTime = eventTimeEditText.getText().toString().trim();
-        String registrationDeadline = registrationDeadlineEditText.getText().toString().trim();
-        String lotteryTime = lotteryTimeEditText.getText().toString().trim();
-        String eventDescription = eventDescriptionEditText.getText().toString().trim(); // 获取活动描述
-
+        String eventTime = eventTimeTextView.getText().toString().trim();
+        String registrationDeadline = registrationDeadlineTextView.getText().toString().trim();
+        String lotteryTime = lotteryTimeTextView.getText().toString().trim();
+        String eventDescription = eventDescriptionEditText.getText().toString().trim();
 
         // 获取设备码
-        SharedPreferences prefs = getSharedPreferences("MyPrefs", MODE_PRIVATE);
         String organizerDeviceID = Settings.Secure.getString(getContentResolver(), Settings.Secure.ANDROID_ID);
-
 
         // 检查必填字段
         if (eventName.isEmpty() || eventTime.isEmpty() || registrationDeadline.isEmpty() || lotteryTime.isEmpty()) {
@@ -131,7 +157,7 @@ public class OrganizerEventCreateActivity extends AppCompatActivity {
             posterRef.putFile(posterUri).addOnSuccessListener(taskSnapshot ->
                     posterRef.getDownloadUrl().addOnSuccessListener(uri -> {
                         Log.d("OrganizerEventCreateActivity", "Poster uploaded, URL: " + uri.toString());
-                        saveEventData(uri.toString(), eventName, eventTime, registrationDeadline, lotteryTime, waitingListCount, lotteryCount, organizerDeviceID,eventDescription);
+                        saveEventData(uri.toString(), eventName, eventTime, registrationDeadline, lotteryTime, waitingListCount, lotteryCount, organizerDeviceID, eventDescription);
                     })
             ).addOnFailureListener(e -> {
                 Toast.makeText(this, "Failed to upload poster", Toast.LENGTH_SHORT).show();
@@ -139,15 +165,13 @@ public class OrganizerEventCreateActivity extends AppCompatActivity {
             });
         } else {
             Log.d("OrganizerEventCreateActivity", "No poster, saving event data directly");
-            saveEventData(null, eventName, eventTime, registrationDeadline, lotteryTime, waitingListCount, lotteryCount,organizerDeviceID,eventDescription);
+            saveEventData(null, eventName, eventTime, registrationDeadline, lotteryTime, waitingListCount, lotteryCount, organizerDeviceID, eventDescription);
         }
     }
 
     private void saveEventData(String posterUrl, String eventName, String eventTime,
                                String registrationDeadline, String lotteryTime,
-                               int waitingListCount, int lotteryCount,String organizerDeviceID,String eventDescription) {
-
-
+                               int waitingListCount, int lotteryCount, String organizerDeviceID, String eventDescription) {
         Map<String, Object> event = new HashMap<>();
         event.put("name", eventName);
         event.put("time", eventTime);
@@ -156,50 +180,13 @@ public class OrganizerEventCreateActivity extends AppCompatActivity {
         event.put("waitingListCount", waitingListCount);
         event.put("lotteryCount", lotteryCount);
         event.put("posterUrl", posterUrl);
-        event.put("organizerDeviceID", organizerDeviceID); // 添加 organizerDeviceID 字段
+        event.put("organizerDeviceID", organizerDeviceID);
         event.put("description", eventDescription);
 
-
         db.collection("events").add(event).addOnSuccessListener(documentReference -> {
-                    Toast.makeText(this, "Event created successfully", Toast.LENGTH_SHORT).show();
-                }
-        ).addOnFailureListener(e -> {
-                    Toast.makeText(this, "Failed to create event", Toast.LENGTH_SHORT).show();
-                }
-        );
-    }
-
-
-
-    private boolean validateInputs() {
-        if (eventNameEditText.getText().toString().isEmpty()) {
-            Toast.makeText(this, "Please enter event name", Toast.LENGTH_SHORT).show();
-            return false;
-        }
-        if (eventDescriptionEditText.getText().toString().isEmpty()) {
-            Toast.makeText(this, "Please enter event description", Toast.LENGTH_SHORT).show();
-            return false;
-        }
-        if (eventTimeEditText.getText().toString().isEmpty()) {
-            Toast.makeText(this, "Please enter event time", Toast.LENGTH_SHORT).show();
-            return false;
-        }
-        if (registrationDeadlineEditText.getText().toString().isEmpty()) {
-            Toast.makeText(this, "Please enter registration deadline", Toast.LENGTH_SHORT).show();
-            return false;
-        }
-        if (waitingListCountEditText.getText().toString().isEmpty()) {
-            Toast.makeText(this, "Please enter waiting list count", Toast.LENGTH_SHORT).show();
-            return false;
-        }
-        if (lotteryCountEditText.getText().toString().isEmpty()) {
-            Toast.makeText(this, "Please enter lottery count", Toast.LENGTH_SHORT).show();
-            return false;
-        }
-        if (lotteryTimeEditText.getText().toString().isEmpty()) {
-            Toast.makeText(this, "Please enter lottery time", Toast.LENGTH_SHORT).show();
-            return false;
-        }
-        return true;
+            Toast.makeText(this, "Event created successfully", Toast.LENGTH_SHORT).show();
+        }).addOnFailureListener(e -> {
+            Toast.makeText(this, "Failed to create event", Toast.LENGTH_SHORT).show();
+        });
     }
 }

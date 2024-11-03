@@ -13,15 +13,12 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.bumptech.glide.Glide;
 import com.example.single_lottery.R;
 import com.example.single_lottery.EventModel;
-import com.google.firebase.firestore.DocumentReference;
-import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.HashMap;
 import java.util.Map;
 
-public class UserEventDetailActivity extends AppCompatActivity {
+public class UserHomeDetailActivity extends AppCompatActivity {
 
     private TextView textViewEventName, textViewEventDescription, textViewEventTime,
             textViewRegistrationDeadline, textViewLotteryTime,
