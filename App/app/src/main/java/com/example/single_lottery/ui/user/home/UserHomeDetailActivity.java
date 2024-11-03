@@ -15,7 +15,11 @@ import com.example.single_lottery.R;
 import com.example.single_lottery.EventModel;
 import com.google.firebase.firestore.FirebaseFirestore;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 
 public class UserHomeDetailActivity extends AppCompatActivity {
@@ -27,6 +31,7 @@ public class UserHomeDetailActivity extends AppCompatActivity {
     private ImageButton backButton;
     private Button buttonSignUp;
     private String eventId;
+    private String registrationDeadline; // 报名截止日期
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,7 +61,7 @@ public class UserHomeDetailActivity extends AppCompatActivity {
 
         loadEventData(eventId);
 
-        // Initialize the Sign Up button
+        // 初始化报名按钮
         buttonSignUp = findViewById(R.id.buttonSignUp);
         buttonSignUp.setOnClickListener(v -> signUpForEvent());
     }
@@ -74,6 +79,8 @@ public class UserHomeDetailActivity extends AppCompatActivity {
                             textViewRegistrationDeadline.setText(event.getRegistrationDeadline());
                             textViewLotteryTime.setText(event.getLotteryTime());
                             textViewLotteryCount.setText(String.valueOf(event.getLotteryCount()));
+
+                            registrationDeadline = event.getRegistrationDeadline(); // 存储报名截止日期
 
                             if (event.getPosterUrl() != null) {
                                 Glide.with(this).load(event.getPosterUrl()).into(imageViewPoster);
@@ -108,41 +115,58 @@ public class UserHomeDetailActivity extends AppCompatActivity {
     }
 
     private void signUpForEvent() {
-        FirebaseFirestore db = FirebaseFirestore.getInstance();
-        String userId = Settings.Secure.getString(getContentResolver(), Settings.Secure.ANDROID_ID);
+        try {
+            // 检查是否在报名截止日期前
+            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault());
+            Date deadlineDate = dateFormat.parse(registrationDeadline);
+            Date currentDate = new Date();
 
-        // 创建一个报名记录到 registered_events 集合中
-        Map<String, Object> registrationData = new HashMap<>();
-        registrationData.put("eventId", eventId);
-        registrationData.put("userId", userId);
-        registrationData.put("timestamp", System.currentTimeMillis()); // 可选：记录报名时间
+            if (currentDate.after(deadlineDate)) {
+                // 如果报名截止日期已过，显示提示信息并退出
+                Toast.makeText(this, "Registration is closed. Sign-up is not allowed.", Toast.LENGTH_SHORT).show();
+                return;
+            }
 
-        // 首先检查用户是否已经报名
-        db.collection("registered_events")
-                .whereEqualTo("eventId", eventId)
-                .whereEqualTo("userId", userId)
-                .get()
-                .addOnSuccessListener(queryDocumentSnapshots -> {
-                    if (queryDocumentSnapshots.isEmpty()) {
-                        // 如果用户还没有报名，则添加报名记录
-                        db.collection("registered_events").add(registrationData)
-                                .addOnSuccessListener(documentReference -> {
-                                    Toast.makeText(this, "Successfully signed up for the event!", Toast.LENGTH_SHORT).show();
-                                    buttonSignUp.setEnabled(false);
-                                    loadEventData(eventId); // 更新页面显示
-                                })
-                                .addOnFailureListener(e -> {
-                                    Toast.makeText(this, "Failed to sign up. Please try again.", Toast.LENGTH_SHORT).show();
-                                });
-                    } else {
-                        // 用户已经报名
-                        Toast.makeText(this, "You have already signed up for this event.", Toast.LENGTH_SHORT).show();
-                        buttonSignUp.setEnabled(false);
-                    }
-                })
-                .addOnFailureListener(e -> {
-                    Toast.makeText(this, "Failed to check registration status. Please try again.", Toast.LENGTH_SHORT).show();
-                });
+            // 报名逻辑
+            FirebaseFirestore db = FirebaseFirestore.getInstance();
+            String userId = Settings.Secure.getString(getContentResolver(), Settings.Secure.ANDROID_ID);
+
+            // 创建一个报名记录到 registered_events 集合中
+            Map<String, Object> registrationData = new HashMap<>();
+            registrationData.put("eventId", eventId);
+            registrationData.put("userId", userId);
+            registrationData.put("timestamp", System.currentTimeMillis()); // 可选：记录报名时间
+
+            // 检查用户是否已经报名
+            db.collection("registered_events")
+                    .whereEqualTo("eventId", eventId)
+                    .whereEqualTo("userId", userId)
+                    .get()
+                    .addOnSuccessListener(queryDocumentSnapshots -> {
+                        if (queryDocumentSnapshots.isEmpty()) {
+                            // 用户尚未报名，添加报名记录
+                            db.collection("registered_events").add(registrationData)
+                                    .addOnSuccessListener(documentReference -> {
+                                        Toast.makeText(this, "Successfully signed up for the event!", Toast.LENGTH_SHORT).show();
+                                        buttonSignUp.setEnabled(false);
+                                        loadEventData(eventId); // 更新页面显示
+                                    })
+                                    .addOnFailureListener(e -> {
+                                        Toast.makeText(this, "Failed to sign up. Please try again.", Toast.LENGTH_SHORT).show();
+                                    });
+                        } else {
+                            // 用户已经报名
+                            Toast.makeText(this, "You have already signed up for this event.", Toast.LENGTH_SHORT).show();
+                            buttonSignUp.setEnabled(false);
+                        }
+                    })
+                    .addOnFailureListener(e -> {
+                        Toast.makeText(this, "Failed to check registration status. Please try again.", Toast.LENGTH_SHORT).show();
+                    });
+
+        } catch (ParseException e) {
+            e.printStackTrace();
+            Toast.makeText(this, "Error parsing registration deadline", Toast.LENGTH_SHORT).show();
+        }
     }
-
 }
