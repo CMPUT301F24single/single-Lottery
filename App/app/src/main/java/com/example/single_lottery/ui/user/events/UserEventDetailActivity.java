@@ -28,17 +28,20 @@ public class UserEventDetailActivity extends AppCompatActivity {
             lotteryTimeTextView, waitingListCountTextView, lotteryCountTextView, eventDescriptionTextView;
     private ImageView eventPosterImageView;
     private TextView eventStatusValueTextView;
-    private Button cancelRegistrationButton;
+    private Button cancelRegistrationButton, acceptButton, declineButton;
 
-    private String registrationDeadline; // 报名截止时间字符串
-    private String lotteryTime; // 抽奖时间字符串
+    private String registrationDeadline;
+    private String lotteryTime;
+    private String eventTime;
+    private String eventId;
+    private String userId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.user_event_viewdetail);
 
-        // 绑定视图
+        // Bind views
         Button backButton = findViewById(R.id.backButton);
         backButton.setOnClickListener(v -> finish());
 
@@ -52,13 +55,17 @@ public class UserEventDetailActivity extends AppCompatActivity {
         eventDescriptionTextView = findViewById(R.id.eventDescriptionTextView);
         eventStatusValueTextView = findViewById(R.id.eventStatusValueTextView);
         cancelRegistrationButton = findViewById(R.id.cancelRegistrationButton);
+        acceptButton = findViewById(R.id.acceptButton);
+        declineButton = findViewById(R.id.declineButton);
 
-        // 获取传递的 eventId
-        String eventId = getIntent().getStringExtra("event_id");
+        eventId = getIntent().getStringExtra("event_id");
+        userId = Settings.Secure.getString(getContentResolver(), Settings.Secure.ANDROID_ID);
+
         loadEventDetails(eventId);
 
-        // 设置取消注册按钮的点击事件
         cancelRegistrationButton.setOnClickListener(v -> cancelRegistration(eventId));
+        acceptButton.setOnClickListener(v -> updateLotteryStatus("Accepted"));
+        declineButton.setOnClickListener(v -> updateLotteryStatus("Declined"));
     }
 
     private void loadEventDetails(String eventId) {
@@ -67,16 +74,14 @@ public class UserEventDetailActivity extends AppCompatActivity {
                 .get()
                 .addOnSuccessListener(documentSnapshot -> {
                     if (documentSnapshot.exists()) {
-                        // 从 documentSnapshot 获取数据
                         String eventName = documentSnapshot.getString("name");
                         String eventDescription = documentSnapshot.getString("description");
-                        String eventTime = documentSnapshot.getString("time");
+                        eventTime = documentSnapshot.getString("time"); // 获取活动时间
                         registrationDeadline = documentSnapshot.getString("registrationDeadline");
                         lotteryTime = documentSnapshot.getString("lotteryTime");
                         String waitingListCount = documentSnapshot.getLong("waitingListCount") + "";
                         String lotteryCount = documentSnapshot.getLong("lotteryCount") + "";
 
-                        // 设置 TextViews 的文本
                         eventNameTextView.setText(eventName);
                         eventTimeTextView.setText(eventTime);
                         registrationDeadlineTextView.setText(registrationDeadline);
@@ -85,13 +90,11 @@ public class UserEventDetailActivity extends AppCompatActivity {
                         lotteryCountTextView.setText(lotteryCount);
                         eventDescriptionTextView.setText(eventDescription);
 
-                        // 加载图片
                         String posterUrl = documentSnapshot.getString("posterUrl");
                         if (posterUrl != null && !posterUrl.isEmpty()) {
                             Glide.with(this).load(posterUrl).into(eventPosterImageView);
                         }
 
-                        // 更新活动状态
                         updateEventStatus();
                     } else {
                         Toast.makeText(this, "Event not found", Toast.LENGTH_SHORT).show();
@@ -105,49 +108,111 @@ public class UserEventDetailActivity extends AppCompatActivity {
             SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault());
             Date deadlineDate = dateFormat.parse(registrationDeadline);
             Date lotteryDate = dateFormat.parse(lotteryTime);
+            Date eventEndDate = dateFormat.parse(eventTime); // 活动的结束时间
             Date currentDate = new Date();
 
-            // 判断当前时间和截止时间、抽奖时间的关系
             if (currentDate.before(deadlineDate)) {
-                // 报名截止日期之前
                 eventStatusValueTextView.setText("Open for Registration");
-                cancelRegistrationButton.setVisibility(View.VISIBLE);  // 显示取消注册按钮
+                cancelRegistrationButton.setVisibility(View.VISIBLE);
+                acceptButton.setVisibility(View.GONE);
+                declineButton.setVisibility(View.GONE);
             } else if (currentDate.after(deadlineDate) && currentDate.before(lotteryDate)) {
-                // 报名截止日期之后但抽奖时间之前
                 eventStatusValueTextView.setText("Registration Closed - Awaiting Lottery");
-                cancelRegistrationButton.setVisibility(View.GONE);  // 隐藏取消注册按钮
-            } else {
-                // 抽奖时间之后
-                eventStatusValueTextView.setText("Registration Closed");
-                cancelRegistrationButton.setVisibility(View.GONE);  // 隐藏取消注册按钮
+                cancelRegistrationButton.setVisibility(View.GONE);
+                acceptButton.setVisibility(View.GONE);
+                declineButton.setVisibility(View.GONE);
+            } else if (currentDate.after(lotteryDate) && currentDate.before(eventEndDate)) {
+                checkUserLotteryStatus();
+            } else if (currentDate.after(eventEndDate)) {
+                // 如果当前时间在活动时间之后，则显示“活动结束”
+                eventStatusValueTextView.setText("Event Ended");
+                cancelRegistrationButton.setVisibility(View.GONE);
+                acceptButton.setVisibility(View.GONE);
+                declineButton.setVisibility(View.GONE);
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    private void cancelRegistration(String eventId) {
-        String userId = Settings.Secure.getString(getContentResolver(), Settings.Secure.ANDROID_ID);
+    private void checkUserLotteryStatus() {
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
 
+        db.collection("registered_events")
+                .whereEqualTo("eventId", eventId)
+                .whereEqualTo("userId", userId)
+                .get()
+                .addOnSuccessListener(querySnapshot -> {
+                    if (!querySnapshot.isEmpty()) {
+                        DocumentSnapshot userRegistration = querySnapshot.getDocuments().get(0);
+                        String userStatus = userRegistration.getString("status");
+
+                        if ("Winner".equals(userStatus)) {
+                            eventStatusValueTextView.setText("Lottery Completed - You Won!");
+                            acceptButton.setVisibility(View.VISIBLE);
+                            declineButton.setVisibility(View.VISIBLE);
+                        } else if ("Not Selected".equals(userStatus)) {
+                            eventStatusValueTextView.setText("Lottery Completed - Not Selected");
+                            acceptButton.setVisibility(View.GONE);
+                            declineButton.setVisibility(View.GONE);
+                        } else if ("Accepted".equals(userStatus)) {
+                            eventStatusValueTextView.setText("You accepted the invitation");
+                            acceptButton.setVisibility(View.GONE);
+                            declineButton.setVisibility(View.GONE);
+                        } else if ("Declined".equals(userStatus)) {
+                            eventStatusValueTextView.setText("You declined the invitation");
+                            acceptButton.setVisibility(View.GONE);
+                            declineButton.setVisibility(View.GONE);
+                        }
+                    } else {
+                        eventStatusValueTextView.setText("Lottery Completed - No Participation Found");
+                        acceptButton.setVisibility(View.GONE);
+                        declineButton.setVisibility(View.GONE);
+                    }
+                })
+                .addOnFailureListener(e -> Log.e("UserEventDetailActivity", "Error checking user lottery status", e));
+    }
+
+    private void updateLotteryStatus(String status) {
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+
+        db.collection("registered_events")
+                .whereEqualTo("eventId", eventId)
+                .whereEqualTo("userId", userId)
+                .get()
+                .addOnSuccessListener(querySnapshot -> {
+                    if (!querySnapshot.isEmpty()) {
+                        DocumentSnapshot document = querySnapshot.getDocuments().get(0);
+                        db.collection("registered_events").document(document.getId())
+                                .update("status", status)
+                                .addOnSuccessListener(aVoid -> {
+                                    Toast.makeText(this, "Status updated to " + status, Toast.LENGTH_SHORT).show();
+                                    checkUserLotteryStatus();
+                                })
+                                .addOnFailureListener(e -> Toast.makeText(this, "Failed to update status", Toast.LENGTH_SHORT).show());
+                    }
+                })
+                .addOnFailureListener(e -> Log.e("UserEventDetailActivity", "Error updating lottery status", e));
+    }
+
+    private void cancelRegistration(String eventId) {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         db.collection("registered_events")
                 .whereEqualTo("userId", userId)
                 .whereEqualTo("eventId", eventId)
                 .get()
-                .addOnSuccessListener(queryDocumentSnapshots -> {
-                    if (!queryDocumentSnapshots.isEmpty()) {
-                        for (DocumentSnapshot document : queryDocumentSnapshots.getDocuments()) {
+                .addOnSuccessListener(querySnapshot -> {
+                    if (!querySnapshot.isEmpty()) {
+                        for (DocumentSnapshot document : querySnapshot.getDocuments()) {
                             db.collection("registered_events").document(document.getId()).delete()
                                     .addOnSuccessListener(aVoid -> {
                                         Toast.makeText(this, "Registration canceled", Toast.LENGTH_SHORT).show();
-                                        finish();  // 关闭当前页面并返回
+                                        finish();
                                     })
                                     .addOnFailureListener(e -> Toast.makeText(this, "Failed to cancel registration", Toast.LENGTH_SHORT).show());
                         }
-                    } else {
-                        Toast.makeText(this, "Registration not found", Toast.LENGTH_SHORT).show();
                     }
                 })
-                .addOnFailureListener(e -> Toast.makeText(this, "Error fetching registration", Toast.LENGTH_SHORT).show());
+                .addOnFailureListener(e -> Log.e("UserEventDetailActivity", "Error canceling registration", e));
     }
 }

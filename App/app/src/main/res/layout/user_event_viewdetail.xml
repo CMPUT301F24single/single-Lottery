@@ -138,6 +138,23 @@
                 android:visibility="gone"
                 android:layout_marginTop="16dp"/>
 
+            <!-- Accept and Decline Buttons -->
+            <Button
+                android:id="@+id/acceptButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Accept"
+                android:visibility="gone"
+                android:layout_marginTop="8dp"/>
+
+            <Button
+                android:id="@+id/declineButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Decline"
+                android:visibility="gone"
+                android:layout_marginTop="8dp"/>
+
         </LinearLayout>
     </LinearLayout>
 </ScrollView>
