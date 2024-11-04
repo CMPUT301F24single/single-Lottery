@@ -1,45 +1,46 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:padding="16dp">
 
-    <!-- 返回按钮固定在顶部 -->
-    <ImageButton
-        android:id="@+id/backButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:src="@drawable/ic_back"
-        android:background="?attr/selectableItemBackgroundBorderless"
-        android:contentDescription="Back Button"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentStart="true"
-        android:layout_margin="16dp" />
-
-    <ScrollView
+    <!-- 使用一个 LinearLayout 包含所有内容 -->
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_below="@id/backButton"
-        android:padding="16dp">
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
 
+        <!-- Back Button -->
+        <Button
+            android:id="@+id/backButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Back"
+            android:layout_marginBottom="16dp" />
+
+        <!-- Event Details Container -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
+            <!-- Event Poster Image -->
             <ImageView
                 android:id="@+id/imageViewPoster"
                 android:layout_width="match_parent"
                 android:layout_height="200dp"
                 android:scaleType="centerCrop"
-                android:contentDescription="Event Poster"/>
+                android:contentDescription="Event Poster" />
 
             <!-- Event Name -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Event Name:"
-                android:textStyle="bold"/>
+                android:textStyle="bold"
+                android:layout_marginTop="16dp" />
             <TextView
-                android:id="@+id/textViewEventName"
+                android:id="@+id/eventNameTextView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content" />
 
@@ -48,9 +49,10 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Event Description:"
-                android:textStyle="bold"/>
+                android:textStyle="bold"
+                android:layout_marginTop="8dp" />
             <TextView
-                android:id="@+id/textViewEventDescription"
+                android:id="@+id/eventDescriptionTextView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content" />
 
@@ -59,9 +61,10 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Event Time:"
-                android:textStyle="bold"/>
+                android:textStyle="bold"
+                android:layout_marginTop="8dp" />
             <TextView
-                android:id="@+id/textViewEventTime"
+                android:id="@+id/eventTimeTextView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content" />
 
@@ -70,9 +73,10 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Registration Deadline:"
-                android:textStyle="bold"/>
+                android:textStyle="bold"
+                android:layout_marginTop="8dp" />
             <TextView
-                android:id="@+id/textViewRegistrationDeadline"
+                android:id="@+id/registrationDeadlineTextView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content" />
 
@@ -81,9 +85,10 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Lottery Time:"
-                android:textStyle="bold"/>
+                android:textStyle="bold"
+                android:layout_marginTop="8dp" />
             <TextView
-                android:id="@+id/textViewLotteryTime"
+                android:id="@+id/lotteryTimeTextView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content" />
 
@@ -92,47 +97,64 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Waiting List Count:"
-                android:textStyle="bold"/>
+                android:textStyle="bold"
+                android:layout_marginTop="8dp" />
             <TextView
-                android:id="@+id/textViewWaitingListCount"
+                android:id="@+id/waitingListCountTextView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content" />
-            <Button
-                android:id="@+id/buttonViewWaitingList"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="View Waiting List"
-                android:layout_marginTop="8dp"/>
 
             <!-- Lottery Count -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Lottery Count:"
-                android:textStyle="bold"/>
+                android:textStyle="bold"
+                android:layout_marginTop="8dp" />
             <TextView
-                android:id="@+id/textViewLotteryCount"
+                android:id="@+id/lotteryCountTextView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content" />
-            <Button
-                android:id="@+id/buttonViewSelectedUsers"
+
+            <!-- Activity Status -->
+            <TextView
+                android:id="@+id/eventStatusTextView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="View Selected Users"
+                android:text="Status: "
+                android:textStyle="bold"
+                android:layout_marginTop="8dp"/>
+            <TextView
+                android:id="@+id/eventStatusValueTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
+
+            <!-- Cancel Registration Button -->
+            <Button
+                android:id="@+id/cancelRegistrationButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Cancel Registration"
+                android:visibility="gone"
+                android:layout_marginTop="16dp"/>
+
+            <!-- Accept and Decline Buttons -->
+            <Button
+                android:id="@+id/acceptButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Accept"
+                android:visibility="gone"
                 android:layout_marginTop="8dp"/>
 
             <Button
-                android:id="@+id/buttonViewAcceptedUsers"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
-
-            <Button
-                android:id="@+id/mapButton"
+                android:id="@+id/declineButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:contentDescription="map" />
+                android:text="Decline"
+                android:visibility="gone"
+                android:layout_marginTop="8dp"/>
+
         </LinearLayout>
-
-    </ScrollView>
-
-</RelativeLayout>
+    </LinearLayout>
+</ScrollView>
