@@ -3,10 +3,8 @@ package com.example.single_lottery.ui.organizer;
 
 import android.graphics.Bitmap;
 import android.graphics.Color;
-import android.net.Uri;
 import android.os.Bundle;
 import android.widget.Button;
-import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.Toast;
 
@@ -14,16 +12,13 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.single_lottery.R;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.storage.FirebaseStorage;
-import com.google.firebase.storage.StorageReference;
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.WriterException;
 import com.google.zxing.common.BitMatrix;
 import com.google.zxing.qrcode.QRCodeWriter;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 
 public class QRCodeActivity extends AppCompatActivity {
 
@@ -40,14 +35,15 @@ public class QRCodeActivity extends AppCompatActivity {
         buttonback.setOnClickListener(v -> finish());
 
         String eventId = getIntent().getStringExtra("event_id");
-        generateQRCode(eventId);
-
+        String hash = hashData(eventId);
+        saveHashToFirestore(eventId, hash);
+        generateQRCode(hash);
     }
 
-    private void generateQRCode(String eventId) {
+    private void generateQRCode(String hash) {
         try {
             QRCodeWriter writer = new QRCodeWriter();
-            BitMatrix bitMatrix = writer.encode(eventId, BarcodeFormat.QR_CODE, 400, 400);
+            BitMatrix bitMatrix = writer.encode(hash, BarcodeFormat.QR_CODE, 400, 400);
 
             int width = bitMatrix.getWidth();
             int height = bitMatrix.getHeight();
@@ -59,48 +55,54 @@ public class QRCodeActivity extends AppCompatActivity {
             }
 
             imageViewQRCode.setImageBitmap(bitmap);
-            uploadQRCode(eventId, bitmap);
         } catch (WriterException e) {
             e.printStackTrace();
+            Toast.makeText(this, "Failed to generate QR Code.", Toast.LENGTH_SHORT).show();
         }
     }
 
-    private void uploadQRCode(String eventId, Bitmap bitmap) {
+    private String hashData(String data) {
         try {
-            String uniqueFileName = eventId + "_qr_" + System.currentTimeMillis() + ".png";
-            File file = new File(getExternalFilesDir(null), eventId + "_qr.png");
-            FileOutputStream outputStream = new FileOutputStream(file);
-            bitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream);
-            outputStream.flush();
-            outputStream.close();
-
-            Uri uri = Uri.fromFile(file);
-            FirebaseStorage storage = FirebaseStorage.getInstance();
-            StorageReference storageRef = storage.getReference().child("qr_codes/" + eventId + uniqueFileName);
-
-            storageRef.putFile(uri).addOnSuccessListener(taskSnapshot -> {
-                storageRef.getDownloadUrl().addOnSuccessListener(downloadUrl -> {
-                    saveQRCodeUrlToFirestore(eventId, downloadUrl.toString());
-                });
-                Toast.makeText(this, "QR Code uploaded successfully!", Toast.LENGTH_SHORT).show();
-            }).addOnFailureListener(e -> {
-                Toast.makeText(this, "Failed to upload QR Code.", Toast.LENGTH_SHORT).show();
-            });
-
-        } catch (IOException e) {
+            MessageDigest digest = MessageDigest.getInstance("SHA-256");
+            byte[] hashBytes = digest.digest(data.getBytes());
+            StringBuilder hexString = new StringBuilder();
+            for (byte b : hashBytes) {
+                String hex = Integer.toHexString(0xff & b);
+                if (hex.length() == 1) hexString.append('0');
+                hexString.append(hex);
+            }
+            return hexString.toString();
+        } catch (NoSuchAlgorithmException e) {
             e.printStackTrace();
-            Toast.makeText(this, "Failed to save QR Code.", Toast.LENGTH_SHORT).show();
+            return null;
         }
     }
 
-    private void saveQRCodeUrlToFirestore(String eventId, String qrCodeUrl) {
+    private void saveHashToFirestore(String eventId, String hash) {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
-        db.collection("events").document(eventId).update("qrCodeUrl", qrCodeUrl)
+        db.collection("events").document(eventId).update("qrCodeHash", hash)
                 .addOnSuccessListener(aVoid -> {
-                    Toast.makeText(this, "QR Code URL saved successfully!", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, "QR Code hash saved successfully!", Toast.LENGTH_SHORT).show();
                 })
                 .addOnFailureListener(e -> {
-                    Toast.makeText(this, "Failed to save QR Code URL.", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, "Failed to save QR Code hash.", Toast.LENGTH_SHORT).show();
                 });
     }
+
+    private void loadQRCodeFromFirestore(String eventId) {
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        db.collection("events").document(eventId).get()
+                .addOnSuccessListener(documentSnapshot -> {
+                    if (documentSnapshot.exists()) {
+                        String hash = documentSnapshot.getString("qrCodeHash");
+                        generateQRCode(hash); // 用哈希值生成二维码
+                    } else {
+                        Toast.makeText(this, "No QR Code hash found.", Toast.LENGTH_SHORT).show();
+                    }
+                })
+                .addOnFailureListener(e -> {
+                    Toast.makeText(this, "Failed to load QR Code hash.", Toast.LENGTH_SHORT).show();
+                });
+    }
+    
 }
