@@ -37,7 +37,6 @@ public class MainActivity extends AppCompatActivity {
         showLandingScreen = getIntent().getBooleanExtra("showLandingScreen", true);
 
         if (showLandingScreen) {
-            // 使用包含 User, Organizer, 和 Admin 按钮的 landing 布局
             setContentView(R.layout.activity_landing);
 
             Button buttonUser = findViewById(R.id.button_user);
@@ -55,7 +54,6 @@ public class MainActivity extends AppCompatActivity {
                 } else if (v.getId() == R.id.button_organizer) {
                     intent = new Intent(MainActivity.this, OrganizerActivity.class);
                 } else {
-                    // Admin按钮的处理（这里跳转到AdminActivity）
                     intent = new Intent(MainActivity.this, AdminActivity.class);
                 }
                 intent.putExtra("showLandingScreen", false);
@@ -74,7 +72,6 @@ public class MainActivity extends AppCompatActivity {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
 
         db.collection("events")
-                .whereEqualTo("lotteryCompleted", false) // 仅找未完成抽奖的活动
                 .get()
                 .addOnSuccessListener(queryDocumentSnapshots -> {
                     for (DocumentSnapshot document : queryDocumentSnapshots.getDocuments()) {
@@ -88,73 +85,73 @@ public class MainActivity extends AppCompatActivity {
                             Date lotteryDate = dateFormat.parse(lotteryTime);
                             Date currentDate = new Date();
                             if (currentDate.after(lotteryDate)) {
-                                performLottery(eventId, lotteryCount);
+                                checkIfAlreadyDrawn(eventId, lotteryCount);
                             }
                         } catch (ParseException e) {
-                            Log.e("MainActivity", "Error parsing lottery time", e);
+                            e.printStackTrace();
                         }
                     }
                 })
                 .addOnFailureListener(e -> Log.e("MainActivity", "Error checking lottery time", e));
     }
 
-    // 抽奖功能
-    private void performLottery(String eventId, int lotteryCount) {
+    // 检查是否已经进行过抽奖
+    private void checkIfAlreadyDrawn(String eventId, int lotteryCount) {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
 
-        // Step 1: Check if lottery has already been completed
-        db.collection("events").document(eventId)
+        db.collection("registered_events")
+                .whereEqualTo("eventId", eventId)
+                .whereEqualTo("status", "Winner") // 检查是否已有 "Winner" 状态的记录
                 .get()
-                .addOnSuccessListener(documentSnapshot -> {
-                    if (documentSnapshot.exists()) {
-                        Boolean lotteryCompleted = documentSnapshot.getBoolean("lotteryCompleted");
-                        if (lotteryCompleted != null && lotteryCompleted) {
-                            Log.d("Lottery", "Lottery already completed for this event. Skipping...");
-                        } else {
-                            // Proceed with lottery
-                            executeLottery(eventId, lotteryCount);
-                        }
+                .addOnSuccessListener(querySnapshot -> {
+                    if (querySnapshot.isEmpty()) {
+                        // 如果没有 "Winner" 状态的记录，执行抽奖
+                        performLottery(eventId, lotteryCount);
+                    } else {
+                        Log.d("MainActivity", "Lottery already performed for event: " + eventId);
                     }
                 })
-                .addOnFailureListener(e -> Log.e("Lottery", "Failed to check lottery status", e));
+                .addOnFailureListener(e -> Log.e("MainActivity", "Error checking if lottery already drawn", e));
     }
 
-    private void executeLottery(String eventId, int lotteryCount) {
+    // 执行抽奖
+    private void performLottery(String eventId, int lotteryCount) {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
 
         db.collection("registered_events")
                 .whereEqualTo("eventId", eventId)
                 .get()
-                .addOnSuccessListener(querySnapshot -> {
-                    List<DocumentSnapshot> registeredUsers = querySnapshot.getDocuments();
-                    int winnersCount = Math.min(registeredUsers.size(), lotteryCount);  // 使用传入的 lotteryCount
+                .addOnSuccessListener(queryDocumentSnapshots -> {
+                    if (!queryDocumentSnapshots.isEmpty()) {
+                        List<DocumentSnapshot> registeredUsers = queryDocumentSnapshots.getDocuments();
+                        int winnersCount = Math.min(registeredUsers.size(), lotteryCount);
 
-                    // Select winners
-                    List<DocumentSnapshot> winners = registeredUsers.subList(0, winnersCount);
-                    for (DocumentSnapshot winnerDoc : winners) {
-                        db.collection("registered_events").document(winnerDoc.getId())
-                                .update("status", "Winner")
-                                .addOnSuccessListener(aVoid -> Log.d("Lottery", "User " + winnerDoc.getString("userId") + " has won the lottery"))
-                                .addOnFailureListener(e -> Log.e("Lottery", "Failed to update winner status", e));
+                        // 随机抽奖逻辑
+                        Collections.shuffle(registeredUsers); // 随机打乱报名用户
+                        List<DocumentSnapshot> winners = registeredUsers.subList(0, winnersCount);
+
+                        // 更新赢家状态
+                        for (DocumentSnapshot winnerDoc : winners) {
+                            db.collection("registered_events").document(winnerDoc.getId())
+                                    .update("status", "Winner")
+                                    .addOnSuccessListener(aVoid -> Log.d("Lottery", "User " + winnerDoc.getString("userId") + " has won the lottery"))
+                                    .addOnFailureListener(e -> Log.e("Lottery", "Failed to update winner status", e));
+                        }
+
+                        // 更新非赢家状态
+                        List<DocumentSnapshot> losers = registeredUsers.subList(winnersCount, registeredUsers.size());
+                        for (DocumentSnapshot loserDoc : losers) {
+                            db.collection("registered_events").document(loserDoc.getId())
+                                    .update("status", "Not Selected")
+                                    .addOnSuccessListener(aVoid -> Log.d("Lottery", "User " + loserDoc.getString("userId") + " did not win"))
+                                    .addOnFailureListener(e -> Log.e("Lottery", "Failed to update loser status", e));
+                        }
+
+                        Toast.makeText(this, "Lottery completed. Winners have been selected.", Toast.LENGTH_SHORT).show();
+                    } else {
+                        Log.d("Lottery", "No users registered for event " + eventId);
                     }
-
-                    // Select losers
-                    List<DocumentSnapshot> losers = registeredUsers.subList(winnersCount, registeredUsers.size());
-                    for (DocumentSnapshot loserDoc : losers) {
-                        db.collection("registered_events").document(loserDoc.getId())
-                                .update("status", "Not Selected")
-                                .addOnSuccessListener(aVoid -> Log.d("Lottery", "User " + loserDoc.getString("userId") + " did not win"))
-                                .addOnFailureListener(e -> Log.e("Lottery", "Failed to update loser status", e));
-                    }
-
-                    // Step 3: Mark lottery as completed
-                    db.collection("events").document(eventId)
-                            .update("lotteryCompleted", true)
-                            .addOnSuccessListener(aVoid -> Log.d("Lottery", "Lottery marked as completed"))
-                            .addOnFailureListener(e -> Log.e("Lottery", "Failed to mark lottery as completed", e));
                 })
-                .addOnFailureListener(e -> Log.e("Lottery", "Error fetching registered users", e));
+                .addOnFailureListener(e -> Log.e("Lottery", "Error performing lottery", e));
     }
-
 }
-
