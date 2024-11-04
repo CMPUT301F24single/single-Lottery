@@ -124,13 +124,13 @@
             <Button
                 android:id="@+id/buttonViewAcceptedUsers"
                 android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
+            <Button
+                android:id="@+id/mapButton"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="View Accepted Users"
-                android:layout_marginTop="16dp"/>
-
-
-
-
+                android:contentDescription="map" />
         </LinearLayout>
 
     </ScrollView>
