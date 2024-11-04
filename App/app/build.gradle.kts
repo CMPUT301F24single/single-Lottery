@@ -57,6 +57,8 @@ dependencies {
     implementation(libs.glide)
     implementation(libs.recyclerview)
     implementation(libs.play.services.maps)
+    implementation(libs.core)
+    implementation(libs.zxing.android.embedded)
     annotationProcessor(libs.compiler)
     implementation(libs.picasso)
     testImplementation(libs.junit)
