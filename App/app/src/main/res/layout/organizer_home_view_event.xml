@@ -125,13 +125,19 @@
                 android:id="@+id/buttonViewAcceptedUsers"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="AcceptedUsers"/>
+                android:text="Accepted Users"/>
 
             <Button
                 android:id="@+id/mapButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="map" />
+
+            <Button
+                android:id="@+id/buttonGenerateQRCode"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="QR Code" />
         </LinearLayout>
 
     </ScrollView>

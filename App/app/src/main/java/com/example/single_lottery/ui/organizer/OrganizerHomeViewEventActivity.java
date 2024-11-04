@@ -25,7 +25,7 @@ public class OrganizerHomeViewEventActivity extends AppCompatActivity {
     private TextView textViewEventName, textViewEventTime, textViewRegistrationDeadline,
             textViewLotteryTime, textViewWaitingListCount, textViewLotteryCount, textViewEventDescription;
     private ImageView imageViewPoster;
-    private Button buttonViewWaitingList, buttonViewSelectedUsers, buttonViewAcceptedUsers;
+    private Button buttonViewWaitingList, buttonViewSelectedUsers, buttonViewAcceptedUsers, buttonGenerateQRCode;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,6 +33,7 @@ public class OrganizerHomeViewEventActivity extends AppCompatActivity {
         setContentView(R.layout.organizer_home_view_event);
 
         ImageButton backButton = findViewById(R.id.backButton);
+        buttonGenerateQRCode = findViewById(R.id.buttonGenerateQRCode);
         backButton.setOnClickListener(v -> finish()); // 返回上一个页面
 
         Button mapButton = findViewById(R.id.mapButton);
@@ -60,6 +61,12 @@ public class OrganizerHomeViewEventActivity extends AppCompatActivity {
 
         // 从 Firestore 加载活动数据
         loadEventData(eventId);
+
+        buttonGenerateQRCode.setOnClickListener(v -> {
+            Intent intent = new Intent(OrganizerHomeViewEventActivity.this, QRCodeActivity.class);
+            intent.putExtra("event_id", eventId);
+            startActivity(intent);
+        });
 
         // 设置查看等待名单按钮的点击事件
         buttonViewWaitingList.setOnClickListener(v -> viewWaitingList(eventId));
