@@ -1,11 +1,15 @@
 package com.example.single_lottery.ui.organizer;
 
 import android.os.Bundle;
+import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.content.Intent;
+
 
 import androidx.appcompat.app.AppCompatActivity;
+import com.example.single_lottery.MapsActivity;
 
 import com.bumptech.glide.Glide;
 import com.example.single_lottery.R;
@@ -25,6 +29,12 @@ public class OrganizerHomeViewEventActivity extends AppCompatActivity {
 
         ImageButton backButton = findViewById(R.id.backButton);
         backButton.setOnClickListener(v -> finish()); // 结束当前 Activity，返回上一个页面
+
+        Button mapButton = findViewById(R.id.mapButton);
+        mapButton.setOnClickListener(v -> {
+            Intent intent = new Intent(OrganizerHomeViewEventActivity.this, MapsActivity.class);
+            startActivity(intent);
+        });
 
 
         // 初始化视图
