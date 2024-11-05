@@ -2,6 +2,8 @@ package com.example.single_lottery.ui.user.profile;
 
 import static android.app.Activity.RESULT_OK;
 
+import static java.util.function.Predicate.isEqual;
+
 import android.app.AlertDialog;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -119,9 +121,12 @@ public class ProfileFragment extends Fragment {
     }
 
     private void generateLetterAvatar(String name) {
-        String[] nameParts = name.split(" ");
+        String[] nameParts = name.split("\\s+");
         String initials = "";
-        if (nameParts.length > 0) {
+        if(name.isEmpty()){
+            initials += '-';
+        }
+        else if (nameParts.length > 0) {
             initials += nameParts[0].charAt(0); 
         }
         if (nameParts.length > 1) {
