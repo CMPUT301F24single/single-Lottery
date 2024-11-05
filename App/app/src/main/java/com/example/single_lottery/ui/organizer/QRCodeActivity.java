@@ -45,7 +45,7 @@ public class QRCodeActivity extends AppCompatActivity {
         }
     }
 
-    private void generateQRCode(String content) {
+    private void generateQRCode(String hash) {
         try {
             QRCodeWriter writer = new QRCodeWriter();
             BitMatrix bitMatrix = writer.encode(hash, BarcodeFormat.QR_CODE, 600, 600);
