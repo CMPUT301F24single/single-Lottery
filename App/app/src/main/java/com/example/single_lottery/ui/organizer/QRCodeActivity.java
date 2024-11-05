@@ -35,12 +35,17 @@ public class QRCodeActivity extends AppCompatActivity {
         buttonback.setOnClickListener(v -> finish());
 
         String eventId = getIntent().getStringExtra("event_id");
-        String hash = hashData(eventId);
-        saveHashToFirestore(eventId, hash);
-        generateQRCode(hash);
+        if (eventId != null) {
+            generateQRCode(eventId);
+            String hash = hashData(eventId);
+            saveHashToFirestore(eventId, hash);
+        } else {
+            Toast.makeText(this, "No event ID found.", Toast.LENGTH_SHORT).show();
+            finish();
+        }
     }
 
-    private void generateQRCode(String hash) {
+    private void generateQRCode(String content) {
         try {
             QRCodeWriter writer = new QRCodeWriter();
             BitMatrix bitMatrix = writer.encode(hash, BarcodeFormat.QR_CODE, 600, 600);
@@ -86,22 +91,6 @@ public class QRCodeActivity extends AppCompatActivity {
                 })
                 .addOnFailureListener(e -> {
                     Toast.makeText(this, "Failed to save QR Code hash.", Toast.LENGTH_SHORT).show();
-                });
-    }
-
-    private void loadQRCodeFromFirestore(String eventId) {
-        FirebaseFirestore db = FirebaseFirestore.getInstance();
-        db.collection("events").document(eventId).get()
-                .addOnSuccessListener(documentSnapshot -> {
-                    if (documentSnapshot.exists()) {
-                        String hash = documentSnapshot.getString("qrCodeHash");
-                        generateQRCode(hash); // 用哈希值生成二维码
-                    } else {
-                        Toast.makeText(this, "No QR Code hash found.", Toast.LENGTH_SHORT).show();
-                    }
-                })
-                .addOnFailureListener(e -> {
-                    Toast.makeText(this, "Failed to load QR Code hash.", Toast.LENGTH_SHORT).show();
                 });
     }
     
