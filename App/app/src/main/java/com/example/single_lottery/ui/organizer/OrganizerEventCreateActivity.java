@@ -35,7 +35,7 @@ public class OrganizerEventCreateActivity extends AppCompatActivity {
 
     private ImageView eventPosterImageView;
     private EditText eventNameEditText, eventDescriptionEditText, waitingListCountEditText, lotteryCountEditText;
-    private TextView eventTimeTextView, registrationDeadlineTextView, lotteryTimeTextView;  // 改为 TextView
+    private TextView eventTimeTextView, registrationDeadlineTextView, lotteryTimeTextView, selectedEventTimeTextView, selectedRegistrationDeadlineTextView, selectedLotteryTimeTextView;  // 改为 TextView
     private Uri posterUri;
 
     private FirebaseFirestore db;
@@ -63,6 +63,9 @@ public class OrganizerEventCreateActivity extends AppCompatActivity {
         waitingListCountEditText = findViewById(R.id.waitingListCountEditText);
         lotteryCountEditText = findViewById(R.id.lotteryCountEditText);
         lotteryTimeTextView = findViewById(R.id.lotteryTimeTextView);  // 改为 TextView
+        selectedEventTimeTextView = findViewById(R.id.selectedEventTimeTextView);  // 改为 TextView
+        selectedRegistrationDeadlineTextView = findViewById(R.id.selectedRegistrationDeadlineTextView);  // 改为 TextView
+        selectedLotteryTimeTextView = findViewById(R.id.selectedLotteryTimeTextView);  // 改为 TextView
 
         Button uploadPosterButton = findViewById(R.id.uploadPosterButton);
         Button createEventButton = findViewById(R.id.createEventButton);
@@ -71,9 +74,9 @@ public class OrganizerEventCreateActivity extends AppCompatActivity {
         createEventButton.setOnClickListener(v -> uploadEventToFirebase());
 
         // 设置点击事件，弹出日期时间选择器
-        eventTimeTextView.setOnClickListener(v -> showDateTimePicker(eventTimeTextView));
-        registrationDeadlineTextView.setOnClickListener(v -> showDateTimePicker(registrationDeadlineTextView));
-        lotteryTimeTextView.setOnClickListener(v -> showDateTimePicker(lotteryTimeTextView));
+        eventTimeTextView.setOnClickListener(v -> showDateTimePicker(selectedEventTimeTextView));
+        registrationDeadlineTextView.setOnClickListener(v -> showDateTimePicker(selectedRegistrationDeadlineTextView));
+        lotteryTimeTextView.setOnClickListener(v -> showDateTimePicker(selectedLotteryTimeTextView));
     }
 
     private void openImagePicker() {
@@ -113,9 +116,9 @@ public class OrganizerEventCreateActivity extends AppCompatActivity {
         Log.d("OrganizerEventCreateActivity", "uploadEventToFirebase() called");
 
         String eventName = eventNameEditText.getText().toString().trim();
-        String eventTime = eventTimeTextView.getText().toString().trim();
-        String registrationDeadline = registrationDeadlineTextView.getText().toString().trim();
-        String lotteryTime = lotteryTimeTextView.getText().toString().trim();
+        String eventTime = selectedEventTimeTextView.getText().toString().trim();
+        String registrationDeadline = selectedRegistrationDeadlineTextView.getText().toString().trim();
+        String lotteryTime = selectedLotteryTimeTextView.getText().toString().trim();
         String eventDescription = eventDescriptionEditText.getText().toString().trim();
 
         // 获取设备码

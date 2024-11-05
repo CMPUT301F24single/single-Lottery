@@ -15,9 +15,12 @@ public class UserEventViewHolder extends RecyclerView.ViewHolder {
     TextView eventNameTextView;
     Button viewButton;
 
+
     public UserEventViewHolder(@NonNull View itemView) {
         super(itemView);
         eventNameTextView = itemView.findViewById(R.id.eventNameTextView);
         viewButton = itemView.findViewById(R.id.viewButton);
+
+
     }
 }

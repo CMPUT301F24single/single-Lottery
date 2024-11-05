@@ -14,16 +14,17 @@
         android:layout_alignParentStart="true"
         android:layout_margin="16dp" />
 
+    <!-- ScrollView to allow scrolling of content -->
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@id/backButton"
-        android:padding="16dp">
+        android:layout_below="@id/backButton">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:padding="16dp">
 
             <ImageView
                 android:id="@+id/imageViewPoster"
@@ -32,114 +33,188 @@
                 android:scaleType="centerCrop"
                 android:contentDescription="Event Poster"/>
 
-            <!-- Event Name -->
-            <TextView
-                android:layout_width="wrap_content"
+            <!-- Event Details Container -->
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Event Name:"
-                android:textStyle="bold"/>
-            <TextView
-                android:id="@+id/textViewEventName"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
+                android:orientation="vertical"
+                android:background="@drawable/rounded_corners_grey">
 
-            <!-- Event Description -->
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Event Description:"
-                android:textStyle="bold"/>
-            <TextView
-                android:id="@+id/textViewEventDescription"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
+                <!-- Event Name -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginStart="8dp">
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Event:"
+                        android:textStyle="bold"
+                        android:textSize="17sp"/>
+                    <TextView
+                        android:id="@+id/textViewEventName"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:textSize="17sp"/>
+                </LinearLayout>
 
-            <!-- Event Time -->
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Event Time:"
-                android:textStyle="bold"/>
-            <TextView
-                android:id="@+id/textViewEventTime"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
+                <!-- Event Description -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:layout_marginStart="8dp">
 
-            <!-- Registration Deadline -->
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Registration Deadline:"
-                android:textStyle="bold"/>
-            <TextView
-                android:id="@+id/textViewRegistrationDeadline"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Description: "
+                        android:textStyle="bold"
+                        android:textSize="17sp"/>
 
-            <!-- Lottery Time -->
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Lottery Time:"
-                android:textStyle="bold"/>
-            <TextView
-                android:id="@+id/textViewLotteryTime"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
+                    <TextView
+                        android:id="@+id/textViewEventDescription"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:textSize="17sp"/>
+                </LinearLayout>
 
-            <!-- Waiting List Count -->
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Waiting List Count:"
-                android:textStyle="bold"/>
-            <TextView
-                android:id="@+id/textViewWaitingListCount"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
+                <!-- Event Time -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginStart="8dp">
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Time: "
+                        android:textStyle="bold"
+                        android:textSize="17sp"/>
+                    <TextView
+                        android:id="@+id/textViewEventTime"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:textSize="17sp"/>
+                </LinearLayout>
+
+                <!-- Registration Deadline -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginStart="8dp">
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Registration Deadline: "
+                        android:textStyle="bold"
+                        android:textSize="17sp"/>
+                    <TextView
+                        android:id="@+id/textViewRegistrationDeadline"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:textSize="17sp"/>
+                </LinearLayout>
+
+                <!-- Waiting List Count -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginStart="8dp">
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Waiting List Count: "
+                        android:textStyle="bold"
+                        android:textSize="17sp"/>
+                    <TextView
+                        android:id="@+id/textViewWaitingListCount"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:textSize="17sp"/>
+                </LinearLayout>
+
+                <!-- Lottery Time -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginStart="8dp">
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Lottery Time: "
+                        android:textStyle="bold"
+                        android:textSize="17sp"/>
+                    <TextView
+                        android:id="@+id/textViewLotteryTime"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:textSize="17sp"/>
+                </LinearLayout>
+
+                <!-- Lottery Count -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginStart="8dp">
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Lottery Count:"
+                        android:textStyle="bold"
+                        android:textSize="17sp"/>
+                    <TextView
+                        android:id="@+id/textViewLotteryCount"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:textSize="17sp"/>
+                </LinearLayout>
+            </LinearLayout>
+
+            <!-- View Waiting List Button -->
             <Button
                 android:id="@+id/buttonViewWaitingList"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="View Waiting List"
                 android:layout_marginTop="8dp"/>
 
-            <!-- Lottery Count -->
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Lottery Count:"
-                android:textStyle="bold"/>
-            <TextView
-                android:id="@+id/textViewLotteryCount"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
+            <!-- View Selected Users Button -->
             <Button
                 android:id="@+id/buttonViewSelectedUsers"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="View Selected Users"
-                android:layout_marginTop="8dp"/>
+                android:text="View Selected Users"/>
 
             <Button
                 android:id="@+id/buttonViewAcceptedUsers"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Accepted Users"/>
 
             <Button
                 android:id="@+id/mapButton"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="map" />
+                android:text="Map"/>
 
             <Button
                 android:id="@+id/buttonGenerateQRCode"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="QR Code" />
+                android:text="QR Code"/>
         </LinearLayout>
-
     </ScrollView>
 
 </RelativeLayout>
