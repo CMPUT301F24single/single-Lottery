@@ -117,10 +117,32 @@ public class QRScannerActivity extends AppCompatActivity {
         byte[] data = new byte[buffer.remaining()];
         buffer.get(data);
     
-        LuminanceSource source = new RGBLuminanceSource(image.getWidth(), image.getHeight(), data);
+        int[] rgb = new int[image.getWidth() * image.getHeight()];
+        for (int i = 0; i < rgb.length; i++) {
+            int yIndex = i; 
+            int uIndex = (i / image.getWidth() / 2) * image.getWidth() / 2 + (i % (image.getWidth() / 2));
+            int vIndex = uIndex; 
+    
+            int Y = data[yIndex] & 0xFF; 
+            int U = data[uIndex] & 0xFF; 
+            int V = data[vIndex] & 0xFF; 
+    
+            int r = Y + (int)(1.402 * (V - 128));
+            int g = Y - (int)(0.344136 * (U - 128)) - (int)(0.714136 * (V - 128));
+            int b = Y + (int)(1.772 * (U - 128));
+    
+            r = Math.max(0, Math.min(255, r));
+            g = Math.max(0, Math.min(255, g));
+            b = Math.max(0, Math.min(255, b));
+    
+            rgb[i] = (0xFF << 24) | (r << 16) | (g << 8) | b; 
+        }
+    
+        LuminanceSource source = new RGBLuminanceSource(image.getWidth(), image.getHeight(), rgb);
         BinaryBitmap bitmap = new BinaryBitmap(new HybridBinarizer(source));
-        
+    
         try {
+            // Decode the QR code
             Result result = new MultiFormatReader().decode(bitmap);
             String scannedContent = result.getText();
             handleQRCodeScan(scannedContent); 
@@ -128,6 +150,7 @@ public class QRScannerActivity extends AppCompatActivity {
             Log.e("QRCodeScanner", "Error decoding QR code", e);
         }
     }
+    
     
 
     private void handleQRCodeScan(String scannedContent) {
