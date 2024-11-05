@@ -48,7 +48,7 @@ public class QRCodeActivity extends AppCompatActivity {
     private void generateQRCode(String content) {
         try {
             QRCodeWriter writer = new QRCodeWriter();
-            BitMatrix bitMatrix = writer.encode(content, BarcodeFormat.QR_CODE, 400, 400);
+            BitMatrix bitMatrix = writer.encode(hash, BarcodeFormat.QR_CODE, 600, 600);
 
             int width = bitMatrix.getWidth();
             int height = bitMatrix.getHeight();

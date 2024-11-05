@@ -2,33 +2,31 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="vertical"
+    android:orientation="horizontal"
     android:padding="8dp">
 
     <TextView
         android:id="@+id/eventNameTextView"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:layout_weight="1"
         android:text="Event Name"
         android:textSize="16sp"
-        android:textColor="#000000" />
+        android:textColor="#000000"
+        android:gravity="center_vertical" /> <!-- Aligns the text vertically -->
 
-    <LinearLayout
+    <Button
+        android:id="@+id/viewButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:orientation="horizontal">
+        android:text="View"
+        android:layout_marginStart="8dp" /> <!-- Adds margin to the start of the button -->
 
-        <Button
-            android:id="@+id/viewButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="View" />
-
-        <Button
-            android:id="@+id/editButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Edit" />
-    </LinearLayout>
+    <Button
+        android:id="@+id/editButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Edit"
+        android:layout_marginStart="8dp" /> <!-- Adds margin to the start of the button -->
 
 </LinearLayout>

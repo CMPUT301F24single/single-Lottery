@@ -7,6 +7,7 @@ import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -32,6 +33,13 @@ public class HomeFragment extends Fragment {
 
         recyclerViewEvents = view.findViewById(R.id.recyclerViewEvents);
         recyclerViewEvents.setLayoutManager(new LinearLayoutManager(getContext()));
+
+        // Add DividerItemDecoration (for dividing list of events)
+        DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(
+                recyclerViewEvents.getContext(),
+                LinearLayoutManager.VERTICAL
+        );
+        recyclerViewEvents.addItemDecoration(dividerItemDecoration);
 
         eventList = new ArrayList<>();
         userHomeAdapter = new UserHomeAdapter(getContext(), eventList);
