@@ -37,64 +37,146 @@
                 android:id="@+id/buttonChangePoster"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Change Poster"/>
+                android:text="Change Poster"
+                android:layout_marginTop="8dp"
+                android:layout_gravity="center"/>
 
-            <EditText
-                android:id="@+id/editTextEventName"
+            <!-- Event Details Section -->
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="Event Name"
-                android:inputType="text" />
+                android:orientation="vertical"
+                android:layout_marginTop="16dp"
+                android:background="@drawable/rounded_corners_grey">
 
-            <EditText
-                android:id="@+id/editTextEventTime"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="Event Time"
-                android:inputType="datetime" />
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Event Details"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    android:layout_marginStart="8dp"/>
 
-            <EditText
-                android:id="@+id/editTextRegistrationDeadline"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="Registration Deadline"
-                android:inputType="datetime" />
+                <!-- Event Name -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Event Name"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginStart="8dp"/>
+                <EditText
+                    android:id="@+id/editTextEventName"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Enter event name"
+                    android:inputType="text"
+                    android:layout_marginStart="8dp"/>
 
-            <EditText
-                android:id="@+id/editTextLotteryTime"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="Lottery Time"
-                android:inputType="datetime" />
+                <!-- Event Time -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Event Time"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginStart="8dp"/>
+                <EditText
+                    android:id="@+id/editTextEventTime"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Enter event time"
+                    android:inputType="datetime"
+                    android:layout_marginStart="8dp"/>
 
-            <EditText
-                android:id="@+id/editTextWaitingListCount"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="Waiting List Count"
-                android:inputType="number" />
+                <!-- Registration Deadline -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Registration Deadline"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginStart="8dp"/>
+                <EditText
+                    android:id="@+id/editTextRegistrationDeadline"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Enter registration deadline"
+                    android:inputType="datetime"
+                    android:layout_marginStart="8dp"/>
 
-            <EditText
-                android:id="@+id/editTextLotteryCount"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="Lottery Count"
-                android:inputType="number" />
+                <!-- Lottery Time -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Lottery Time"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginStart="8dp" />
 
-            <EditText
-                android:id="@+id/editTextEventDescription"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="Event Description"
-                android:inputType="textMultiLine" />
+                <EditText
+                    android:id="@+id/editTextLotteryTime"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Enter lottery time"
+                    android:inputType="datetime"
+                    android:layout_marginStart="8dp"/>
 
-            <Button
-                android:id="@+id/buttonUpdateEvent"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Update Event"
-                android:layout_marginTop="16dp" />
+                <!-- Waiting List Count -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Waiting List Count"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginStart="8dp"/>
+
+                <EditText
+                    android:id="@+id/editTextWaitingListCount"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Enter waiting list count"
+                    android:inputType="number"
+                    android:layout_marginStart="8dp"/>
+
+                <!-- Lottery Count -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Lottery Count"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginStart="8dp"/>
+
+                <EditText
+                    android:id="@+id/editTextLotteryCount"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Enter lottery count"
+                    android:inputType="number"
+                    android:layout_marginStart="8dp"/>
+
+                <!-- Event Description -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Event Description"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginStart="8dp"/>
+
+                <EditText
+                    android:id="@+id/editTextEventDescription"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Enter event description"
+                    android:inputType="textMultiLine"
+                    android:layout_marginStart="8dp"/>
+
+                <Button
+                    android:id="@+id/buttonUpdateEvent"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Update Event"
+                    android:layout_marginTop="16dp"
+                    android:layout_gravity="center"/>
+
+            </LinearLayout>
+
+
         </LinearLayout>
     </ScrollView>
 </RelativeLayout>
-

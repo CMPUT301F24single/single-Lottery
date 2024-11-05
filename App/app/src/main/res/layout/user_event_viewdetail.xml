@@ -4,13 +4,13 @@
     android:layout_height="match_parent"
     android:padding="16dp">
 
-    <!-- 使用一个 LinearLayout 包含所有内容 -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:background="@drawable/rounded_corners_grey"
+        android:padding="16dp">
 
-        <!-- Back Button -->
         <Button
             android:id="@+id/backButton"
             android:layout_width="wrap_content"
@@ -18,143 +18,211 @@
             android:text="Back"
             android:layout_marginBottom="16dp" />
 
-        <!-- Event Details Container -->
+        <!-- Event Poster -->
+        <ImageView
+            android:id="@+id/imageViewPoster"
+            android:layout_width="match_parent"
+            android:layout_height="200dp"
+            android:scaleType="centerCrop"
+            android:contentDescription="Event Poster"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="8dp" />
+
+        <!-- Event Name -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical">
-
-            <!-- Event Poster Image -->
-            <ImageView
-                android:id="@+id/imageViewPoster"
-                android:layout_width="match_parent"
-                android:layout_height="200dp"
-                android:scaleType="centerCrop"
-                android:contentDescription="Event Poster" />
-
-            <!-- Event Name -->
+            android:orientation="horizontal"
+            android:layout_marginTop="8dp">
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Event Name:"
                 android:textStyle="bold"
-                android:layout_marginTop="16dp" />
+                android:textSize="17sp" />
             <TextView
                 android:id="@+id/eventNameTextView"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
-
-            <!-- Event Description -->
-            <TextView
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:text="Event Description:"
-                android:textStyle="bold"
-                android:layout_marginTop="8dp" />
-            <TextView
-                android:id="@+id/eventDescriptionTextView"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
+                android:layout_weight="1"
+                android:text="Event Name"
+                android:textSize="17sp"
+                android:paddingStart="8dp" />
+        </LinearLayout>
 
-            <!-- Event Time -->
+        <!-- Event Description -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Event Description:"
+            android:textStyle="bold"
+            android:textSize="17sp"
+            android:paddingTop="8dp" />
+        <TextView
+            android:id="@+id/eventDescriptionTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Event Description"
+            android:textSize="17sp"
+            android:paddingTop="4dp" />
+
+        <!-- Event Time -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="8dp">
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Event Time:"
                 android:textStyle="bold"
-                android:layout_marginTop="8dp" />
+                android:textSize="17sp" />
             <TextView
                 android:id="@+id/eventTimeTextView"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Event Time"
+                android:textSize="17sp"
+                android:paddingStart="8dp" />
+        </LinearLayout>
 
-            <!-- Registration Deadline -->
+        <!-- Registration Deadline -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="8dp">
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Registration Deadline:"
                 android:textStyle="bold"
-                android:layout_marginTop="8dp" />
+                android:textSize="17sp" />
             <TextView
                 android:id="@+id/registrationDeadlineTextView"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Deadline"
+                android:textSize="17sp"
+                android:paddingStart="8dp" />
+        </LinearLayout>
 
-            <!-- Lottery Time -->
+        <!-- Lottery Time -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="8dp">
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Lottery Time:"
                 android:textStyle="bold"
-                android:layout_marginTop="8dp" />
+                android:textSize="17sp" />
             <TextView
                 android:id="@+id/lotteryTimeTextView"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Lottery Time"
+                android:textSize="17sp"
+                android:paddingStart="8dp" />
+        </LinearLayout>
 
-            <!-- Waiting List Count -->
+        <!-- Waiting List Count -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="8dp">
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Waiting List Count:"
                 android:textStyle="bold"
-                android:layout_marginTop="8dp" />
+                android:textSize="17sp" />
             <TextView
                 android:id="@+id/waitingListCountTextView"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Waiting List Count"
+                android:textSize="17sp"
+                android:paddingStart="8dp" />
+        </LinearLayout>
 
-            <!-- Lottery Count -->
+        <!-- Lottery Count -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="8dp">
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Lottery Count:"
                 android:textStyle="bold"
-                android:layout_marginTop="8dp" />
+                android:textSize="17sp" />
             <TextView
                 android:id="@+id/lotteryCountTextView"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Lottery Count"
+                android:textSize="17sp"
+                android:paddingStart="8dp" />
+        </LinearLayout>
 
-            <!-- Activity Status -->
+        <!-- Activity Status -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="8dp">
             <TextView
                 android:id="@+id/eventStatusTextView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Status: "
+                android:text="Status:"
                 android:textStyle="bold"
-                android:layout_marginTop="8dp"/>
+                android:textSize="17sp" />
             <TextView
                 android:id="@+id/eventStatusValueTextView"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"/>
-
-            <!-- Cancel Registration Button -->
-            <Button
-                android:id="@+id/cancelRegistrationButton"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:text="Cancel Registration"
-                android:visibility="gone"
-                android:layout_marginTop="16dp"/>
-
-            <!-- Accept and Decline Buttons -->
-            <Button
-                android:id="@+id/acceptButton"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Accept"
-                android:visibility="gone"
-                android:layout_marginTop="8dp"/>
-
-            <Button
-                android:id="@+id/declineButton"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Decline"
-                android:visibility="gone"
-                android:layout_marginTop="8dp"/>
-
+                android:layout_weight="1"
+                android:text="Status Value"
+                android:textSize="17sp"
+                android:paddingStart="8dp" />
         </LinearLayout>
+
+        <!-- Cancel Registration Button -->
+        <Button
+            android:id="@+id/cancelRegistrationButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Cancel Registration"
+            android:layout_gravity="center"
+            android:layout_marginTop="16dp"/>
+
+        <!-- Accept and Decline Buttons -->
+        <Button
+            android:id="@+id/acceptButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Accept"
+            android:visibility="gone"
+            android:layout_marginTop="8dp"/>
+
+        <Button
+            android:id="@+id/declineButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Decline"
+            android:visibility="gone"
+            android:layout_marginTop="8dp"/>
     </LinearLayout>
 </ScrollView>

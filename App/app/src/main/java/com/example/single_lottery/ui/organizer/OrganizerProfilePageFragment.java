@@ -122,7 +122,7 @@ public class OrganizerProfilePageFragment extends Fragment {
 
     private void showEditDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-        builder.setTitle("edit profile");
+        builder.setTitle("Edit Profile");
 
         View dialogView = getLayoutInflater().inflate(R.layout.edit_org_dialog, null);
         final EditText nameInput = dialogView.findViewById(R.id.nameInput);

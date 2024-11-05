@@ -9,7 +9,7 @@
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
-        <!-- 返回按钮 -->
+        <!-- Back Button -->
         <ImageButton
             android:id="@+id/backButton"
             android:layout_width="wrap_content"
@@ -36,7 +36,8 @@
             android:id="@+id/uploadPosterButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Upload Poster" />
+            android:text="Upload Poster"
+            android:layout_gravity="center"/>
 
         <EditText
             android:id="@+id/eventNameEditText"
@@ -50,18 +51,6 @@
             android:layout_height="wrap_content"
             android:hint="Event Description" />
 
-        <TextView
-            android:id="@+id/eventTimeTextView"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Select Event Time" />
-
-        <TextView
-            android:id="@+id/registrationDeadlineTextView"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Select Registration Deadline" />
-
         <EditText
             android:id="@+id/waitingListCountEditText"
             android:layout_width="match_parent"
@@ -74,11 +63,92 @@
             android:layout_height="wrap_content"
             android:hint="Lottery Count" />
 
-        <TextView
-            android:id="@+id/lotteryTimeTextView"
-            android:layout_width="wrap_content"
+        <!-- Select Event Time -->
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Select Lottery Time" />
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/eventTimeTextView"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Select Event Time"
+                android:textStyle="bold"
+                android:textColor="@android:color/holo_blue_dark"
+                android:padding="8dp"
+                android:background="?attr/selectableItemBackground"
+                android:clickable="true"
+                android:focusable="true" />
+
+            <TextView
+                android:id="@+id/selectedEventTimeTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text=""
+                android:layout_gravity="end"
+                android:padding="8dp"
+                android:textColor="@android:color/black" />
+        </LinearLayout>
+
+        <!-- Select Registration Deadline -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/registrationDeadlineTextView"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Select Registration Deadline"
+                android:textStyle="bold"
+                android:textColor="@android:color/holo_blue_dark"
+                android:padding="8dp"
+                android:background="?attr/selectableItemBackground"
+                android:clickable="true"
+                android:focusable="true" />
+
+            <TextView
+                android:id="@+id/selectedRegistrationDeadlineTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text=""
+                android:layout_gravity="end"
+                android:padding="8dp"
+                android:textColor="@android:color/black" />
+        </LinearLayout>
+
+        <!-- Select Lottery Time -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/lotteryTimeTextView"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Select Lottery Time"
+                android:textStyle="bold"
+                android:textColor="@android:color/holo_blue_dark"
+                android:padding="8dp"
+                android:background="?attr/selectableItemBackground"
+                android:clickable="true"
+                android:focusable="true" />
+
+            <TextView
+                android:id="@+id/selectedLotteryTimeTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text=""
+                android:layout_gravity="end"
+                android:padding="8dp"
+                android:textColor="@android:color/black" />
+        </LinearLayout>
 
         <Button
             android:id="@+id/createEventButton"
