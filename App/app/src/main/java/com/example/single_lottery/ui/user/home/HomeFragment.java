@@ -20,6 +20,13 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Fragment displaying available lottery events for users.
+ * Shows list of all events from Firestore database.
+ *
+ * @author [Jingyao Gu]
+ * @version 1.0
+ */
 public class HomeFragment extends Fragment {
 
     private RecyclerView recyclerViewEvents;
@@ -50,6 +57,10 @@ public class HomeFragment extends Fragment {
         return view;
     }
 
+    /**
+     * Loads all events from Firestore database.
+     * Updates RecyclerView adapter with loaded events.
+     */
     private void loadEventsFromDatabase() {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         db.collection("events").get().addOnSuccessListener(queryDocumentSnapshots -> {

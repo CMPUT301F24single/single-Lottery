@@ -1,4 +1,3 @@
-// QRCodeActivity.java
 package com.example.single_lottery.ui.organizer;
 
 import android.graphics.Bitmap;
@@ -20,6 +19,13 @@ import com.google.zxing.qrcode.QRCodeWriter;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
+/**
+ * Activity for generating and displaying QR code for event verification.
+ * Handles QR code generation, hashing, and storage in Firebase.
+ *
+ * @author [Haorui Gao]
+ * @version 1.0
+ */
 public class QRCodeActivity extends AppCompatActivity {
 
     private ImageView imageViewQRCode;
@@ -45,6 +51,13 @@ public class QRCodeActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * Generates QR code bitmap from provided hash.
+     * Creates 600x600 black and white QR code image.
+     *
+     * @param hash Hashed event data to encode in QR code
+     * @throws WriterException If QR code generation fails
+     */
     private void generateQRCode(String hash) {
         try {
             QRCodeWriter writer = new QRCodeWriter();
@@ -66,6 +79,13 @@ public class QRCodeActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * Creates SHA-256 hash of event data for QR code.
+     *
+     * @param data Event data to hash
+     * @return Hexadecimal string of hashed data
+     * @throws NoSuchAlgorithmException If SHA-256 algorithm is not available
+     */
     private String hashData(String data) {
         try {
             MessageDigest digest = MessageDigest.getInstance("SHA-256");
@@ -83,6 +103,12 @@ public class QRCodeActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * Saves event QR code hash to Firestore.
+     *
+     * @param eventId ID of event
+     * @param hash Generated QR code hash
+     */
     private void saveHashToFirestore(String eventId, String hash) {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         db.collection("events").document(eventId).update("qrCodeHash", hash)

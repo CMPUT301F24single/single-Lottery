@@ -23,6 +23,13 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 
+/**
+ * Activity for displaying event details from user perspective.
+ * Handles event registration, lottery status updates and registration cancellation.
+ *
+ * @author [Jingyao Gu]
+ * @version 1.0
+ */
 public class UserEventDetailActivity extends AppCompatActivity {
     private TextView eventNameTextView, eventTimeTextView, registrationDeadlineTextView,
             lotteryTimeTextView, waitingListCountTextView, lotteryCountTextView, eventDescriptionTextView;
@@ -68,6 +75,12 @@ public class UserEventDetailActivity extends AppCompatActivity {
         declineButton.setOnClickListener(v -> updateLotteryStatus("Declined"));
     }
 
+    /**
+     * Loads event details from Firestore and updates UI.
+     * Displays event information including name, time, description and poster.
+     *
+     * @param eventId Unique identifier of the event
+     */
     private void loadEventDetails(String eventId) {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         db.collection("events").document(eventId)
@@ -103,6 +116,14 @@ public class UserEventDetailActivity extends AppCompatActivity {
                 .addOnFailureListener(e -> Log.e("UserEventDetailActivity", "Error loading event details", e));
     }
 
+    /**
+     * Updates event status display based on current time and deadlines.
+     * Shows different status messages and buttons based on event phase:
+     * - Registration open
+     * - Awaiting lottery
+     * - Lottery completed
+     * - Event ended
+     */
     private void updateEventStatus() {
         try {
             SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault());
@@ -124,7 +145,7 @@ public class UserEventDetailActivity extends AppCompatActivity {
             } else if (currentDate.after(lotteryDate) && currentDate.before(eventEndDate)) {
                 checkUserLotteryStatus();
             } else if (currentDate.after(eventEndDate)) {
-                // 如果当前时间在活动时间之后，则显示“活动结束”
+                // If the current time is after the event time, "Event Ended" will be displayed.
                 eventStatusValueTextView.setText("Event Ended");
                 cancelRegistrationButton.setVisibility(View.GONE);
                 acceptButton.setVisibility(View.GONE);
@@ -135,6 +156,10 @@ public class UserEventDetailActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * Checks and displays user's lottery status for the event.
+     * Updates UI based on status (Winner, Not Selected, Accepted, Declined).
+     */
     private void checkUserLotteryStatus() {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
 
@@ -172,7 +197,11 @@ public class UserEventDetailActivity extends AppCompatActivity {
                 })
                 .addOnFailureListener(e -> Log.e("UserEventDetailActivity", "Error checking user lottery status", e));
     }
-
+    /**
+     * Updates user's lottery response status in Firestore.
+     *
+     * @param status New status ("Accepted" or "Declined")
+     */
     private void updateLotteryStatus(String status) {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
 
@@ -195,6 +224,12 @@ public class UserEventDetailActivity extends AppCompatActivity {
                 .addOnFailureListener(e -> Log.e("UserEventDetailActivity", "Error updating lottery status", e));
     }
 
+    /**
+     * Cancels user's event registration.
+     * Removes registration record from Firestore.
+     *
+     * @param eventId ID of event to cancel registration for
+     */
     private void cancelRegistration(String eventId) {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         db.collection("registered_events")

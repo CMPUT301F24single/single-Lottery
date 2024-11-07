@@ -20,6 +20,26 @@ import com.example.single_lottery.EventModel;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
+/**
+ * Activity for viewing event details by organizers.
+ * Provides comprehensive view of event information and management tools including:
+ * - Basic event information display
+ * - Participant list management
+ * - QR code generation
+ * - Map location view
+ * - User status tracking
+ *
+ * Handles:
+ * - Loading and displaying event details from Firestore
+ * - Managing different user lists (waiting, selected, accepted)
+ * - Navigation to QR code generation and map views
+ *
+ * @author [Jingyao Gu]
+ * @version 1.0
+ * @see AppCompatActivity
+ * @see EventModel
+ * @since 1.0
+ */
 public class OrganizerHomeViewEventActivity extends AppCompatActivity {
 
     private TextView textViewEventName, textViewEventTime, textViewRegistrationDeadline,
@@ -27,6 +47,16 @@ public class OrganizerHomeViewEventActivity extends AppCompatActivity {
     private ImageView imageViewPoster;
     private Button buttonViewWaitingList, buttonViewSelectedUsers, buttonViewAcceptedUsers, buttonGenerateQRCode;
 
+    /**
+     * Initializes the event viewing interface and sets up:
+     * - UI component references
+     * - Event data loading
+     * - Button click listeners
+     * - Navigation handlers
+     *
+     * @param savedInstanceState If the activity is being re-initialized after previously being shut down,
+     *                          this Bundle contains the data it most recently supplied
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -34,7 +64,7 @@ public class OrganizerHomeViewEventActivity extends AppCompatActivity {
 
         ImageButton backButton = findViewById(R.id.backButton);
         buttonGenerateQRCode = findViewById(R.id.buttonGenerateQRCode);
-        backButton.setOnClickListener(v -> finish()); // 返回上一个页面
+        backButton.setOnClickListener(v -> finish()); // return to previous page
 
         Button mapButton = findViewById(R.id.mapButton);
         mapButton.setOnClickListener(v -> {
@@ -43,7 +73,7 @@ public class OrganizerHomeViewEventActivity extends AppCompatActivity {
         });
 
 
-        // 初始化视图
+        // Initialize back button
         textViewEventName = findViewById(R.id.textViewEventName);
         textViewEventDescription = findViewById(R.id.textViewEventDescription);
         textViewEventTime = findViewById(R.id.textViewEventTime);
@@ -56,10 +86,10 @@ public class OrganizerHomeViewEventActivity extends AppCompatActivity {
         buttonViewSelectedUsers = findViewById(R.id.buttonViewSelectedUsers);
         buttonViewAcceptedUsers = findViewById(R.id.buttonViewAcceptedUsers);
 
-        // 获取传递的 event_id
+        // Get event ID from intent
         String eventId = getIntent().getStringExtra("event_id");
 
-        // 从 Firestore 加载活动数据
+        // Load event data from Firestore
         loadEventData(eventId);
 
         buttonGenerateQRCode.setOnClickListener(v -> {
@@ -68,23 +98,31 @@ public class OrganizerHomeViewEventActivity extends AppCompatActivity {
             startActivity(intent);
         });
 
-        // 设置查看等待名单按钮的点击事件
         buttonViewWaitingList.setOnClickListener(v -> viewWaitingList(eventId));
 
-        // 设置查看选中和未选中用户按钮的点击事件
+        // Set the click event of the user button to view the selected and unselected
         buttonViewSelectedUsers.setOnClickListener(v -> viewSelectedAndNotSelectedUsers(eventId));
 
-        // 设置查看已接受用户按钮的点击事件
+        // Set the click event of the View Accepted User Button
         buttonViewAcceptedUsers.setOnClickListener(v -> viewAcceptedUsers(eventId));
     }
 
+    /**
+     * Reloads event data when activity resumes to ensure current information.
+     */
     @Override
     protected void onResume() {
         super.onResume();
-        String eventId = getIntent().getStringExtra("event_id");  // 确保传递了正确的 eventId
-        loadEventData(eventId);  // 每次返回页面时重新加载活动数据
+        String eventId = getIntent().getStringExtra("event_id");  // Make sure you pass the correct eventId
+        loadEventData(eventId);  // Reload activity data every time you return to the page
     }
 
+    /**
+     * Loads event details from Firestore and updates UI components.
+     * Displays event information including name, description, times, and poster.
+     *
+     * @param eventId ID of the event to load
+     */
     private void loadEventData(String eventId) {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         db.collection("events").document(eventId).get()
@@ -100,7 +138,7 @@ public class OrganizerHomeViewEventActivity extends AppCompatActivity {
                             textViewWaitingListCount.setText(String.valueOf(event.getWaitingListCount()));
                             textViewLotteryCount.setText(String.valueOf(event.getLotteryCount()));
 
-                            // 使用 Glide 显示活动海报
+                            // Use Glide to display event posters
                             if (event.getPosterUrl() != null) {
                                 Glide.with(this).load(event.getPosterUrl()).into(imageViewPoster);
                             }
@@ -108,11 +146,15 @@ public class OrganizerHomeViewEventActivity extends AppCompatActivity {
                     }
                 })
                 .addOnFailureListener(e -> {
-                    // 错误处理
                 });
     }
 
-    // 查看等待名单的方法
+    /**
+     * Displays list of users waiting to participate in the event.
+     * Shows waiting list in an AlertDialog.
+     *
+     * @param eventId ID of the event to view waiting list for
+     */
     private void viewWaitingList(String eventId) {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
 
@@ -135,7 +177,12 @@ public class OrganizerHomeViewEventActivity extends AppCompatActivity {
                 .addOnFailureListener(e -> Toast.makeText(this, "Failed to load waiting list.", Toast.LENGTH_SHORT).show());
     }
 
-    // 查看选中和未选中用户的方法
+    /**
+     * Displays lists of selected and non-selected users for the event.
+     * Shows both winners and non-winners in an AlertDialog.
+     *
+     * @param eventId ID of the event to view selected users for
+     */
     private void viewSelectedAndNotSelectedUsers(String eventId) {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
 
@@ -150,7 +197,7 @@ public class OrganizerHomeViewEventActivity extends AppCompatActivity {
                         String userId = document.getString("userId");
                         String status = document.getString("status");
 
-                        // 检查并添加用户到相应的名单
+                        // Check and add users to the corresponding list
                         if ("Winner".equals(status)) {
                             winnersList.append(userId).append("\n");
                         } else if ("Not Selected".equals(status)) {
@@ -158,7 +205,7 @@ public class OrganizerHomeViewEventActivity extends AppCompatActivity {
                         }
                     }
 
-                    // 确保数据显示在弹出框中
+                    // Make sure the data is displayed in the pop-up box
                     new AlertDialog.Builder(this)
                             .setTitle("Selected Users")
                             .setMessage(winnersList.toString() + "\n" + nonWinnersList.toString())
@@ -169,13 +216,18 @@ public class OrganizerHomeViewEventActivity extends AppCompatActivity {
     }
 
 
-    // 查看已接受用户的方法
+    /**
+     * Displays list of users who have accepted their selection for the event.
+     * Shows accepted users in an AlertDialog.
+     *
+     * @param eventId ID of the event to view accepted users for
+     */
     private void viewAcceptedUsers(String eventId) {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
 
         db.collection("registered_events")
                 .whereEqualTo("eventId", eventId)
-                .whereEqualTo("status", "Accepted")  // 仅查询状态为 Accepted 的用户
+                .whereEqualTo("status", "Accepted")  // Only query users whose status is Accepted
                 .get()
                 .addOnSuccessListener(querySnapshot -> {
                     StringBuilder acceptedUsersList = new StringBuilder("Accepted Users:\n");

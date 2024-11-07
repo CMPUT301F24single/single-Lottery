@@ -19,6 +19,27 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
+/**
+ * Activity for editing existing lottery events by organizers.
+ * Provides functionality for:
+ * - Viewing and editing event details
+ * - Updating event poster image
+ * - Managing event parameters
+ * - Saving changes to Firebase
+ *
+ * This activity handles:
+ * - Loading existing event data from Firestore
+ * - Image selection and upload to Firebase Storage
+ * - Form validation and data updates
+ * - User feedback through Toast messages
+ *
+ * @author [Jingyao Gu]
+ * @version 1.0
+ * @see AppCompatActivity
+ * @see FirebaseFirestore
+ * @see EventModel
+ * @since 1.0
+ */
 public class OrganizerHomeEditEventActivity extends AppCompatActivity {
 
     private EditText editTextEventName, editTextEventDescription, editTextEventTime, editTextRegistrationDeadline,
@@ -27,7 +48,17 @@ public class OrganizerHomeEditEventActivity extends AppCompatActivity {
     private Button buttonUpdate;
     private String eventId;
 
-
+    /**
+     * Initializes the event editing interface and loads existing event data.
+     * Sets up:
+     * - UI components and their references
+     * - Event data loading from Firestore
+     * - Click listeners for updates and image selection
+     * - Back navigation
+     *
+     * @param savedInstanceState If the activity is being re-initialized after previously being shut down,
+     *                          this Bundle contains the data it most recently supplied
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -36,7 +67,7 @@ public class OrganizerHomeEditEventActivity extends AppCompatActivity {
         ImageButton backButton = findViewById(R.id.backButton);
         backButton.setOnClickListener(v -> finish());
 
-        // 初始化视图
+        // Initializing the View
         editTextEventName = findViewById(R.id.editTextEventName);
         editTextEventDescription = findViewById(R.id.editTextEventDescription);
         editTextEventTime = findViewById(R.id.editTextEventTime);
@@ -51,41 +82,59 @@ public class OrganizerHomeEditEventActivity extends AppCompatActivity {
         buttonChangePoster.setOnClickListener(v -> openImagePicker()); // 设置点击事件
 
 
-        // 获取传递的 event_id
-//        String eventId = getIntent().getStringExtra("event_id");
+        // Get the passed event_id
+        // String eventId = getIntent().getStringExtra("event_id");
         eventId = getIntent().getStringExtra("event_id");
 
-        // 加载活动数据并填充
+        // Load activity data and populate
         loadEventData(eventId);
 
-        // 设置更新按钮点击事件
+        // Set the update button click event
         buttonUpdate.setOnClickListener(v -> updateEventData(eventId));
     }
 
+    /**
+     * Opens system image picker for selecting a new event poster.
+     * Launches intent for image selection from device storage.
+     */
     private void openImagePicker() {
         Intent intent = new Intent(Intent.ACTION_PICK);
         intent.setType("image/*");
-        startActivityForResult(intent, 1002); // 1002是请求码
+        startActivityForResult(intent, 1002); // 1002 is the request code
     }
 
+    /**
+     * Handles the result from image picker activity.
+     * Updates UI and uploads new image if selection was successful.
+     *
+     * @param requestCode The request code passed to startActivityForResult()
+     * @param resultCode The result code returned by the child activity
+     * @param data An Intent that carries the result data
+     */
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == 1002 && resultCode == RESULT_OK && data != null) {
             Uri posterUri = data.getData();
-            imageViewPoster.setImageURI(posterUri);  // 更新 ImageView 显示新图片
+            imageViewPoster.setImageURI(posterUri); // Update ImageView to display the new image
 
-            // 上传图片到 Firebase 或者更新到活动数据中
+            //Upload the image to Firebase or update it to the activity data
             uploadPosterToFirebase(posterUri, eventId);
         }
     }
 
+    /**
+     * Uploads new event poster to Firebase Storage and updates event data.
+     *
+     * @param posterUri URI of the selected poster image
+     * @param eventId ID of the event being edited
+     */
     private void uploadPosterToFirebase(Uri posterUri, String eventId) {
         if (posterUri != null) {
             StorageReference posterRef = FirebaseStorage.getInstance().getReference().child("event_posters/" + System.currentTimeMillis() + ".jpg");
             posterRef.putFile(posterUri).addOnSuccessListener(taskSnapshot ->
                     posterRef.getDownloadUrl().addOnSuccessListener(uri -> {
-                        // 更新活动中的 posterUrl 字段
+                        // Update the posterUrl field in the activity
                         FirebaseFirestore db = FirebaseFirestore.getInstance();
                         db.collection("events").document(eventId).update("posterUrl", uri.toString())
                                 .addOnSuccessListener(aVoid -> {
@@ -102,17 +151,28 @@ public class OrganizerHomeEditEventActivity extends AppCompatActivity {
     }
 
 
-
+    /**
+     * Reloads event data when activity resumes.
+     * Ensures displayed data is current.
+     */
     @Override
     protected void onResume() {
         super.onResume();
-        String eventId = getIntent().getStringExtra("event_id");  // 从Intent获取eventId
+        String eventId = getIntent().getStringExtra("event_id");  // Get eventId from Intent
         if (eventId != null) {
-            loadEventData(eventId);  // 加载指定活动的数据
+            loadEventData(eventId);  // Load the data for the specified activity
         }
     }
 
-
+    /**
+     * Loads existing event data from Firestore and populates form fields.
+     * Retrieves and displays:
+     * - Event details (name, description, times)
+     * - Participant limits
+     * - Event poster
+     *
+     * @param eventId ID of the event to load
+     */
     private void loadEventData(String eventId) {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         db.collection("events").document(eventId).get()
@@ -137,10 +197,20 @@ public class OrganizerHomeEditEventActivity extends AppCompatActivity {
                 })
 
                 .addOnFailureListener(e -> {
-                    // 错误处理
+                    // Error handling
                 });
     }
 
+    /**
+     * Updates event data in Firestore with current form values.
+     * Validates and saves changes to:
+     * - Event details
+     * - Time settings
+     * - Participant limits
+     *
+     * @param eventId ID of the event to update
+     * @throws NumberFormatException if numeric fields contain invalid values
+     */
     private void updateEventData(String eventId) {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         db.collection("events").document(eventId).update(
@@ -153,9 +223,9 @@ public class OrganizerHomeEditEventActivity extends AppCompatActivity {
                 "description", editTextEventDescription.getText().toString()
 
         ).addOnSuccessListener(aVoid -> {
-            // 更新成功提示
+            // Update successful prompt
         }).addOnFailureListener(e -> {
-            // 更新失败处理
+            // Update failure handling
         });
     }
 }

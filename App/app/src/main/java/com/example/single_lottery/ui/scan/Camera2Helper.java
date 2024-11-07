@@ -11,6 +11,13 @@ import android.view.TextureView;
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 
+/**
+ * Helper class for managing Camera2 API functionality.
+ * Handles camera initialization, preview creation and resource cleanup.
+ *
+ * @author [Haorui Gao]
+ * @version 1.0
+ */
 public class Camera2Helper {
     private Context context;
     private CameraDevice cameraDevice;
@@ -20,6 +27,14 @@ public class Camera2Helper {
         this.context = context;
     }
 
+
+    /**
+     * Opens camera and initializes preview session.
+     * Requires CAMERA permission to be granted.
+     *
+     * @throws SecurityException if camera permission not granted
+     * @throws CameraAccessException if camera cannot be accessed
+     */
     public void openCamera() {
         if (ActivityCompat.checkSelfPermission(context, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
 
@@ -36,6 +51,9 @@ public class Camera2Helper {
         }
     }
 
+    /**
+     * Handles camera device state changes and preview session creation.
+     */
     private CameraDevice.StateCallback stateCallback = new CameraDevice.StateCallback() {
         @Override
         public void onOpened(@NonNull CameraDevice camera) {
@@ -57,9 +75,12 @@ public class Camera2Helper {
     };
 
     private void createCameraPreviewSession() {
-        // 支持相机预览的逻辑
+        // Logic to support camera preview
     }
 
+    /**
+     * Releases camera resources and closes active sessions.
+     */
     public void closeCamera() {
         if (cameraDevice != null) {
             cameraDevice.close();
