@@ -94,11 +94,6 @@ public class ProfileFragment extends Fragment {
                 userPhone = task.getResult().getString("phone");
                 String profileImageUrl = task.getResult().getString("profileImageUrl");
                 updateUserDetails(profileImageUrl);
-            } else {
-                userName = "Name";
-                userEmail = "Email";
-                userPhone = "Phone";
-                updateUserDetails(null);
             }
         }).addOnFailureListener(e -> {
             Log.e("ProfileFragment", "failed to load user profile: " + e.getMessage());
