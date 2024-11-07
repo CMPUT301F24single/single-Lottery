@@ -107,12 +107,6 @@ public class OrganizerProfilePageFragment extends Fragment {
                 companyInfo = task.getResult().getString("info");
                 String profileImageUrl = task.getResult().getString("profileImageUrl");
                 updateOrganizerDetails(profileImageUrl);
-            } else {
-                organizerName = "Name";
-                organizerEmail = "Email";
-                organizerPhone = "Phone";
-                companyInfo = "info";
-                updateOrganizerDetails(null);
             }
         }).addOnFailureListener(e -> {
             Log.e("OrganizerProfilePageFragment", "failed to load user profile: " + e.getMessage());
