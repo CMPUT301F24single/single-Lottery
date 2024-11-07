@@ -19,11 +19,24 @@ import com.example.single_lottery.ui.user.home.UserHomeAdapter;
 
 import java.util.List;
 
+/**
+ * RecyclerView adapter for user's registered events list.
+ * Handles event item display and click actions.
+ *
+ * @author [Jingyao Gu]
+ * @version 1.0
+ */
 public class UserEventAdapter extends RecyclerView.Adapter<UserEventAdapter.UserEventViewHolder> {
 
     private List<EventModel> eventList;
     private Context context;
 
+    /**
+     * Creates new adapter instance with event list.
+     *
+     * @param context Context for launching activities
+     * @param eventList List of events to display
+     */
     public UserEventAdapter(Context context, List<EventModel> eventList) {
         this.context = context;
         this.eventList = eventList;
@@ -58,6 +71,10 @@ public class UserEventAdapter extends RecyclerView.Adapter<UserEventAdapter.User
         return eventList.size();
     }
 
+    /**
+     * ViewHolder class for event list items.
+     * Contains event name and view button.
+     */
     public static class UserEventViewHolder extends RecyclerView.ViewHolder {
         public TextView eventNameTextView;
         public Button viewButton;

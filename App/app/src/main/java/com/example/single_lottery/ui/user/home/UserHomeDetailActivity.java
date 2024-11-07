@@ -22,6 +22,13 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
+/**
+ * Activity for displaying event details and handling user registration.
+ * Shows event information and allows users to sign up before deadline.
+ *
+ * @author [Jingyao Gu]
+ * @version 1.0
+ */
 public class UserHomeDetailActivity extends AppCompatActivity {
 
     private TextView textViewEventName, textViewEventDescription, textViewEventTime,
@@ -31,7 +38,7 @@ public class UserHomeDetailActivity extends AppCompatActivity {
     private ImageButton backButton;
     private Button buttonSignUp;
     private String eventId;
-    private String registrationDeadline; // 报名截止日期
+    private String registrationDeadline;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,7 +48,7 @@ public class UserHomeDetailActivity extends AppCompatActivity {
         backButton = findViewById(R.id.backButton);
         backButton.setOnClickListener(v -> finish());
 
-        // 获取传递的 event_id
+        // Get the passed event_id
         eventId = getIntent().getStringExtra("event_id");
         if (eventId == null) {
             Toast.makeText(this, "Event ID is missing", Toast.LENGTH_SHORT).show();
@@ -49,7 +56,6 @@ public class UserHomeDetailActivity extends AppCompatActivity {
             return;
         }
 
-        // 初始化视图
         textViewEventName = findViewById(R.id.textViewEventName);
         textViewEventDescription = findViewById(R.id.textViewEventDescription);
         textViewEventTime = findViewById(R.id.textViewEventTime);
@@ -61,11 +67,16 @@ public class UserHomeDetailActivity extends AppCompatActivity {
 
         loadEventData(eventId);
 
-        // 初始化报名按钮
         buttonSignUp = findViewById(R.id.buttonSignUp);
         buttonSignUp.setOnClickListener(v -> signUpForEvent());
     }
 
+    /**
+     * Loads event details from Firestore and updates UI.
+     * Retrieves event data including name, description, times and registration counts.
+     *
+     * @param eventId ID of event to load
+     */
     private void loadEventData(String eventId) {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         db.collection("events").document(eventId).get()
@@ -80,33 +91,39 @@ public class UserHomeDetailActivity extends AppCompatActivity {
                             textViewLotteryTime.setText(event.getLotteryTime());
                             textViewLotteryCount.setText(String.valueOf(event.getLotteryCount()));
 
-                            registrationDeadline = event.getRegistrationDeadline(); // 存储报名截止日期
+                            registrationDeadline = event.getRegistrationDeadline(); // Store Registration Deadline
 
                             if (event.getPosterUrl() != null) {
                                 Glide.with(this).load(event.getPosterUrl()).into(imageViewPoster);
                             }
 
-                            // 获取实时报名人数
+                            // Get real-time registration number
                             countRegistrations(eventId, event.getWaitingListCount());
                         }
                     }
                 })
                 .addOnFailureListener(e -> {
-                    // 错误处理
                 });
     }
 
+    /**
+     * Updates registration count display.
+     * Shows current/maximum registration ratio.
+     *
+     * @param eventId Event to count registrations for
+     * @param maxWaitingListCount Maximum allowed registrations
+     */
     private void countRegistrations(String eventId, int maxWaitingListCount) {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
 
-        // 查询registered_events集合中符合eventId条件的报名记录数
+        // Query the number of registration records that meet the eventId condition in the registered_events collection
         db.collection("registered_events")
                 .whereEqualTo("eventId", eventId)
                 .get()
                 .addOnSuccessListener(queryDocumentSnapshots -> {
-                    int currentSignUpCount = queryDocumentSnapshots.size(); // 获取文档数量即为报名人数
+                    int currentSignUpCount = queryDocumentSnapshots.size(); // The number of documents obtained is the number of applicants
 
-                    // 设置“报名数量/最大数量”格式
+                    // Set the format of "Number of registrations/maximum number"
                     textViewWaitingListCount.setText(currentSignUpCount + "/" + maxWaitingListCount);
                 })
                 .addOnFailureListener(e -> {
@@ -114,48 +131,55 @@ public class UserHomeDetailActivity extends AppCompatActivity {
                 });
     }
 
+    /**
+     * Handles event registration process.
+     * Validates registration deadline and checks for duplicate registration.
+     * Creates registration record in Firestore if validation passes.
+     *
+     * @throws ParseException If registration deadline date parsing fails
+     */
     private void signUpForEvent() {
         try {
-            // 检查是否在报名截止日期前
+            // Check if you are within the registration deadline
             SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault());
             Date deadlineDate = dateFormat.parse(registrationDeadline);
             Date currentDate = new Date();
 
             if (currentDate.after(deadlineDate)) {
-                // 如果报名截止日期已过，显示提示信息并退出
+                // If the registration deadline has passed, display a reminder message and exit
                 Toast.makeText(this, "Registration is closed. Sign-up is not allowed.", Toast.LENGTH_SHORT).show();
                 return;
             }
 
-            // 报名逻辑
+            // Registration Logic
             FirebaseFirestore db = FirebaseFirestore.getInstance();
             String userId = Settings.Secure.getString(getContentResolver(), Settings.Secure.ANDROID_ID);
 
-            // 创建一个报名记录到 registered_events 集合中
+            // Create a registration record in the registered_events collection
             Map<String, Object> registrationData = new HashMap<>();
             registrationData.put("eventId", eventId);
             registrationData.put("userId", userId);
-            registrationData.put("timestamp", System.currentTimeMillis()); // 可选：记录报名时间
+            registrationData.put("timestamp", System.currentTimeMillis()); // Optional: Record the registration time
 
-            // 检查用户是否已经报名
+            // Check if the user has registered
             db.collection("registered_events")
                     .whereEqualTo("eventId", eventId)
                     .whereEqualTo("userId", userId)
                     .get()
                     .addOnSuccessListener(queryDocumentSnapshots -> {
                         if (queryDocumentSnapshots.isEmpty()) {
-                            // 用户尚未报名，添加报名记录
+                            // The user has not registered yet, add a registration record
                             db.collection("registered_events").add(registrationData)
                                     .addOnSuccessListener(documentReference -> {
                                         Toast.makeText(this, "Successfully signed up for the event!", Toast.LENGTH_SHORT).show();
                                         buttonSignUp.setEnabled(false);
-                                        loadEventData(eventId); // 更新页面显示
+                                        loadEventData(eventId); // Update page display
                                     })
                                     .addOnFailureListener(e -> {
                                         Toast.makeText(this, "Failed to sign up. Please try again.", Toast.LENGTH_SHORT).show();
                                     });
                         } else {
-                            // 用户已经报名
+                            // User has registered
                             Toast.makeText(this, "You have already signed up for this event.", Toast.LENGTH_SHORT).show();
                             buttonSignUp.setEnabled(false);
                         }

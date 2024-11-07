@@ -12,6 +12,13 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.example.single_lottery.databinding.ActivityMapsBinding;
 
+/**
+ * Activity for displaying event location on Google Maps.
+ * Shows event venue with marker at University of Alberta CCIS building.
+ *
+ * @author [Haorui Gao]
+ * @version 1.0
+ */
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
 
     private GoogleMap mMap;

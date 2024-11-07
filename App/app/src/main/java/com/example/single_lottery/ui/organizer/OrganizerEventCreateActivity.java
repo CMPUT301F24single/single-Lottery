@@ -31,7 +31,42 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
+/**
+ * Activity for creating new lottery events by organizers.
+ * This activity provides functionality for:
+ * - Event information input (name, description, times)
+ * - Event poster upload
+ * - Participant capacity settings
+ * - Event creation and submission to Firebase
+ *
+ * The activity handles:
+ * - Image selection and upload to Firebase Storage
+ * - Date and time selection through dialogs
+ * - Form validation and data submission to Firestore
+ * - User feedback through Toast messages
+ *
+ * @author [Jingyao Gu]
+ * @version 1.0
+ * @see AppCompatActivity
+ * @see FirebaseFirestore
+ * @see StorageReference
+ * @since 1.0
+ */
+
 public class OrganizerEventCreateActivity extends AppCompatActivity {
+
+    /**
+     * Initializes the event creation interface and sets up all necessary components.
+     * Configures:
+     * - UI elements binding
+     * - Firebase instances
+     * - Click listeners for date/time selection
+     * - Image upload functionality
+     * - Event submission handling
+     *
+     * @param savedInstanceState If the activity is being re-initialized after previously being shut down,
+     *                          this Bundle contains the data it most recently supplied
+     */
 
     private ImageView eventPosterImageView;
     private EditText eventNameEditText, eventDescriptionEditText, waitingListCountEditText, lotteryCountEditText;
@@ -50,11 +85,11 @@ public class OrganizerEventCreateActivity extends AppCompatActivity {
         ImageButton backButton = findViewById(R.id.backButton);
         backButton.setOnClickListener(v -> finish());
 
-        // 初始化 Firebase 实例
+        // Initialize the Firebase instance
         db = FirebaseFirestore.getInstance();
         storageRef = FirebaseStorage.getInstance().getReference().child("event_posters");
 
-        // 绑定视图
+        // Binding Views
         eventPosterImageView = findViewById(R.id.eventPosterImageView);
         eventNameEditText = findViewById(R.id.eventNameEditText);
         eventDescriptionEditText = findViewById(R.id.eventDescriptionEditText);
@@ -73,7 +108,7 @@ public class OrganizerEventCreateActivity extends AppCompatActivity {
         uploadPosterButton.setOnClickListener(v -> openImagePicker());
         createEventButton.setOnClickListener(v -> uploadEventToFirebase());
 
-        // 设置点击事件，弹出日期时间选择器
+        // Set a click event to pop up a date and time picker
         eventTimeTextView.setOnClickListener(v -> showDateTimePicker(selectedEventTimeTextView));
         registrationDeadlineTextView.setOnClickListener(v -> showDateTimePicker(selectedRegistrationDeadlineTextView));
         lotteryTimeTextView.setOnClickListener(v -> showDateTimePicker(selectedLotteryTimeTextView));
@@ -104,7 +139,7 @@ public class OrganizerEventCreateActivity extends AppCompatActivity {
             new TimePickerDialog(this, (view1, hourOfDay, minute) -> {
                 date.set(Calendar.HOUR_OF_DAY, hourOfDay);
                 date.set(Calendar.MINUTE, minute);
-                // 格式化并设置日期时间
+                // Format and set date and time
                 SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault());
                 textView.setText(sdf.format(date.getTime()));
             }, currentDate.get(Calendar.HOUR_OF_DAY), currentDate.get(Calendar.MINUTE), false).show();
@@ -112,7 +147,7 @@ public class OrganizerEventCreateActivity extends AppCompatActivity {
     }
 
     private void uploadEventToFirebase() {
-        // 检查必填字段是否为空
+        // Check if a required field is empty
         Log.d("OrganizerEventCreateActivity", "uploadEventToFirebase() called");
 
         String eventName = eventNameEditText.getText().toString().trim();
@@ -121,10 +156,10 @@ public class OrganizerEventCreateActivity extends AppCompatActivity {
         String lotteryTime = selectedLotteryTimeTextView.getText().toString().trim();
         String eventDescription = eventDescriptionEditText.getText().toString().trim();
 
-        // 获取设备码
+        // Get device code
         String organizerDeviceID = Settings.Secure.getString(getContentResolver(), Settings.Secure.ANDROID_ID);
 
-        // 检查必填字段
+        // Check required fields
         if (eventName.isEmpty() || eventTime.isEmpty() || registrationDeadline.isEmpty() || lotteryTime.isEmpty()) {
             Toast.makeText(this, "Please fill in all required fields", Toast.LENGTH_SHORT).show();
             Log.d("OrganizerEventCreateActivity", "Required fields are missing");
@@ -137,11 +172,11 @@ public class OrganizerEventCreateActivity extends AppCompatActivity {
             String waitingListStr = waitingListCountEditText.getText().toString().trim();
             String lotteryCountStr = lotteryCountEditText.getText().toString().trim();
 
-            // 设置等待列表和彩票数量的默认值
+            // Set default values for waiting list and lottery numbers
             waitingListCount = waitingListStr.isEmpty() ? Integer.MAX_VALUE : Integer.parseInt(waitingListStr);
             lotteryCount = lotteryCountStr.isEmpty() ? waitingListCount : Integer.parseInt(lotteryCountStr);
 
-            // 检查彩票数量是否小于或等于等待列表数量
+            // Check if the number of tickets is less than or equal to the number of waiting lists
             if (lotteryCount > waitingListCount) {
                 Toast.makeText(this, "Lottery count cannot exceed waiting list count", Toast.LENGTH_SHORT).show();
                 Log.d("OrganizerEventCreateActivity", "Lottery count exceeds waiting list count");
@@ -153,7 +188,7 @@ public class OrganizerEventCreateActivity extends AppCompatActivity {
             return;
         }
 
-        // 检查海报上传
+        // Check Poster Upload
         if (posterUri != null) {
             StorageReference posterRef = storageRef.child(System.currentTimeMillis() + ".jpg");
             Log.d("OrganizerEventCreateActivity", "Uploading poster to Firebase Storage");

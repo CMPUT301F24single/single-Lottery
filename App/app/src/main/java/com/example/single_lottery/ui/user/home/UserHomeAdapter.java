@@ -16,11 +16,24 @@ import com.example.single_lottery.EventModel;
 
 import java.util.List;
 
+/**
+ * Adapter for displaying event list in user's home screen.
+ * Handles event item display and navigation to event details.
+ *
+ * @author [Jingyao Gu]
+ * @version 1.0
+ */
 public class UserHomeAdapter extends RecyclerView.Adapter<UserHomeAdapter.UserHomeViewHolder> {
 
     private List<EventModel> eventList;
     private Context context;
 
+    /**
+     * Creates new adapter instance for event list.
+     *
+     * @param context Context for launching activities
+     * @param eventList List of events to display
+     */
     public UserHomeAdapter(Context context, List<EventModel> eventList) {
         this.context = context;
         this.eventList = eventList;
@@ -50,6 +63,10 @@ public class UserHomeAdapter extends RecyclerView.Adapter<UserHomeAdapter.UserHo
         return eventList.size();
     }
 
+    /**
+     * ViewHolder for home screen event items.
+     * Contains event name and view button.
+     */
     public static class UserHomeViewHolder extends RecyclerView.ViewHolder {
         public TextView eventNameTextView;
         public Button viewButton;

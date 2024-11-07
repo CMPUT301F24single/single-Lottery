@@ -11,7 +11,47 @@ import androidx.fragment.app.Fragment;
 import com.example.single_lottery.R;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
+/**
+ * The main control activity for event organizers in the Single Lottery application.
+ * This activity serves as the primary navigation hub for organizers, providing access to:
+ * - Event management through OrganizerHomeFragment
+ * - Event creation via OrganizerEventCreateActivity
+ * - Profile management using OrganizerProfilePageFragment
+ *
+ * This activity coordinates with various other components:
+ * - Event management: OrganizerEventAdapter, OrganizerEventViewHolder
+ * - Event operations: OrganizerHomeEditEventActivity, OrganizerHomeViewEventActivity
+ * - QR code functionality: QRCodeActivity
+ *
+ * @author [Jingyao Gu]
+ * @version 1.0
+ * @see OrganizerHomeFragment
+ * @see OrganizerEventCreateActivity
+ * @see OrganizerProfilePageFragment
+ * @see OrganizerEventAdapter
+ * @since 1.0
+ */
+
 public class OrganizerActivity extends AppCompatActivity {
+
+    /**
+     * Initializes and sets up the organizer's main interface.
+     * Configures the bottom navigation with three main sections:
+     * - Home: Displays event management interface via OrganizerHomeFragment
+     * - New Event: Launches event creation interface via OrganizerEventCreateActivity
+     * - Profile: Shows organizer profile management via OrganizerProfilePageFragment
+     *
+     * The method establishes the navigation flow between different fragments and activities
+     * within the organizer's section of the application.
+     *
+     * @param savedInstanceState If the activity is being re-initialized after previously being shut down,
+     *                          this Bundle contains the data it most recently supplied.
+     *                          Otherwise it is null.
+     * @see BottomNavigationView
+     * @see OrganizerHomeFragment
+     * @see OrganizerEventCreateActivity
+     * @see OrganizerProfilePageFragment
+     */
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
