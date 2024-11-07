@@ -5,6 +5,13 @@ import android.view.ViewGroup;
 import androidx.fragment.app.Fragment;
 import com.example.single_lottery.R;
 
+/**
+ * Fragment for handling camera preview display.
+ * Uses Camera2Preview to show camera feed.
+ *
+ * @author [Haorui Gao]
+ * @version 1.0
+ */
 public class CameraFragment extends Fragment {
 
     @Override

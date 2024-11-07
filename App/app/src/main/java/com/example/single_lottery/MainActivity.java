@@ -25,6 +25,13 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
+/**
+ * Main entry point activity for Single Lottery application.
+ * Handles role selection and automatic lottery execution for events.
+ *
+ * @author [Haorui Gao]
+ * @version 1.0
+ */
 public class MainActivity extends AppCompatActivity {
 
     private boolean showLandingScreen;
@@ -33,7 +40,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        // 检查是否显示初始的 landing screen
+        // Check if the initial landing screen is displayed
         showLandingScreen = getIntent().getBooleanExtra("showLandingScreen", true);
 
         if (showLandingScreen) {
@@ -43,11 +50,11 @@ public class MainActivity extends AppCompatActivity {
             Button buttonOrganizer = findViewById(R.id.button_organizer);
             Button buttonAdmin = findViewById(R.id.button_admin);
 
-            // 点击任意按钮时进行抽奖检查
+            // Lottery check when any button is clicked
             View.OnClickListener listener = v -> {
-                performLotteryCheck(); // 执行抽奖检查
+                performLotteryCheck(); // Perform draw check
 
-                // 根据点击的按钮跳转到不同的活动
+                // Jump to different activities based on the button clicked
                 Intent intent;
                 if (v.getId() == R.id.button_user) {
                     intent = new Intent(MainActivity.this, UserActivity.class);
@@ -67,7 +74,10 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    // 抽奖检查功能
+    /**
+     * Checks all events and performs lottery draws if deadline is reached.
+     * Verifies lottery time and triggers draw for eligible events.
+     */
     private void performLotteryCheck() {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
 
@@ -79,7 +89,7 @@ public class MainActivity extends AppCompatActivity {
                         String lotteryTime = document.getString("lotteryTime");
                         int lotteryCount = document.getLong("lotteryCount").intValue();
 
-                        // 检查是否到达抽奖时间
+                        // Check if the lottery time has arrived
                         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault());
                         try {
                             Date lotteryDate = dateFormat.parse(lotteryTime);
@@ -95,17 +105,22 @@ public class MainActivity extends AppCompatActivity {
                 .addOnFailureListener(e -> Log.e("MainActivity", "Error checking lottery time", e));
     }
 
-    // 检查是否已经进行过抽奖
+    /**
+     * Verifies if lottery has already been performed for an event.
+     *
+     * @param eventId Event to check
+     * @param lotteryCount Number of winners to select
+     */
     private void checkIfAlreadyDrawn(String eventId, int lotteryCount) {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
 
         db.collection("registered_events")
                 .whereEqualTo("eventId", eventId)
-                .whereEqualTo("status", "Winner") // 检查是否已有 "Winner" 状态的记录
+                .whereEqualTo("status", "Winner") // Check if there is already a record with "Winner" status
                 .get()
                 .addOnSuccessListener(querySnapshot -> {
                     if (querySnapshot.isEmpty()) {
-                        // 如果没有 "Winner" 状态的记录，执行抽奖
+                        // If there is no record with "Winner" status, execute the lottery
                         performLottery(eventId, lotteryCount);
                     } else {
                         Log.d("MainActivity", "Lottery already performed for event: " + eventId);
@@ -114,7 +129,15 @@ public class MainActivity extends AppCompatActivity {
                 .addOnFailureListener(e -> Log.e("MainActivity", "Error checking if lottery already drawn", e));
     }
 
-    // 执行抽奖
+
+    /**
+     * Executes lottery draw for an event.
+     * Randomly selects winners, updates participant status,
+     * and notifies users of results.
+     *
+     * @param eventId Event to perform lottery for
+     * @param lotteryCount Number of winners to select
+     */
     private void performLottery(String eventId, int lotteryCount) {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
 
@@ -126,11 +149,11 @@ public class MainActivity extends AppCompatActivity {
                         List<DocumentSnapshot> registeredUsers = queryDocumentSnapshots.getDocuments();
                         int winnersCount = Math.min(registeredUsers.size(), lotteryCount);
 
-                        // 随机抽奖逻辑
-                        Collections.shuffle(registeredUsers); // 随机打乱报名用户
+                        // Random draw logic
+                        Collections.shuffle(registeredUsers); // Randomly shuffle registered users
                         List<DocumentSnapshot> winners = registeredUsers.subList(0, winnersCount);
 
-                        // 更新赢家状态
+                        // Update winner status
                         for (DocumentSnapshot winnerDoc : winners) {
                             db.collection("registered_events").document(winnerDoc.getId())
                                     .update("status", "Winner")
@@ -138,7 +161,7 @@ public class MainActivity extends AppCompatActivity {
                                     .addOnFailureListener(e -> Log.e("Lottery", "Failed to update winner status", e));
                         }
 
-                        // 更新非赢家状态
+                        // Update non-winner status
                         List<DocumentSnapshot> losers = registeredUsers.subList(winnersCount, registeredUsers.size());
                         for (DocumentSnapshot loserDoc : losers) {
                             db.collection("registered_events").document(loserDoc.getId())

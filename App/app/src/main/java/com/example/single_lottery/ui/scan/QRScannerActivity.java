@@ -31,6 +31,14 @@ import com.google.zxing.common.HybridBinarizer;
 import java.nio.ByteBuffer;
 import java.util.Arrays;
 
+/**
+ * Activity for scanning event QR codes.
+ * Handles camera initialization, QR code scanning and processing.
+ * Uses Camera2 API for camera preview and ZXing for QR code decoding.
+ *
+ * @author [Haorui Gao]
+ * @version 1.0
+ */
 public class QRScannerActivity extends AppCompatActivity {
     private TextureView textureView;
     private CameraDevice cameraDevice;
@@ -45,6 +53,10 @@ public class QRScannerActivity extends AppCompatActivity {
         textureView.setSurfaceTextureListener(textureListener);
     }
 
+    /**
+     * Checks and requests camera permissions if needed.
+     * Initiates camera preview if permission granted.
+     */
     private void checkCameraPermission() {
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA}, 1);
@@ -82,6 +94,11 @@ public class QRScannerActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * Creates camera preview session and configures capture request.
+     *
+     * @throws CameraAccessException if camera access fails
+     */
     private void createCameraPreviewSession() {
         try {
             SurfaceTexture texture = textureView.getSurfaceTexture();
@@ -112,6 +129,12 @@ public class QRScannerActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * Processes camera image to decode QR code.
+     * Converts YUV to RGB and uses ZXing for decoding.
+     *
+     * @param image Camera image to process
+     */
     private void processImageForQRCode(Image image) {
         ByteBuffer buffer = image.getPlanes()[0].getBuffer();
         byte[] data = new byte[buffer.remaining()];
@@ -150,9 +173,14 @@ public class QRScannerActivity extends AppCompatActivity {
             Log.e("QRCodeScanner", "Error decoding QR code", e);
         }
     }
-    
-    
 
+
+    /**
+     * Handles decoded QR code content.
+     * Launches event view activity with scanned event ID.
+     *
+     * @param scannedContent Decoded QR code content
+     */
     private void handleQRCodeScan(String scannedContent) {
         Intent intent = new Intent(this, OrganizerHomeViewEventActivity.class);
         intent.putExtra("event_id", scannedContent); 

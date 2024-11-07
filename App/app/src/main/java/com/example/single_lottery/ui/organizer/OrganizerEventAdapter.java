@@ -15,12 +15,40 @@ import com.example.single_lottery.EventModel;
 
 import java.util.List;
 
+/**
+ * Adapter class for managing and displaying event items in the organizer's event list.
+ * Handles the display and interaction of events including view and edit operations.
+ * Works with RecyclerView to efficiently display scrollable lists of events.
+ *
+ * @author [Jingyao Gu]
+ * @version 1.0
+ * @see RecyclerView.Adapter
+ * @see EventModel
+ * @see OrganizerEventViewHolder
+ * @since 1.0
+ */
+
 public class OrganizerEventAdapter extends RecyclerView.Adapter<OrganizerEventAdapter.OrganizerEventViewHolder> {
     private List<EventModel> eventList;
+
+    /**
+     * Constructs an OrganizerEventAdapter with a list of events.
+     *
+     * @param eventList List of EventModel objects to be displayed
+     */
 
     public OrganizerEventAdapter(List<EventModel> eventList) {
         this.eventList = eventList;
     }
+
+    /**
+     * Creates new ViewHolder instances for event items.
+     * Inflates the event item layout and creates a new OrganizerEventViewHolder.
+     *
+     * @param parent The ViewGroup into which the new View will be added
+     * @param viewType The view type of the new View
+     * @return A new OrganizerEventViewHolder that holds a View of the event item layout
+     */
 
     @NonNull
     @Override

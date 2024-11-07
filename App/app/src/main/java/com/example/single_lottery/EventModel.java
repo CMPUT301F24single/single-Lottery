@@ -1,5 +1,13 @@
 package com.example.single_lottery;
 
+/**
+ * Model class representing a lottery event.
+ * Stores event details including timing, capacity and registration information.
+ * Used for Firestore data mapping.
+ *
+ * @author [Haorui Gao]
+ * @version 1.0
+ */
 public class EventModel {
     private String name;
     private String organizerDeviceID;
@@ -13,10 +21,10 @@ public class EventModel {
     private String description;
 
     public EventModel() {
-        // 无参数构造函数，Firestore 数据绑定需要
+        // No-argument constructor, required for Firestore data binding
     }
 
-    // 所有字段的 getter 和 setter
+    // Getters and setters for all fields
     public String getName() {
         return name;
     }

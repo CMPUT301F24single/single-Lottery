@@ -29,6 +29,13 @@ import com.google.firebase.storage.StorageReference;
 import java.io.IOException;
 import java.util.UUID;
 
+/**
+ * Fragment for managing organizer profile details and image.
+ * Handles profile data storage and updates in Firebase.
+ *
+ * @author [Haorui Gao]
+ * @version 1.0
+ */
 public class OrganizerProfilePageFragment extends Fragment {
     private TextView nameTextView, emailTextView, phoneTextView, infoTextView;
     private Button editButton, uploadButton, removeImageButton;
@@ -45,7 +52,10 @@ public class OrganizerProfilePageFragment extends Fragment {
     private FirebaseStorage storage;
     private StorageReference storageReference;
 
-
+    /**
+     * Creates and initializes the profile page interface.
+     * Sets up Firebase connections and loads existing profile data.
+     */
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -82,6 +92,11 @@ public class OrganizerProfilePageFragment extends Fragment {
         return view;
     }
 
+    /**
+     * Retrieves organizer profile data from Firestore using installation ID.
+     *
+     * @param installationId Unique identifier for the organizer
+     */
     private void loadOrganizerProfile(String installationId) {
         DocumentReference docRef = firestore.collection("organizers").document(installationId);
         docRef.get().addOnCompleteListener(task -> {
@@ -104,6 +119,11 @@ public class OrganizerProfilePageFragment extends Fragment {
         });
     }
 
+    /**
+     * Updates UI with organizer profile information.
+     *
+     * @param profileImageUrl URL of profile image, null if no image exists
+     */
     private void updateOrganizerDetails(String profileImageUrl) {
         nameTextView.setText(organizerName);
         emailTextView.setText(organizerEmail);
@@ -120,6 +140,10 @@ public class OrganizerProfilePageFragment extends Fragment {
         }
     }
 
+    /**
+     * Shows dialog for editing profile information.
+     * Updates Firestore on save.
+     */
     private void showEditDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         builder.setTitle("Edit Profile");
@@ -156,6 +180,9 @@ public class OrganizerProfilePageFragment extends Fragment {
         startActivityForResult(Intent.createChooser(intent, "select image"), 1);
     }
 
+    /**
+     * Handles image selection result and initiates upload.
+     */
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -179,6 +206,10 @@ public class OrganizerProfilePageFragment extends Fragment {
         }
     }
 
+    /**
+     * Uploads new profile image to Firebase Storage.
+     * Deletes old image if exists.
+     */
     private void uploadProfileImage() {
         if (profileImageUri != null) {
             DocumentReference docRef = firestore.collection("organizers").document(installationId);
@@ -246,6 +277,12 @@ public class OrganizerProfilePageFragment extends Fragment {
         });
     }
 
+    /**
+     * Saves organizer profile data to Firestore.
+     *
+     * @param installationId Unique identifier for the organizer
+     * @param profileImageUri URI of uploaded profile image
+     */
     private void saveOrganizerDataToFirestore(String installationId, String profileImageUri) {
         if (installationId == null) {
             Log.e("OrganizerProfilePageFragment", "installationId is null");

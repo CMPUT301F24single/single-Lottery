@@ -9,7 +9,13 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.single_lottery.R;
 
-
+/**
+ * ViewHolder for event list items in user home screen.
+ * Contains event name and view button.
+ *
+ * @author [Jingyao Gu]
+ * @version 1.0
+ */
 public class UserEventViewHolder extends RecyclerView.ViewHolder {
 
     TextView eventNameTextView;

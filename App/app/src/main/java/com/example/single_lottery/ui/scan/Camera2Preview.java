@@ -5,6 +5,13 @@ import android.graphics.SurfaceTexture;
 import android.util.AttributeSet;
 import android.view.TextureView;
 
+/**
+ * Custom TextureView for camera preview display.
+ * Handles camera preview lifecycle and surface state changes.
+ *
+ * @author [Haorui Gao]
+ * @version 1.0
+ */
 public class Camera2Preview extends TextureView implements TextureView.SurfaceTextureListener {
     private Camera2Helper camera2Helper;
 
@@ -14,6 +21,10 @@ public class Camera2Preview extends TextureView implements TextureView.SurfaceTe
         camera2Helper = new Camera2Helper(context); 
     }
 
+    /**
+     * Called when surface is ready for use.
+     * Initializes camera preview.
+     */
     @Override
     public void onSurfaceTextureAvailable(SurfaceTexture surface, int width, int height) {
         camera2Helper.openCamera(); 
@@ -24,6 +35,10 @@ public class Camera2Preview extends TextureView implements TextureView.SurfaceTe
         
     }
 
+    /**
+     * Called when surface is about to be destroyed.
+     * Cleans up camera resources.
+     */
     @Override
     public boolean onSurfaceTextureDestroyed(SurfaceTexture surface) {
         camera2Helper.closeCamera(); 

@@ -23,12 +23,22 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Fragment for displaying user's registered events list.
+ * Shows events user has registered for and handles empty state display.
+ *
+ * @author [Jingyao Gu]
+ * @version 1.0
+ */
 public class EventsFragment extends Fragment {
     private RecyclerView recyclerView;
     private UserEventAdapter eventAdapter;
     private List<EventModel> eventList;
     private TextView noEventsTextView;
 
+    /**
+     * Initializes the fragment view and sets up RecyclerView with event list.
+     */
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -54,6 +64,11 @@ public class EventsFragment extends Fragment {
         return view;
     }
 
+    /**
+     * Loads user's registered events from Firestore.
+     * Handles empty state visibility and updates event list display.
+     * Uses device ID as user identifier.
+     */
     private void loadRegisteredEvents() {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         String userId = Settings.Secure.getString(getContext().getContentResolver(), Settings.Secure.ANDROID_ID);
