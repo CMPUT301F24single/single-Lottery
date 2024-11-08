@@ -40,7 +40,7 @@ import java.util.UUID;
  * Fragment for managing user profile and data in the Single Lottery application.
  * Handles profile information display, editing capabilities and image management.
  *
- * @author [Jingyao Gu]
+ * @author [Haorui Gao]
  * @version 1.0
  */
 public class ProfileFragment extends Fragment {
