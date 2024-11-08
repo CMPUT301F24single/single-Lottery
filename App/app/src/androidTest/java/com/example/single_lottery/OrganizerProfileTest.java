@@ -27,7 +27,7 @@ import java.util.concurrent.CountDownLatch;
 /*
 User profile fragment test that checks that fields are editable and up to date with firestore.
  */
-public class ProfileFragmentTest {
+public class OrganizerProfileTest {
     private String installationId;
 
     //https://stackoverflow.com/questions/29378552/in-espresso-how-to-avoid-ambiguousviewmatcherexception-when-multiple-views-matc
@@ -50,11 +50,11 @@ public class ProfileFragmentTest {
         };
     }
 
-    private String[] loadUserProfile(String installationId) {
+    private String[] loadOrganizerProfile(String installationId) {
         final String[] userProfile = new String[3];
         final CountDownLatch latch = new CountDownLatch(1);
         FirebaseFirestore firestore = FirebaseFirestore.getInstance();
-        DocumentReference docRef = firestore.collection("users").document(installationId);
+        DocumentReference docRef = firestore.collection("organizers").document(installationId);
         docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
             @Override
             public void onComplete(Task<DocumentSnapshot> task) {
@@ -97,22 +97,15 @@ public class ProfileFragmentTest {
                         Log.e("ProfileFragment", "failed to get installation id: " + task.getException());
                     }
                 });
-        onView(withId(R.id.button_user)).perform(click());
+        onView(withId(R.id.button_organizer)).perform(click());
         Thread.sleep(500);
-        onView(withIndex(withId(R.id.navigation_notifications), 0)).perform(click());
-    }
-    @Test
-    public void currentUserDetails(){
-        String[] details = loadUserProfile(installationId);
-        onView(withId(R.id.nameTextView)).check(matches(withText(details[0])));
-        onView(withId(R.id.emailTextView)).check(matches(withText(details[1])));
-        onView(withId(R.id.phoneTextView)).check(matches(withText(details[2])));
+        onView(withIndex(withId(R.id.navigation_profile), 0)).perform(click());
     }
 
     @Test
-    public void editedUserDetails(){
-        String testName = "John299292";
-        String testEmail = "icantsleep@gmail.com";
+    public void editOrganizer(){
+        String testName = "Organizer Test";
+        String testEmail = "organizer@gmail.com";
         String testPhone = "123123123";
 
         onView(withId(R.id.editButton)).perform(click());
@@ -121,7 +114,7 @@ public class ProfileFragmentTest {
         onView(withId(R.id.phoneInput)).perform(replaceText(testPhone));
         onView(withText("save")).perform(click());
 
-        String[] details = loadUserProfile(installationId);
+        String[] details = loadOrganizerProfile(installationId);
         onView(withId(R.id.nameTextView)).check(matches(withText(details[0])));
         onView(withId(R.id.emailTextView)).check(matches(withText(details[1])));
         onView(withId(R.id.phoneTextView)).check(matches(withText(details[2])));
