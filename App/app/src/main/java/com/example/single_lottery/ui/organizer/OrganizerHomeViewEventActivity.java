@@ -120,7 +120,7 @@ public class OrganizerHomeViewEventActivity extends AppCompatActivity {
                 .whereEqualTo("eventId", eventId)
                 .get()
                 .addOnSuccessListener(querySnapshot -> {
-                    StringBuilder waitingList = new StringBuilder("Waiting List:\n");
+                    StringBuilder waitingList = new StringBuilder();
                     for (DocumentSnapshot document : querySnapshot.getDocuments()) {
                         String userId = document.getString("userId");
                         waitingList.append(userId).append("\n");
@@ -178,7 +178,7 @@ public class OrganizerHomeViewEventActivity extends AppCompatActivity {
                 .whereEqualTo("status", "Accepted")  // 仅查询状态为 Accepted 的用户
                 .get()
                 .addOnSuccessListener(querySnapshot -> {
-                    StringBuilder acceptedUsersList = new StringBuilder("Accepted Users:\n");
+                    StringBuilder acceptedUsersList = new StringBuilder();
                     for (DocumentSnapshot document : querySnapshot.getDocuments()) {
                         String userId = document.getString("userId");
                         acceptedUsersList.append(userId).append("\n");
