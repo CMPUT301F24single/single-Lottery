@@ -25,8 +25,11 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 
-//Gpt4o: Make custom PickerActions class that select date and time of respective dialogboxes
-//androidx.test.espresso:espresso-contrib.PickerActions is deprecated and has compatibility issues with running correctly on current environment
+/*
+ * Gpt4o: Make custom PickerActions class that select date and time of respective dialogboxes
+ * //androidx.test.espresso:espresso-contrib.PickerActions is deprecated and has compatibility issues with running correctly on current environment
+ * Functions in this class are used to manually set the date and time in a calendar/clock dialog box in a UI test.
+ */
 class PickerActions {
     public static ViewAction setDate(final int year, final int month, final int dayOfMonth) {
         return new ViewAction() {
@@ -45,7 +48,6 @@ class PickerActions {
             }
         };
     }
-
     public static ViewAction setTime(final int hour, final int minute) {
         return new ViewAction() {
             @Override
@@ -68,17 +70,11 @@ class PickerActions {
     }
 }
 
-/*Black box testing for creating and viewing an event
-Things to adjust for while app is still in development:
--test case launch will change as the app is able to automatically choose device as one of: {user, organizer, admin}
--check deletion of events functionality (if applicable to an organizer)
--check for correct inputs (e.g. a lottery date shouldn't exceed the event date)
+/*
+ * Black box testing for creating and viewing an event as an organizer.
  */
 
 public class OrganizerEventTest {
-    //before: make an event as an organizer
-    //after: test as an organizer that the event details can be viewed and edited
-    //https://stackoverflow.com/questions/29378552/in-espresso-how-to-avoid-ambiguousviewmatcherexception-when-multiple-views-matc
     public static Matcher<View> withIndex(final Matcher<View> matcher, final int index) {
         return new TypeSafeMatcher<View>() {
             int currentIndex = 0;
