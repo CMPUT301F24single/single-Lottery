@@ -69,14 +69,14 @@ public class OrganizerHomeViewEventActivity extends AppCompatActivity {
 
         Button mapButton = findViewById(R.id.mapButton);
         mapButton.setOnClickListener(v -> {
-            String eventId = getIntent().getStringExtra("event_id"); // 确保这里的键名与传递的一致
+            String eventId = getIntent().getStringExtra("event_id");
             Log.d("OrganizerHomeViewEventActivity", "event_id: " + eventId);
             if (eventId != null) {
                 Intent intent = new Intent(OrganizerHomeViewEventActivity.this, MapsActivity.class);
-                intent.putExtra("eventId", eventId); // 将 eventId 传递
+                intent.putExtra("eventId", eventId);
                 startActivity(intent);
             } else {
-                Toast.makeText(this, "Event ID is null", Toast.LENGTH_SHORT).show(); // 处理 eventId 为 null 的情况
+                Toast.makeText(this, "Event ID is null", Toast.LENGTH_SHORT).show();
             }
         });
 
@@ -101,7 +101,7 @@ public class OrganizerHomeViewEventActivity extends AppCompatActivity {
         loadEventData(eventId);
 
         buttonGenerateQRCode.setOnClickListener(v -> {
-            Intent intent = new Intent(OrganizerHomeViewEventActivity.this, QRCodeActivity.class);
+            Intent intent = new Intent(OrganizerHomeViewEventActivity.this, OrganizerQRCode.class);
             intent.putExtra("event_id", eventId);
             startActivity(intent);
         });
