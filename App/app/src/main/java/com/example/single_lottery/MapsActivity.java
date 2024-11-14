@@ -83,7 +83,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             for (LatLng location : locations) {
                 mMap.addMarker(new MarkerOptions().position(location));
             }
-            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(locations.get(0), 15)); // 移动相机到第一个位置
+            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(locations.get(0), 15));
         } else {
             Toast.makeText(this, "No locations found", Toast.LENGTH_SHORT).show();
         }
