@@ -2,6 +2,7 @@ package com.example.single_lottery.ui.organizer;
 
 import android.annotation.SuppressLint;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -68,8 +69,15 @@ public class OrganizerHomeViewEventActivity extends AppCompatActivity {
 
         Button mapButton = findViewById(R.id.mapButton);
         mapButton.setOnClickListener(v -> {
-            Intent intent = new Intent(OrganizerHomeViewEventActivity.this, MapsActivity.class);
-            startActivity(intent);
+            String eventId = getIntent().getStringExtra("event_id"); // 确保这里的键名与传递的一致
+            Log.d("OrganizerHomeViewEventActivity", "event_id: " + eventId);
+            if (eventId != null) {
+                Intent intent = new Intent(OrganizerHomeViewEventActivity.this, MapsActivity.class);
+                intent.putExtra("eventId", eventId); // 将 eventId 传递
+                startActivity(intent);
+            } else {
+                Toast.makeText(this, "Event ID is null", Toast.LENGTH_SHORT).show(); // 处理 eventId 为 null 的情况
+            }
         });
 
 
