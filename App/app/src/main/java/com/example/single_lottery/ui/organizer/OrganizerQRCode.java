@@ -59,7 +59,7 @@ public class OrganizerQRCode extends AppCompatActivity {
     private void checkAndDisplayExistingQRCode(String eventId) {
         FirebaseFirestore.getInstance().collection("QRCode")
                 .whereEqualTo("eventId", eventId)
-                .whereEqualTo("type", "CheckIn")
+                .whereEqualTo("type", "Signup")
                 .limit(1)
                 .get()
                 .addOnSuccessListener(queryDocumentSnapshots -> {
@@ -80,7 +80,7 @@ public class OrganizerQRCode extends AppCompatActivity {
         String qrCodeId = UUID.randomUUID().toString();
         try {
             QRCodeWriter qrCodeWriter = new QRCodeWriter();
-            String qrCodeContent = "{ \"eventId\": \"" + eventId + "\", \"qrCodeId\": \"" + qrCodeId + "\", \"type\": \"CheckIn\" }";
+            String qrCodeContent = "{ \"eventId\": \"" + eventId + "\", \"qrCodeId\": \"" + qrCodeId + "\", \"type\": \"Signup\" }";
             BitMatrix bitMatrix = qrCodeWriter.encode(qrCodeContent, BarcodeFormat.QR_CODE, 600, 600);
             BarcodeEncoder barcodeEncoder = new BarcodeEncoder();
             Bitmap bitmap = barcodeEncoder.createBitmap(bitMatrix);
@@ -110,7 +110,7 @@ public class OrganizerQRCode extends AppCompatActivity {
     private void saveQrCodeDetailsToFirestore(String qrCodeId, String eventId, String qrCodeUrl) {
         Map<String, Object> qrCodeDetails = new HashMap<>();
         qrCodeDetails.put("eventId", eventId);
-        qrCodeDetails.put("type", "CheckIn");
+        qrCodeDetails.put("type", "Signup");
         qrCodeDetails.put("qrCodeUrl", qrCodeUrl);
         
         FirebaseFirestore.getInstance().collection("QRCode").document(qrCodeId)
@@ -123,7 +123,7 @@ public class OrganizerQRCode extends AppCompatActivity {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         db.collection("QRCode")
                 .whereEqualTo("eventId", eventId)
-                .whereEqualTo("type", "CheckIn")
+                .whereEqualTo("type", "Signup")
                 .get()
                 .addOnSuccessListener(queryDocumentSnapshots -> {
                     if (!queryDocumentSnapshots.isEmpty()) {

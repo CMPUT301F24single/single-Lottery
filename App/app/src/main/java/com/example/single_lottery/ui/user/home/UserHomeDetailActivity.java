@@ -13,6 +13,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.Manifest;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
@@ -122,7 +123,7 @@ public class UserHomeDetailActivity extends AppCompatActivity {
      * Updates registration count display.
      * Shows current/maximum registration ratio.
      *
-     * @param eventId Event to count registrations for
+     * @param eventId             Event to count registrations for
      * @param maxWaitingListCount Maximum allowed registrations
      */
     private void countRegistrations(String eventId, int maxWaitingListCount) {
@@ -214,9 +215,22 @@ public class UserHomeDetailActivity extends AppCompatActivity {
         }
     }
 
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == LOCATION_PERMISSION_REQUEST_CODE) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                getUserLocation(eventId, Settings.Secure.getString(getContentResolver(), Settings.Secure.ANDROID_ID));
+            } else {
+                Toast.makeText(this, "Location permission is required to get your location.", Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
+
+
     private void getUserLocation(String eventId, String userId) {
         LocationManager locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
-        
+
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
             locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 10000, 0, location -> {
                 if (location != null) {
@@ -241,13 +255,33 @@ public class UserHomeDetailActivity extends AppCompatActivity {
         locationData.put("latitude", latitude);
         locationData.put("longitude", longitude);
 
-        db.collection("user_locations").add(locationData)
-                .addOnSuccessListener(documentReference -> {
-                    Toast.makeText(this, "Location saved!", Toast.LENGTH_SHORT).show();
+        db.collection("user_locations")
+                .whereEqualTo("userId", userId)
+                .whereEqualTo("eventId", eventId)
+                .get()
+                .addOnSuccessListener(queryDocumentSnapshots -> {
+                    if (!queryDocumentSnapshots.isEmpty()) {
+                        String docId = queryDocumentSnapshots.getDocuments().get(0).getId();
+                        db.collection("user_locations").document(docId)
+                                .update(locationData)
+                                .addOnSuccessListener(aVoid -> {
+                                    Toast.makeText(this, "Location updated!", Toast.LENGTH_SHORT).show();
+                                })
+                                .addOnFailureListener(e -> {
+                                    Toast.makeText(this, "Failed to update location.", Toast.LENGTH_SHORT).show();
+                                });
+                    } else {
+                        db.collection("user_locations").add(locationData)
+                                .addOnSuccessListener(documentReference -> {
+                                    Toast.makeText(this, "Location saved!", Toast.LENGTH_SHORT).show();
+                                })
+                                .addOnFailureListener(e -> {
+                                    Toast.makeText(this, "Failed to save location.", Toast.LENGTH_SHORT).show();
+                                });
+                    }
                 })
                 .addOnFailureListener(e -> {
-                    Toast.makeText(this, "Failed to save location.", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, "Failed to query user location.", Toast.LENGTH_SHORT).show();
                 });
     }
-
 }
