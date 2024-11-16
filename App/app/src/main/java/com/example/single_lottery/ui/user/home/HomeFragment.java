@@ -1,5 +1,6 @@
 package com.example.single_lottery.ui.user.home;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -13,6 +14,8 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.single_lottery.R;
 import com.example.single_lottery.EventModel;
+import com.example.single_lottery.ui.scan.QRScannerActivity;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.database.annotations.Nullable;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -54,6 +57,12 @@ public class HomeFragment extends Fragment {
 
         loadEventsFromDatabase();
 
+        FloatingActionButton fabCamera = view.findViewById(R.id.fab_camera);
+        fabCamera.setOnClickListener(v -> {
+            Intent intent = new Intent(getActivity(), QRScannerActivity.class);
+            startActivity(intent);
+        });
+
         return view;
     }
 
@@ -66,12 +75,11 @@ public class HomeFragment extends Fragment {
         db.collection("events").get().addOnSuccessListener(queryDocumentSnapshots -> {
             for (DocumentSnapshot document : queryDocumentSnapshots) {
                 EventModel event = document.toObject(EventModel.class);
-                event.setEventId(document.getId());  // 设置 document ID 为 eventId
+                event.setEventId(document.getId());
                 eventList.add(event);
             }
             userHomeAdapter.notifyDataSetChanged();
         }).addOnFailureListener(e -> {
-            // 错误处理
         });
     }
 }

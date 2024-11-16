@@ -51,7 +51,7 @@ public class UserHomeDetailActivity extends AppCompatActivity {
     private Button buttonSignUp;
     private String eventId;
     private String registrationDeadline;
-    private static final int LOCATION_PERMISSION_REQUEST_CODE = 1000;
+    private static final int LOCATION_PERMISSION_REQUEST_CODE = 100;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

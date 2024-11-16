@@ -1,4 +1,6 @@
-package com.example.single_lottery.ui.scan;import android.os.Bundle;
+package com.example.single_lottery.ui.scan;
+
+import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;

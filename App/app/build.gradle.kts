@@ -52,6 +52,7 @@ dependencies {
     implementation(libs.firebase.auth)
     implementation(libs.firebase.installations)
     implementation(libs.firebase.storage)
+    implementation("com.google.firebase:firebase-messaging:24.1.0")
     implementation(libs.glide)
     implementation(libs.recyclerview)
     implementation(libs.play.services.maps.v1900)
