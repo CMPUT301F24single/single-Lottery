@@ -13,8 +13,12 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.example.single_lottery.databinding.ActivityMapsBinding;
 
 /**
- * Activity for displaying event location on Google Maps.
- * Shows event venue with marker at University of Alberta CCIS building.
+ * Activity for map display and location stuff.
+ *
+ * Outstanding Issues:
+ * - Location works fine on emulator but breaks on real phones ugh
+ * - Need to fix location permissions and updates on actual devices
+ * - Like seriously why does this only work in emulator??
  *
  * @author [Haorui Gao]
  * @version 1.0

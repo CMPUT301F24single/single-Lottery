@@ -25,16 +25,16 @@ import org.junit.Test;
 import java.util.concurrent.CountDownLatch;
 
 /**
- * Test class for the User Profile functionality in the Single Lottery application.
- * This class contains UI tests that verify the proper functioning of the user profile
- * viewing and editing features, including synchronization with Firestore database.
+ * Test class for the Organizer Profile functionality in the Single Lottery application.
+ * This class contains UI tests that verify the proper functioning of the organizer profile
+ * editing and display features, including interaction with Firestore database.
  *
  * User profile fragment test that checks that fields are editable and up to date with firestore.
  *
  * @author Aaron Kim
  * @version 1.0
  */
-public class ProfileFragmentTest {
+public class OrganizerProfileTest {
     private String installationId;
 
     /**
@@ -67,20 +67,20 @@ public class ProfileFragmentTest {
     }
 
     /**
-     * Loads the user profile data from Firestore database.
-     * This method synchronously retrieves the user's name, email, and phone number.
+     * Loads the organizer profile data from Firestore database.
+     * This method synchronously retrieves the organizer's name, email, and phone number.
      *
-     * @param installationId The unique installation ID used to identify the user in Firestore
-     * @return String array containing the user's profile information:
+     * @param installationId The unique installation ID used to identify the organizer in Firestore
+     * @return String array containing the organizer's profile information:
      *         index 0: name
      *         index 1: email
      *         index 2: phone number
      */
-    private String[] loadUserProfile(String installationId) {
+    private String[] loadOrganizerProfile(String installationId) {
         final String[] userProfile = new String[3];
         final CountDownLatch latch = new CountDownLatch(1);
         FirebaseFirestore firestore = FirebaseFirestore.getInstance();
-        DocumentReference docRef = firestore.collection("users").document(installationId);
+        DocumentReference docRef = firestore.collection("organizers").document(installationId);
         docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
             @Override
             public void onComplete(Task<DocumentSnapshot> task) {
@@ -110,15 +110,19 @@ public class ProfileFragmentTest {
         }
         return userProfile;
     }
+
+    /**
+     * Rule to launch the MainActivity for testing.
+     */
     @Rule
     public ActivityScenarioRule<MainActivity> scenario = new ActivityScenarioRule<>(MainActivity.class);
 
     /**
      * Sets up the test environment before each test case.
      * This method:
-     * Retrieves the Firebase installation ID
-     * Navigates to the user section
-     * Opens the notifications fragment
+     * 1. Retrieves the Firebase installation ID
+     * 2. Navigates to the organizer section
+     * 3. Opens the profile fragment
      *
      * @throws InterruptedException if the thread sleep is interrupted
      */
@@ -132,33 +136,22 @@ public class ProfileFragmentTest {
                         Log.e("ProfileFragment", "failed to get installation id: " + task.getException());
                     }
                 });
-        onView(withId(R.id.button_user)).perform(click());
+        onView(withId(R.id.button_organizer)).perform(click());
         Thread.sleep(500);
-        onView(withIndex(withId(R.id.navigation_notifications), 0)).perform(click());
-    }
-    /**
-     * Tests that the current user details are correctly displayed.
-     * Verifies that the UI elements show the same information as stored in Firestore.
-     */
-    @Test
-    public void currentUserDetails(){
-        String[] details = loadUserProfile(installationId);
-        onView(withId(R.id.nameTextView)).check(matches(withText(details[0])));
-        onView(withId(R.id.emailTextView)).check(matches(withText(details[1])));
-        onView(withId(R.id.phoneTextView)).check(matches(withText(details[2])));
+        onView(withIndex(withId(R.id.navigation_profile), 0)).perform(click());
     }
 
     /**
-     * Tests the user profile editing functionality.
+     * Tests the organizer profile editing functionality.
      * This test:
-     * Enters test data for name, email, and phone
-     * Saves the changes
-     * Verifies that the changes are reflected in both the UI and Firestore
+     * 1. Enters test data for name, email, and phone
+     * 2. Saves the changes
+     * 3. Verifies that the changes are reflected in both the UI and Firestore
      */
     @Test
-    public void editedUserDetails(){
-        String testName = "John299292";
-        String testEmail = "icantsleep@gmail.com";
+    public void editOrganizer(){
+        String testName = "Organizer Test";
+        String testEmail = "organizer@gmail.com";
         String testPhone = "123123123";
 
         onView(withId(R.id.editButton)).perform(click());
@@ -167,7 +160,7 @@ public class ProfileFragmentTest {
         onView(withId(R.id.phoneInput)).perform(replaceText(testPhone));
         onView(withText("save")).perform(click());
 
-        String[] details = loadUserProfile(installationId);
+        String[] details = loadOrganizerProfile(installationId);
         onView(withId(R.id.nameTextView)).check(matches(withText(details[0])));
         onView(withId(R.id.emailTextView)).check(matches(withText(details[1])));
         onView(withId(R.id.phoneTextView)).check(matches(withText(details[2])));

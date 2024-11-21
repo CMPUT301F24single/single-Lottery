@@ -27,6 +27,11 @@ import java.util.Locale;
  * Activity for displaying event details from user perspective.
  * Handles event registration, lottery status updates and registration cancellation.
  *
+ * Outstanding Issues:
+ * - Push notifications not working yet (can't notify users when they win)
+ * - Need to implement FCM to send notifications when lottery results are out
+ * - No notification system for event status changes and deadlines
+ *
  * @author [Jingyao Gu]
  * @version 1.0
  */

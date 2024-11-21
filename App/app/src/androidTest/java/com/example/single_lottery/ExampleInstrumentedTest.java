@@ -12,7 +12,11 @@ import static org.junit.Assert.*;
 
 /**
  * Instrumented test, which will execute on an Android device.
+ * This test class verifies the basic application context setup.
+ * It ensures the package name matches the expected value and
+ * the application context is properly initialized.
  *
+ * @author [Aaron Kim]
  * @see <a href="http://d.android.com/tools/testing">Testing documentation</a>
  */
 @RunWith(AndroidJUnit4.class)
