@@ -54,6 +54,9 @@ public class UserEventAdapter extends RecyclerView.Adapter<UserEventAdapter.User
         EventModel event = eventList.get(position);
         holder.eventNameTextView.setText(event.getName());
 
+        TextView lotteryDateTextView = holder.itemView.findViewById(R.id.lotteryDate);
+        lotteryDateTextView.setText("Lottery Date: " + event.getLotteryTime());
+
         holder.viewButton.setOnClickListener(v -> {
             Intent intent = new Intent(context, UserEventDetailActivity.class);
             intent.putExtra("event_id", event.getEventId()); // 确保 eventId 非空
