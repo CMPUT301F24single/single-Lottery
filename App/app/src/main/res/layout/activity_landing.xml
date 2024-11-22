@@ -1,25 +1,30 @@
-<!-- activity_landing.xml -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:gravity="center">
 
-    <Button
-        android:id="@+id/button_user"
+    <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="User" />
+        android:orientation="vertical">
 
-    <Button
-        android:id="@+id/button_organizer"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Organizer" />
+        <Button
+            android:id="@+id/button_user"
+            android:layout_width="200dp"
+            android:layout_height="wrap_content"
+            android:text="Browse Events" />
 
-    <Button
-        android:id="@+id/button_admin"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Admin" />
+        <Button
+            android:id="@+id/button_organizer"
+            android:layout_width="200dp"
+            android:layout_height="wrap_content"
+            android:text="Manage events" />
+
+        <Button
+            android:id="@+id/button_admin"
+            android:layout_width="200dp"
+            android:layout_height="wrap_content"
+            android:text="Admin" />
+    </LinearLayout>
 </LinearLayout>
