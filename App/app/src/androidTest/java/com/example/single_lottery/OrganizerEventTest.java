@@ -95,9 +95,16 @@ class PickerActions {
 
 /*
  * Black box testing for creating and viewing an event as an organizer.
+    Things to adjust for while app is still in development:
+    -test case launch will change as the app is able to automatically choose device as one of: {user, organizer, admin}
+    -check deletion of events functionality (if applicable to an organizer)
+    -check for correct inputs (e.g. a lottery date shouldn't exceed the event date)
  */
 
 public class OrganizerEventTest {
+    //before: make an event as an organizer
+    //after: test as an organizer that the event details can be viewed and edited
+    //https://stackoverflow.com/questions/29378552/in-espresso-how-to-avoid-ambiguousviewmatcherexception-when-multiple-views-matc
     public static Matcher<View> withIndex(final Matcher<View> matcher, final int index) {
         return new TypeSafeMatcher<View>() {
             int currentIndex = 0;
