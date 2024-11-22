@@ -3,6 +3,8 @@ package com.example.single_lottery;
 import androidx.fragment.app.FragmentActivity;
 
 import android.os.Bundle;
+import android.util.Log;
+import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -11,6 +13,10 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.example.single_lottery.databinding.ActivityMapsBinding;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
+
+import java.util.ArrayList;
 
 /**
  * Activity for displaying event location on Google Maps.
@@ -31,28 +37,62 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         binding = ActivityMapsBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
+        String eventId = getIntent().getStringExtra("eventId");
+        Log.d("MapsActivity", "Event ID:" + eventId);
+        loadLocations(eventId);
+
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map_fragment);
         mapFragment.getMapAsync(this);
     }
 
-    /**
-     * Manipulates the map once available.
-     * This callback is triggered when the map is ready to be used.
-     * This is where we can add markers or lines, add listeners or move the camera. In this case,
-     * we just add a marker near Edmonton, Canada.
-     * If Google Play services is not installed on the device, the user will be prompted to install
-     * it inside the SupportMapFragment. This method will only be triggered once the user has
-     * installed Google Play services and returned to the app.
-     */
+    private void loadLocations(String eventId) {
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        Log.d("MapsActivity", "Event ID:" + eventId);
+
+        if (eventId == null) {
+            Log.e("MapsActivity", "Event ID is null");
+            return;
+        }
+
+        db.collection("user_locations")
+                .whereEqualTo("eventId", eventId)
+                .get()
+                .addOnSuccessListener(queryDocumentSnapshots -> {
+                    Log.d("MapsActivity", "Documents found: " + queryDocumentSnapshots.size());
+                    ArrayList<LatLng> locations = new ArrayList<>();
+                    for (DocumentSnapshot document : queryDocumentSnapshots) {
+                        double latitude = document.getDouble("latitude");
+                        double longitude = document.getDouble("longitude");
+                        Log.d("MapsActivity", "Latitude: " + latitude + ", Longitude: " + longitude);
+                        locations.add(new LatLng(latitude, longitude));
+                    }
+                    if (mMap != null) {
+                        addMarkersToMap(locations);
+                    }
+                })
+                .addOnFailureListener(e -> {
+                    Toast.makeText(this, "Failed to load locations.", Toast.LENGTH_SHORT).show();
+                    Log.e("MapsActivity", "Error getting documents: ", e);
+                });
+    }
+    
+    private void addMarkersToMap(ArrayList<LatLng> locations) {
+        if (locations != null && !locations.isEmpty()) {
+            for (LatLng location : locations) {
+                mMap.addMarker(new MarkerOptions().position(location));
+            }
+            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(locations.get(0), 15));
+        } else {
+            Toast.makeText(this, "No locations found", Toast.LENGTH_SHORT).show();
+        }
+    }
+
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
-
-        //Add a marker in Sydney and move the camera
-        LatLng edmonton = new LatLng(53.528184049877886, -113.5257462042106);
-        mMap.addMarker(new MarkerOptions().position(edmonton).title("Marker in UofA CCIS"));
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(edmonton));
+        String eventId = getIntent().getStringExtra("event_id");
+        loadLocations(eventId);
     }
 }
