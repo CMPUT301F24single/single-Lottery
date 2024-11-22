@@ -38,6 +38,11 @@ import org.junit.Test;
  * //androidx.test.espresso:espresso-contrib.PickerActions is deprecated and has compatibility issues with running correctly on current environment
  * Functions in this class are used to manually set the date and time in a calendar/clock dialog box in a UI test.
  */
+/*
+ * Gpt4o: Make custom PickerActions class that select date and time of respective dialogboxes
+ * //androidx.test.espresso:espresso-contrib.PickerActions is deprecated and has compatibility issues with running correctly on current environment
+ * Functions in this class are used to manually set the date and time in a calendar/clock dialog box in a UI test.
+ */
 class PickerActions {
     /**
      * Creates a ViewAction that sets a specific date in a DatePicker.
@@ -102,9 +107,6 @@ class PickerActions {
  */
 
 public class OrganizerEventTest {
-    //before: make an event as an organizer
-    //after: test as an organizer that the event details can be viewed and edited
-    //https://stackoverflow.com/questions/29378552/in-espresso-how-to-avoid-ambiguousviewmatcherexception-when-multiple-views-matc
     public static Matcher<View> withIndex(final Matcher<View> matcher, final int index) {
         return new TypeSafeMatcher<View>() {
             int currentIndex = 0;
