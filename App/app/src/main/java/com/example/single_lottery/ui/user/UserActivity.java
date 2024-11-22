@@ -16,10 +16,21 @@ import com.example.single_lottery.R;
 import com.example.single_lottery.databinding.ActivityMainBinding;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
+/**
+ * Main activity for user interface.
+ * Manages bottom navigation and fragment navigation between Home, Events and Profile sections.
+ *
+ * @author [Haorui Gao]
+ * @version 1.0
+ */
 public class UserActivity extends AppCompatActivity {
 
     private ActivityMainBinding binding;
 
+    /**
+     * Initializes user interface and sets up navigation.
+     * Configures bottom navigation view and navigation controller.
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -38,6 +49,12 @@ public class UserActivity extends AppCompatActivity {
         navController.navigate(R.id.navigation_home);
     }
 
+    /**
+     * Handles navigation up action.
+     * Required for proper back navigation.
+     *
+     * @return true if navigation handled, false otherwise
+     */
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu to add items to the action bar if present

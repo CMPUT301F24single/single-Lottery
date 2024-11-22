@@ -10,6 +10,16 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.example.single_lottery.MainActivity;
 import com.example.single_lottery.R;
 
+/**
+ * Activity class for the admin interface that provides administrative functions and management features.
+ * This is the main entry point for admin users to manage the lottery system.
+ *
+ * @author [Haorui Gao]
+ * @version 1.0
+ * @see AppCompatActivity
+ * @since 1.0
+ */
+
 public class AdminActivity extends AppCompatActivity {
 
     /**
