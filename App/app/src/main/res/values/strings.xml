@@ -1,7 +1,7 @@
 <resources>
     <string name="app_name">Single_Lottery</string>
-    <string name="title_home">Home</string>
-    <string name="title_dashboard">Events</string>
+    <string name="title_home">All Events</string>
+    <string name="title_dashboard">Registered Events</string>
     <string name="title_notifications">Profile</string>
     <string name="title_activity_maps">MapsActivity</string>
     <string name="lottery_date">Lottery Date:</string>
