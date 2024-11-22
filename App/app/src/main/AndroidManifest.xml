@@ -69,6 +69,11 @@
 
         <activity android:name=".ui.admin.AdminActivity" />
 
+        <activity android:name=".ui.admin.AdminEventDetailActivity" />
+
+        <activity android:name=".ui.admin.AdminLoginActivity" />
+
+
         <service
             android:name=".ui.notification.MyFireBaseMessagingService"
             android:exported="false">

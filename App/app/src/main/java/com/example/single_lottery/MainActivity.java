@@ -9,9 +9,11 @@ import android.widget.Button;
 import android.widget.Toast;
 
 import com.example.single_lottery.ui.admin.AdminActivity;
+import com.example.single_lottery.ui.admin.AdminLoginActivity;
 import com.example.single_lottery.ui.organizer.OrganizerActivity;
 
 import com.example.single_lottery.ui.user.UserActivity;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
@@ -35,11 +37,12 @@ import java.util.Locale;
 public class MainActivity extends AppCompatActivity {
 
     private boolean showLandingScreen;
+    private FirebaseAuth firebaseAuth;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
+        firebaseAuth = FirebaseAuth.getInstance();
         // Check if the initial landing screen is displayed
         showLandingScreen = getIntent().getBooleanExtra("showLandingScreen", true);
 
@@ -60,8 +63,17 @@ public class MainActivity extends AppCompatActivity {
                     intent = new Intent(MainActivity.this, UserActivity.class);
                 } else if (v.getId() == R.id.button_organizer) {
                     intent = new Intent(MainActivity.this, OrganizerActivity.class);
-                } else {
-                    intent = new Intent(MainActivity.this, AdminActivity.class);
+                } else if (v.getId() == R.id.button_admin) {
+                    if (firebaseAuth.getCurrentUser() != null &&
+                            "admin@example.com".equals(firebaseAuth.getCurrentUser().getEmail())) {
+                        // 用户已登录且是管理员，跳转到 AdminActivity
+                        intent = new Intent(MainActivity.this, AdminActivity.class);
+                    } else {
+                        // 用户未登录或不是管理员，跳转到 AdminLoginActivity
+                        intent = new Intent(MainActivity.this, AdminLoginActivity.class);
+                    }
+                }else {
+                    intent = new Intent(MainActivity.this, MainActivity.class);
                 }
                 intent.putExtra("showLandingScreen", false);
                 startActivity(intent);
