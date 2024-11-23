@@ -7,8 +7,14 @@
         android:title="Event"
         app:showAsAction="ifRoom" />
     <item
-        android:id="@+id/nav_profile"
+        android:id="@+id/nav_organizer"
         android:icon="@drawable/ic_profile"
-        android:title="Profile"
+        android:title="Organizer"
+        app:showAsAction="ifRoom" />
+
+    <item
+        android:id="@+id/nav_user"
+        android:icon="@drawable/ic_profile"
+        android:title="User"
         app:showAsAction="ifRoom" />
 </menu>

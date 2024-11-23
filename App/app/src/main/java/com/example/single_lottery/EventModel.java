@@ -11,6 +11,7 @@ package com.example.single_lottery;
 public class EventModel {
     private String name;
     private String organizerDeviceID;
+    private String userDeviceID;
     private int waitingListCount;
     private int lotteryCount;
     private String lotteryTime;
@@ -19,6 +20,10 @@ public class EventModel {
     private String posterUrl;
     private String eventId;
     private String description;
+    private String profileImageUrl;
+    private String email;
+    private String phone;
+    private String info;
 
     public EventModel() {
         // No-argument constructor, required for Firestore data binding
@@ -39,6 +44,14 @@ public class EventModel {
 
     public void setOrganizerDeviceID(String organizerDeviceID) {
         this.organizerDeviceID = organizerDeviceID;
+    }
+
+    public String getUserDeviceID() {
+        return userDeviceID;
+    }
+
+    public void setUserDeviceID(String userDeviceID) {
+        this.organizerDeviceID = userDeviceID;
     }
 
     public String getTime() {
@@ -104,4 +117,38 @@ public class EventModel {
     public void setDescription(String description) {
         this.description = description;
     }
+
+    public String getProfileImageUrl() {
+        return profileImageUrl;
+    }
+
+    public void setProfileImageUrl(String profileImageUrl) {
+        this.profileImageUrl = profileImageUrl;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public String getPhone() {
+        return phone;
+    }
+
+    public void setPhone(String phone) {
+        this.phone = phone;
+    }
+
+    public String getInfo() {
+        return info;
+    }
+
+    public void setInfo(String info) {
+        this.info = info;
+    }
+
 }
+

@@ -13,10 +13,12 @@ import com.example.single_lottery.ui.admin.AdminLoginActivity;
 import com.example.single_lottery.ui.organizer.OrganizerActivity;
 
 import com.example.single_lottery.ui.user.UserActivity;
+import com.google.firebase.FirebaseApp;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
-
+import com.google.firebase.appcheck.FirebaseAppCheck;
+import com.google.firebase.appcheck.debug.DebugAppCheckProviderFactory;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -37,12 +39,12 @@ import java.util.Locale;
 public class MainActivity extends AppCompatActivity {
 
     private boolean showLandingScreen;
-    private FirebaseAuth firebaseAuth;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        firebaseAuth = FirebaseAuth.getInstance();
+
+
         // Check if the initial landing screen is displayed
         showLandingScreen = getIntent().getBooleanExtra("showLandingScreen", true);
 
@@ -53,31 +55,26 @@ public class MainActivity extends AppCompatActivity {
             Button buttonOrganizer = findViewById(R.id.button_organizer);
             Button buttonAdmin = findViewById(R.id.button_admin);
 
-            // Lottery check when any button is clicked
+            // Set up button click listeners
             View.OnClickListener listener = v -> {
                 performLotteryCheck(); // Perform draw check
 
-                // Jump to different activities based on the button clicked
-                Intent intent;
+                Intent intent = null;
+
                 if (v.getId() == R.id.button_user) {
                     intent = new Intent(MainActivity.this, UserActivity.class);
                 } else if (v.getId() == R.id.button_organizer) {
                     intent = new Intent(MainActivity.this, OrganizerActivity.class);
                 } else if (v.getId() == R.id.button_admin) {
-                    if (firebaseAuth.getCurrentUser() != null &&
-                            "admin@example.com".equals(firebaseAuth.getCurrentUser().getEmail())) {
-                        // 用户已登录且是管理员，跳转到 AdminActivity
-                        intent = new Intent(MainActivity.this, AdminActivity.class);
-                    } else {
-                        // 用户未登录或不是管理员，跳转到 AdminLoginActivity
-                        intent = new Intent(MainActivity.this, AdminLoginActivity.class);
-                    }
-                }else {
-                    intent = new Intent(MainActivity.this, MainActivity.class);
+                    // Admin Login verification
+                    intent = new Intent(MainActivity.this, AdminLoginActivity.class);
                 }
-                intent.putExtra("showLandingScreen", false);
-                startActivity(intent);
-                finish();
+
+                if (intent != null) {
+                    intent.putExtra("showLandingScreen", false);
+                    startActivity(intent);
+                    finish();
+                }
             };
 
             buttonUser.setOnClickListener(listener);
@@ -120,7 +117,7 @@ public class MainActivity extends AppCompatActivity {
     /**
      * Verifies if lottery has already been performed for an event.
      *
-     * @param eventId Event to check
+     * @param eventId      Event to check
      * @param lotteryCount Number of winners to select
      */
     private void checkIfAlreadyDrawn(String eventId, int lotteryCount) {
@@ -141,13 +138,12 @@ public class MainActivity extends AppCompatActivity {
                 .addOnFailureListener(e -> Log.e("MainActivity", "Error checking if lottery already drawn", e));
     }
 
-
     /**
      * Executes lottery draw for an event.
      * Randomly selects winners, updates participant status,
      * and notifies users of results.
      *
-     * @param eventId Event to perform lottery for
+     * @param eventId      Event to perform lottery for
      * @param lotteryCount Number of winners to select
      */
     private void performLottery(String eventId, int lotteryCount) {

@@ -25,32 +25,33 @@ public class AdminActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.admin_homepage);
 
-        // 初始化 BottomNavigationView
         BottomNavigationView bottomNavigationView = findViewById(R.id.admin_nav_bottom_navigation);
 
-        // 默认加载 EventFragment
+        // 默认加载 AdminEventFragment
         if (savedInstanceState == null) {
             getSupportFragmentManager().beginTransaction()
                     .replace(R.id.admin_fragment_container, new AdminEventFragment())
                     .commit();
         }
 
-        // 设置底部导航栏的切换逻辑
         bottomNavigationView.setOnItemSelectedListener(item -> {
-            Fragment selectedFragment = null;
+            Fragment selectedFragment;
 
+            // 根据选择的菜单项切换 Fragment
             if (item.getItemId() == R.id.nav_event) {
                 selectedFragment = new AdminEventFragment();
-            } else if (item.getItemId() == R.id.nav_profile) {
-                selectedFragment = new AdminProfileFragment();
+            } else if (item.getItemId() == R.id.nav_organizer) {
+                selectedFragment = new AdminOrganizerFragment();
+            } else if (item.getItemId() == R.id.nav_user) {
+                selectedFragment = new AdminUserFragment();
+            } else {
+                return false;
             }
 
-            if (selectedFragment != null) {
-                getSupportFragmentManager().beginTransaction()
-                        .replace(R.id.admin_fragment_container, selectedFragment)
-                        .commit();
-            }
-
+            // 切换到选中的 Fragment
+            getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.admin_fragment_container, selectedFragment)
+                    .commit();
             return true;
         });
     }

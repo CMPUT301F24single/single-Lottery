@@ -110,5 +110,20 @@
             android:textColor="@android:color/white"
             android:layout_gravity="center_horizontal" />
 
+        <Button
+            android:id="@+id/buttonDeleteEvent"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="Delete Event"
+            android:backgroundTint="@color/purple_500"
+            android:textColor="@android:color/white" />
+        <Button
+            android:id="@+id/buttonDeleteQRCode"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Delete QR Code"
+            android:layout_marginTop="16dp" />
+
     </LinearLayout>
 </ScrollView>

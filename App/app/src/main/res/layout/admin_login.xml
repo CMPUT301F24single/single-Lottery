@@ -10,14 +10,14 @@
         android:id="@+id/emailInput"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Enter Email"
+        android:hint="Enter Admin Email"
         android:inputType="textEmailAddress" />
 
     <EditText
         android:id="@+id/passwordInput"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Enter Password"
+        android:hint="Enter Admin Password"
         android:inputType="textPassword"
         android:layout_marginTop="8dp" />
 
@@ -27,4 +27,7 @@
         android:layout_height="wrap_content"
         android:text="Login"
         android:layout_marginTop="16dp" />
+
+
+
 </LinearLayout>

@@ -1,5 +1,6 @@
 package com.example.single_lottery.ui.admin;
 
+import android.app.ProgressDialog;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.util.Log;
@@ -10,6 +11,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.bumptech.glide.Glide;
@@ -31,6 +33,9 @@ public class AdminEventDetailActivity extends AppCompatActivity {
     private TextView textViewWaitingListCount;
     private TextView textViewLotteryCount;
     private ImageView imageViewPoster;
+    private Button buttonDeletePoster;
+    private Button buttonDeleteEvent;
+    private ProgressDialog progressDialog;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -44,6 +49,10 @@ public class AdminEventDetailActivity extends AppCompatActivity {
         // 初始化视图
         initViews();
 
+        // 初始化加载对话框
+        progressDialog = new ProgressDialog(this);
+        progressDialog.setCancelable(false);
+
         // 获取从Intent传递的eventId
         String eventId = getIntent().getStringExtra("eventId");
         if (eventId != null) {
@@ -52,10 +61,24 @@ public class AdminEventDetailActivity extends AppCompatActivity {
             Log.e("AdminEventDetail", "Event ID is missing in intent.");
         }
 
-        // 绑定删除按钮
-        Button buttonDeletePoster = findViewById(R.id.buttonDeletePoster);
+        // 绑定删除海报按钮
         buttonDeletePoster.setOnClickListener(v -> {
             deletePoster(eventId);
+        });
+
+        // 绑定删除活动按钮
+        buttonDeleteEvent.setOnClickListener(v -> {
+            new AlertDialog.Builder(this)
+                    .setTitle("Delete Event")
+                    .setMessage("Are you sure you want to delete this event? This action cannot be undone.")
+                    .setPositiveButton("Yes", (dialog, which) -> deleteEvent(eventId))
+                    .setNegativeButton("No", null)
+                    .show();
+        });
+
+        Button buttonDeleteQRCode = findViewById(R.id.buttonDeleteQRCode);
+        buttonDeleteQRCode.setOnClickListener(v -> {
+            deleteQRCode(eventId);
         });
     }
 
@@ -77,6 +100,8 @@ public class AdminEventDetailActivity extends AppCompatActivity {
         textViewWaitingListCount = findViewById(R.id.textViewWaitingListCount);
         textViewLotteryCount = findViewById(R.id.textViewLotteryCount);
         imageViewPoster = findViewById(R.id.imageViewPoster);
+        buttonDeletePoster = findViewById(R.id.buttonDeletePoster);
+        buttonDeleteEvent = findViewById(R.id.buttonDeleteEvent);
     }
 
     private void loadEventDetails(String eventId) {
@@ -107,13 +132,10 @@ public class AdminEventDetailActivity extends AppCompatActivity {
     private void deletePoster(String eventId) {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         FirebaseStorage storage = FirebaseStorage.getInstance();
-        FirebaseAuth auth = FirebaseAuth.getInstance();
 
-        // 确保用户已登录
-        if (auth.getCurrentUser() == null) {
-            Toast.makeText(this, "User not signed in. Please log in first.", Toast.LENGTH_SHORT).show();
-            return;
-        }
+        // 显示加载对话框
+        progressDialog.setMessage("Deleting poster...");
+        progressDialog.show();
 
         db.collection("events").document(eventId)
                 .get()
@@ -132,28 +154,115 @@ public class AdminEventDetailActivity extends AppCompatActivity {
                                             .update("posterUrl", null)
                                             .addOnSuccessListener(unused -> {
                                                 Log.d("DeletePoster", "Poster URL removed from Firestore");
-                                                ImageView imageViewPoster = findViewById(R.id.imageViewPoster);
                                                 imageViewPoster.setImageResource(android.R.color.transparent);
                                                 Toast.makeText(this, "Poster deleted successfully", Toast.LENGTH_SHORT).show();
+                                                progressDialog.dismiss();
                                             })
                                             .addOnFailureListener(e -> {
                                                 Log.e("DeletePoster", "Failed to update Firestore", e);
                                                 Toast.makeText(this, "Failed to update database", Toast.LENGTH_SHORT).show();
+                                                progressDialog.dismiss();
                                             });
                                 })
                                 .addOnFailureListener(e -> {
                                     Log.e("DeletePoster", "Failed to delete poster from storage", e);
                                     Toast.makeText(this, "Failed to delete poster from storage", Toast.LENGTH_SHORT).show();
+                                    progressDialog.dismiss();
                                 });
                     } else {
                         Toast.makeText(this, "No poster URL found", Toast.LENGTH_SHORT).show();
+                        progressDialog.dismiss();
                     }
                 })
                 .addOnFailureListener(e -> {
                     Log.e("DeletePoster", "Error fetching event details", e);
                     Toast.makeText(this, "Failed to fetch event details", Toast.LENGTH_SHORT).show();
+                    progressDialog.dismiss();
                 });
     }
 
+    private void deleteEvent(String eventId) {
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        FirebaseStorage storage = FirebaseStorage.getInstance();
 
+        // 显示加载对话框
+        progressDialog.setMessage("Deleting event...");
+        progressDialog.show();
+
+        db.collection("events").document(eventId)
+                .get()
+                .addOnSuccessListener(documentSnapshot -> {
+                    // 删除关联的海报
+                    String posterUrl = documentSnapshot.getString("posterUrl");
+                    if (posterUrl != null && !posterUrl.isEmpty()) {
+                        StorageReference posterRef = storage.getReferenceFromUrl(posterUrl);
+                        posterRef.delete()
+                                .addOnSuccessListener(aVoid -> Log.d("DeleteEvent", "Poster deleted successfully"))
+                                .addOnFailureListener(e -> Log.e("DeleteEvent", "Failed to delete poster from storage", e));
+                    }
+
+                    // 删除活动文档
+                    db.collection("events").document(eventId)
+                            .delete()
+                            .addOnSuccessListener(aVoid -> {
+                                progressDialog.dismiss();
+                                Toast.makeText(this, "Event deleted successfully", Toast.LENGTH_SHORT).show();
+                                finish(); // 关闭当前页面
+                            })
+                            .addOnFailureListener(e -> {
+                                progressDialog.dismiss();
+                                Log.e("DeleteEvent", "Failed to delete event document", e);
+                                Toast.makeText(this, "Failed to delete event", Toast.LENGTH_SHORT).show();
+                            });
+                })
+                .addOnFailureListener(e -> {
+                    progressDialog.dismiss();
+                    Log.e("DeleteEvent", "Failed to fetch event details", e);
+                    Toast.makeText(this, "Failed to fetch event details", Toast.LENGTH_SHORT).show();
+                });
+    }
+
+    private void deleteQRCode(String eventId) {
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+
+        // 显示加载进度对话框
+        ProgressDialog progressDialog = new ProgressDialog(this);
+        progressDialog.setMessage("Deleting QR Code...");
+        progressDialog.setCancelable(false);
+        progressDialog.show();
+
+        db.collection("events").document(eventId)
+                .get()
+                .addOnSuccessListener(documentSnapshot -> {
+                    if (documentSnapshot.exists()) {
+                        // 检查是否存在 QR Code
+                        String qrCodeHash = documentSnapshot.getString("qrCodeHash");
+                        if (qrCodeHash != null && !qrCodeHash.isEmpty()) {
+                            // 删除 QR Code 字段
+                            db.collection("events").document(eventId)
+                                    .update("qrCodeHash", null)
+                                    .addOnSuccessListener(unused -> {
+                                        progressDialog.dismiss();
+                                        Toast.makeText(this, "QR Code deleted successfully", Toast.LENGTH_SHORT).show();
+                                    })
+                                    .addOnFailureListener(e -> {
+                                        progressDialog.dismiss();
+                                        Log.e("DeleteQRCode", "Error deleting QR Code from Firestore", e);
+                                        Toast.makeText(this, "Failed to delete QR Code", Toast.LENGTH_SHORT).show();
+                                    });
+                        } else {
+                            progressDialog.dismiss();
+                            Toast.makeText(this, "No QR Code found for this event", Toast.LENGTH_SHORT).show();
+                        }
+                    } else {
+                        progressDialog.dismiss();
+                        Toast.makeText(this, "Event not found", Toast.LENGTH_SHORT).show();
+                    }
+                })
+                .addOnFailureListener(e -> {
+                    progressDialog.dismiss();
+                    Log.e("DeleteQRCode", "Error fetching event details", e);
+                    Toast.makeText(this, "Failed to fetch event details", Toast.LENGTH_SHORT).show();
+                });
+    }
 }
