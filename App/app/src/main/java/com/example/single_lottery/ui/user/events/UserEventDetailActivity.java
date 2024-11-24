@@ -242,7 +242,27 @@ public class UserEventDetailActivity extends AppCompatActivity {
                             db.collection("registered_events").document(document.getId()).delete()
                                     .addOnSuccessListener(aVoid -> {
                                         Toast.makeText(this, "Registration canceled", Toast.LENGTH_SHORT).show();
-                                        finish();
+    
+                                        db.collection("user_locations")
+                                                .whereEqualTo("userId", userId) 
+                                                .get()
+                                                .addOnSuccessListener(locationQuerySnapshot -> {
+                                                    if (!locationQuerySnapshot.isEmpty()) {
+                                                        for (DocumentSnapshot locationDocument : locationQuerySnapshot.getDocuments()) {
+                                                            db.collection("user_locations").document(locationDocument.getId()).delete()
+                                                                    .addOnSuccessListener(aVoid1 -> {
+                                                                        Log.d("UserEventDetailActivity", "User location deleted successfully.");
+                                                                    })
+                                                                    .addOnFailureListener(e -> {
+                                                                        Toast.makeText(this, "Failed to delete user location", Toast.LENGTH_SHORT).show();
+                                                                        Log.e("UserEventDetailActivity", "Error deleting user location", e);
+                                                                    });
+                                                        }
+                                                    }
+                                                })
+                                                .addOnFailureListener(e -> Log.e("UserEventDetailActivity", "Error querying user location", e));
+    
+                                        finish(); 
                                     })
                                     .addOnFailureListener(e -> Toast.makeText(this, "Failed to cancel registration", Toast.LENGTH_SHORT).show());
                         }

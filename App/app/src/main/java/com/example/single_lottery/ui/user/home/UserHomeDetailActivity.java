@@ -187,15 +187,8 @@ public class UserHomeDetailActivity extends AppCompatActivity {
                                         Toast.makeText(this, "Successfully signed up for the event!", Toast.LENGTH_SHORT).show();
                                         buttonSignUp.setEnabled(false);
                                         loadEventData(eventId); // Update page display
-
-                                        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
-                                                != PackageManager.PERMISSION_GRANTED) {
-                                            ActivityCompat.requestPermissions(this,
-                                                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
-                                                    LOCATION_PERMISSION_REQUEST_CODE);
-                                        } else {
-                                            getUserLocation(eventId, userId);
-                                        }
+                                        
+                                        getUserLocation(eventId, userId);
                                     })
                                     .addOnFailureListener(e -> {
                                         Toast.makeText(this, "Failed to sign up. Please try again.", Toast.LENGTH_SHORT).show();
@@ -232,16 +225,17 @@ public class UserHomeDetailActivity extends AppCompatActivity {
         LocationManager locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
 
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 10000, 0, location -> {
-                if (location != null) {
-                    double latitude = location.getLatitude();
-                    double longitude = location.getLongitude();
+            android.location.Location lastKnownLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+                if (lastKnownLocation != null) {
+                    double latitude = lastKnownLocation.getLatitude();
+                    double longitude = lastKnownLocation.getLongitude();
 
                     Log.d("UserLocation", "Latitude: " + latitude + ", Longitude: " + longitude);
 
                     saveUserLocation(eventId, userId, latitude, longitude);
+                } else {
+                    Toast.makeText(this, "Failed to get your location.", Toast.LENGTH_SHORT).show();
                 }
-            });
         } else {
             Toast.makeText(this, "Location permission is required.", Toast.LENGTH_SHORT).show();
         }
