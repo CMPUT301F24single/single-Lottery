@@ -1,5 +1,7 @@
 package com.example.single_lottery;
 
+import java.io.Serializable;
+
 /**
  * Model class representing a lottery event.
  * Stores event details including timing, capacity and registration information.
@@ -8,7 +10,7 @@ package com.example.single_lottery;
  * @author [Haorui Gao]
  * @version 1.0
  */
-public class EventModel {
+public class EventModel implements Serializable {
     private String name;
     private String organizerDeviceID;
     private String userDeviceID;
@@ -51,7 +53,7 @@ public class EventModel {
     }
 
     public void setUserDeviceID(String userDeviceID) {
-        this.organizerDeviceID = userDeviceID;
+        this.userDeviceID = userDeviceID;
     }
 
     public String getTime() {

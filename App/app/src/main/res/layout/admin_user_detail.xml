@@ -1,65 +1,65 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView
+<LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
     android:padding="16dp">
 
-    <LinearLayout
-        android:layout_width="match_parent"
+    <!-- 用户头像 -->
+    <ImageView
+        android:id="@+id/userProfileImage"
+        android:layout_width="150dp"
+        android:layout_height="150dp"
+        android:layout_gravity="center"
+        android:scaleType="centerCrop"
+        android:src="@drawable/ic_profile" />
+
+    <!-- 用户名称 -->
+    <TextView
+        android:id="@+id/userName"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:orientation="vertical">
+        android:layout_marginTop="16dp"
+        android:layout_gravity="center"
+        android:text="User Name"
+        android:textSize="20sp"
+        android:textStyle="bold" />
 
-        <!-- 用户头像 -->
-        <ImageView
-            android:id="@+id/imageUserAvatar"
-            android:layout_width="120dp"
-            android:layout_height="120dp"
-            android:layout_gravity="center"
-            android:src="@drawable/ic_profile"
-            android:scaleType="centerCrop"
-            android:layout_marginBottom="16dp" />
+    <!-- 用户邮箱 -->
+    <TextView
+        android:id="@+id/userEmail"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:layout_gravity="center"
+        android:text="Email: example@example.com"
+        android:textSize="16sp" />
 
-        <!-- 用户信息 -->
-        <TextView
-            android:id="@+id/textUserNameDetail"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Name"
-            android:textSize="18sp"
-            android:textStyle="bold"
-            android:layout_marginBottom="8dp" />
+    <!-- 用户电话 -->
+    <TextView
+        android:id="@+id/userPhone"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:layout_gravity="center"
+        android:text="Phone: 1234567890"
+        android:textSize="16sp" />
 
-        <TextView
-            android:id="@+id/textUserEmail"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Email"
-            android:layout_marginBottom="8dp" />
+    <Button
+        android:id="@+id/btnDeleteAvatar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginTop="16dp"
+        android:text="Delete Avatar" />
 
-        <TextView
-            android:id="@+id/textUserPhone"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Phone"
-            android:layout_marginBottom="16dp" />
+    <Button
+        android:id="@+id/btnDeleteProfile"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginTop="16dp"
+        android:text="Delete User" />
 
-        <!-- 操作按钮 -->
-        <Button
-            android:id="@+id/buttonDeleteAvatar"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Delete Avatar"
-            android:backgroundTint="@color/purple_500"
-            android:textColor="@android:color/white"
-            android:layout_marginBottom="16dp" />
-
-        <Button
-            android:id="@+id/buttonDeleteUser"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Delete User"
-            android:backgroundTint="@color/purple_500"
-            android:textColor="@android:color/white" />
-    </LinearLayout>
-</ScrollView>
+</LinearLayout>

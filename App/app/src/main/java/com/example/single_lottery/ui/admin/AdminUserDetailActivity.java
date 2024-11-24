@@ -1,114 +1,109 @@
 package com.example.single_lottery.ui.admin;
 
+import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
-import android.view.MenuItem;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.bumptech.glide.Glide;
+import com.example.single_lottery.EventModel;
 import com.example.single_lottery.R;
 import com.google.firebase.database.annotations.Nullable;
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.storage.FirebaseStorage;
-import com.google.firebase.storage.StorageException;
-import com.google.firebase.storage.StorageReference;
 
 public class AdminUserDetailActivity extends AppCompatActivity {
-
-    private TextView userName, userEmail, userPhone;
-    private ImageView userAvatar;
-    private Button deleteAvatarButton, deleteUserButton;
-
-    private String userId;
-    private String profileImageUrl;
+    public static final String EXTRA_USER = "extra_user";
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.admin_user_detail);
 
-        // 设置返回按钮
-        if (getSupportActionBar() != null) {
-            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        // 获取传递的用户数据
+        EventModel user = (EventModel) getIntent().getSerializableExtra(EXTRA_USER);
+
+        // 绑定 UI 元素
+        ImageView userProfileImage = findViewById(R.id.userProfileImage);
+        TextView userName = findViewById(R.id.userName);
+        TextView userEmail = findViewById(R.id.userEmail);
+        TextView userPhone = findViewById(R.id.userPhone);
+        Button btnDeleteAvatar = findViewById(R.id.btnDeleteAvatar);
+        Button btnDeleteProfile = findViewById(R.id.btnDeleteProfile);
+
+        if (user != null) {
+            userName.setText(user.getName());
+            userEmail.setText(String.format("Email: %s", user.getEmail()));
+            userPhone.setText(String.format("Phone: %s", user.getPhone()));
+
+            // 加载头像
+            Glide.with(this)
+                    .load(user.getProfileImageUrl())
+                    .placeholder(R.drawable.ic_profile)
+                    .into(userProfileImage);
+
+            // 删除头像按钮逻辑
+            btnDeleteAvatar.setOnClickListener(v -> deleteAvatar(user));
+
+            // 删除用户按钮逻辑
+            btnDeleteProfile.setOnClickListener(v -> deleteProfile(user));
         }
-
-        // 初始化视图
-        userName = findViewById(R.id.textUserNameDetail);
-        userEmail = findViewById(R.id.textUserEmail);
-        userPhone = findViewById(R.id.textUserPhone);
-        userAvatar = findViewById(R.id.imageUserAvatar);
-        deleteAvatarButton = findViewById(R.id.buttonDeleteAvatar);
-        deleteUserButton = findViewById(R.id.buttonDeleteUser);
-
-        // 获取Intent传递的数据
-        userId = getIntent().getStringExtra("userId");
-        profileImageUrl = getIntent().getStringExtra("profileImageUrl");
-        String name = getIntent().getStringExtra("userName");
-        String email = getIntent().getStringExtra("userEmail");
-        String phone = getIntent().getStringExtra("userPhone");
-
-        // 设置数据到视图
-        userName.setText(name != null ? "Name: " + name : "Name: No Name");
-        userEmail.setText(email != null ? "Email: " + email : "Email: No Email");
-        userPhone.setText(phone != null ? "Phone: " + phone : "Phone: No Phone");
-
-        // 加载头像
-        if (profileImageUrl != null && !profileImageUrl.isEmpty()) {
-            Glide.with(this).load(profileImageUrl).into(userAvatar);
-        } else {
-            userAvatar.setImageResource(R.drawable.ic_profile); // 默认头像
-        }
-
-        // 设置删除头像按钮点击事件
-        deleteAvatarButton.setOnClickListener(v -> deleteAvatar());
-
-        // 设置删除用户按钮点击事件
-        deleteUserButton.setOnClickListener(v -> deleteUser());
     }
 
-    @Override
-    public boolean onSupportNavigateUp() {
-        onBackPressed(); // 返回上一页
-        return true;
-    }
-
-    private void deleteAvatar() {
-        FirebaseFirestore db = FirebaseFirestore.getInstance();
-        if (userId == null) {
-            Toast.makeText(this, "User ID is null", Toast.LENGTH_SHORT).show();
+    // 删除用户文档逻辑
+    private void deleteProfile(EventModel user) {
+        if (user.getEventId() == null) {
+            Toast.makeText(this, "User ID is missing!", Toast.LENGTH_SHORT).show();
             return;
         }
 
-        // 将 profileImageUrl 设置为 null
-        db.collection("users").document(userId)
-                .update("profileImageUrl", null)
-                .addOnSuccessListener(aVoid -> {
-                    Toast.makeText(this, "Avatar deleted successfully", Toast.LENGTH_SHORT).show();
-                    userAvatar.setImageResource(R.drawable.ic_profile); // 切换为默认头像
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        DocumentReference userRef = db.collection("users").document(user.getEventId());
+
+        // 提示确认删除
+        new AlertDialog.Builder(this)
+                .setTitle("Delete User")
+                .setMessage("Are you sure you want to delete this user?")
+                .setPositiveButton("Yes", (dialog, which) -> {
+                    userRef.delete()
+                            .addOnSuccessListener(aVoid -> {
+                                Toast.makeText(this, "User deleted successfully!", Toast.LENGTH_SHORT).show();
+                                finish(); // 关闭当前页面
+                            })
+                            .addOnFailureListener(e -> {
+                                Toast.makeText(this, "Failed to delete user: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                            });
                 })
-                .addOnFailureListener(e -> Toast.makeText(this, "Failed to delete avatar", Toast.LENGTH_SHORT).show());
+                .setNegativeButton("No", null)
+                .show();
     }
 
-    private void deleteUser() {
-        FirebaseFirestore db = FirebaseFirestore.getInstance();
-        if (userId == null) {
-            Toast.makeText(this, "User ID is null", Toast.LENGTH_SHORT).show();
+
+    // 删除头像逻辑
+    private void deleteAvatar(EventModel user) {
+        // 检查 eventId 是否为 null
+        if (user.getEventId() == null) {
+            Toast.makeText(this, "User ID is missing!", Toast.LENGTH_SHORT).show();
             return;
         }
 
-        // 删除用户文档
-        db.collection("users").document(userId)
-                .delete()
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        DocumentReference userRef = db.collection("users").document(user.getEventId());
+
+        userRef.update("profileImageUrl", null)
                 .addOnSuccessListener(aVoid -> {
-                    Toast.makeText(this, "User deleted successfully", Toast.LENGTH_SHORT).show();
-                    finish(); // 关闭当前页面
+                    Toast.makeText(this, "Avatar deleted successfully!", Toast.LENGTH_SHORT).show();
+                    ImageView userProfileImage = findViewById(R.id.userProfileImage);
+                    userProfileImage.setImageResource(R.drawable.ic_profile);
                 })
-                .addOnFailureListener(e -> Toast.makeText(this, "Failed to delete user", Toast.LENGTH_SHORT).show());
+                .addOnFailureListener(e -> {
+                    Toast.makeText(this, "Failed to delete avatar: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                });
     }
+
 }

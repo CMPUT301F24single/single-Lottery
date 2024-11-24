@@ -18,18 +18,20 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.single_lottery.EventModel;
 import com.example.single_lottery.R;
 import com.google.firebase.database.annotations.Nullable;
+import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class AdminUserFragment extends Fragment {
-
     private RecyclerView recyclerView;
-    private AdminUserAdapter adapter;
-    private final List<EventModel> userList = new ArrayList<>();
+    private AdminUserAdapter userAdapter;
+    private List<EventModel> userList;
+    private FirebaseFirestore db;
 
     @Nullable
     @Override
@@ -39,38 +41,43 @@ public class AdminUserFragment extends Fragment {
         recyclerView = view.findViewById(R.id.recyclerViewUsers);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
-        adapter = new AdminUserAdapter(getContext(), userList, user -> {
-            // 点击用户跳转到详情页面
-            Intent intent = new Intent(getContext(), AdminUserDetailActivity.class);
-            intent.putExtra("userId", user.getUserDeviceID());
-            intent.putExtra("userName", user.getName());
-            intent.putExtra("userEmail", user.getEmail());
-            intent.putExtra("userPhone", user.getPhone());
-            intent.putExtra("profileImageUrl", user.getProfileImageUrl());
-            startActivity(intent);
-        });
+        userList = new ArrayList<>();
+        userAdapter = new AdminUserAdapter(requireContext(), userList);
+        recyclerView.setAdapter(userAdapter);
 
-        recyclerView.setAdapter(adapter);
 
+        db = FirebaseFirestore.getInstance();
         loadUsers();
 
         return view;
     }
 
     private void loadUsers() {
-        FirebaseFirestore db = FirebaseFirestore.getInstance();
-        db.collection("users").get()
-                .addOnSuccessListener(querySnapshot -> {
-                    userList.clear(); // 清空当前用户列表
-                    for (DocumentSnapshot document : querySnapshot) {
-                        EventModel user = document.toObject(EventModel.class);
-                        if (user != null) {
-                            user.setUserDeviceID(document.getId()); // 设置文档 ID 为 userDeviceID
-                            userList.add(user);
-                        }
-                    }
-                    adapter.notifyDataSetChanged(); // 刷新适配器
-                })
-                .addOnFailureListener(e -> Log.e("AdminUserFragment", "Error loading organizers", e));
+        CollectionReference usersRef = db.collection("users");
+        usersRef.get().addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                QuerySnapshot snapshot = task.getResult();
+                if (snapshot != null) {
+                    userList.clear();
+                    snapshot.forEach(document -> {
+                        EventModel user = new EventModel();
+                        user.setEventName(document.getString("name"));
+                        user.setEmail(document.getString("email"));
+                        user.setPhone(document.getString("phone"));
+                        user.setProfileImageUrl(document.getString("profileImageUrl"));
+
+                        // 使用 Firestore 文档 ID 设置 eventId
+                        user.setEventId(document.getId());
+
+                        userList.add(user);
+                    });
+                    userAdapter.notifyDataSetChanged();
+                }
+            } else {
+                task.getException().printStackTrace();
+            }
+        });
     }
+
+
 }
