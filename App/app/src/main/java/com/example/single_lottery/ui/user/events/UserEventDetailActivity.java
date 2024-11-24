@@ -66,6 +66,11 @@ public class UserEventDetailActivity extends AppCompatActivity {
         declineButton = findViewById(R.id.declineButton);
 
         eventId = getIntent().getStringExtra("event_id");
+        if (eventId == null) {
+            Toast.makeText(this, "Event ID not found", Toast.LENGTH_SHORT).show();
+            finish();
+            return;
+        }
         userId = Settings.Secure.getString(getContentResolver(), Settings.Secure.ANDROID_ID);
 
         loadEventDetails(eventId);
