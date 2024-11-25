@@ -1,8 +1,4 @@
-package com.example.single_lottery.ui.user.profile;
-
-import static android.app.Activity.RESULT_OK;
-
-import static java.util.function.Predicate.isEqual;
+package com.example.single_lottery.ui.organizer;
 
 import android.app.AlertDialog;
 import android.content.Intent;
@@ -14,12 +10,10 @@ import android.net.Uri;
 import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
+import androidx.appcompat.app.AppCompatActivity;
 import android.provider.MediaStore;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -36,21 +30,14 @@ import com.google.firebase.storage.StorageReference;
 import java.io.IOException;
 import java.util.UUID;
 
-/**
- * Fragment for managing user profile and data in the Single Lottery application.
- * Handles profile information display, editing capabilities and image management.
- *
- * @author [Haorui Gao]
- * @version 1.0
- */
-public class ProfileFragment extends Fragment {
+public class FacilityProfile extends AppCompatActivity {
     private TextView nameTextView, emailTextView, phoneTextView;
     private Button editButton, uploadButton, removeImageButton;
     private ImageView profileImageView;
 
-    private String userName;
-    private String userEmail;
-    private String userPhone;
+    private String facilityName;
+    private String facilityEmail;
+    private String facilityPhone;
     private String installationId;
     private Uri profileImageUri;
 
@@ -60,16 +47,17 @@ public class ProfileFragment extends Fragment {
 
     @Nullable
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_profile, container, false);
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.fragment_facility_profile);
 
-        nameTextView = view.findViewById(R.id.nameTextView);
-        emailTextView = view.findViewById(R.id.emailTextView);
-        phoneTextView = view.findViewById(R.id.phoneTextView);
-        editButton = view.findViewById(R.id.editButton);
-        uploadButton = view.findViewById(R.id.uploadButton);
-        removeImageButton = view.findViewById(R.id.removeImageButton);
-        profileImageView = view.findViewById(R.id.profileImageView);
+        nameTextView = findViewById(R.id.nameTextView);
+        emailTextView = findViewById(R.id.emailTextView);
+        phoneTextView = findViewById(R.id.phoneTextView);
+        editButton = findViewById(R.id.editButton);
+        uploadButton = findViewById(R.id.uploadButton);
+        removeImageButton = findViewById(R.id.removeImageButton);
+        profileImageView = findViewById(R.id.profileImageView);
 
         firestore = FirebaseFirestore.getInstance();
         storage = FirebaseStorage.getInstance();
@@ -79,7 +67,7 @@ public class ProfileFragment extends Fragment {
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
                         installationId = task.getResult();
-                        loadUserProfile(installationId);
+                        loadFacilityProfile(installationId);
                     } else {
                         Log.e("ProfileFragment", "failed to get installation id: " + task.getException());
                     }
@@ -88,41 +76,27 @@ public class ProfileFragment extends Fragment {
         editButton.setOnClickListener(v -> showEditDialog());
         uploadButton.setOnClickListener(v -> selectImage());
         removeImageButton.setOnClickListener(v -> removeProfileImage());
-
-        return view;
     }
 
-    /**
-     * Retrieves user profile data from Firestore database.
-     * Updates UI with fetched data or sets default values if no data exists.
-     *
-     * @param installationId Unique device installation identifier
-     */
-    private void loadUserProfile(String installationId) {
-        DocumentReference docRef = firestore.collection("users").document(installationId);
+    private void loadFacilityProfile(String installationId) {
+        DocumentReference docRef = firestore.collection("facilities").document(installationId);
         docRef.get().addOnCompleteListener(task -> {
             if (task.isSuccessful() && task.getResult() != null && task.getResult().exists()) {
-                userName = task.getResult().getString("name");
-                userEmail = task.getResult().getString("email");
-                userPhone = task.getResult().getString("phone");
+                facilityName = task.getResult().getString("name");
+                facilityEmail = task.getResult().getString("email");
+                facilityPhone = task.getResult().getString("phone");
                 String profileImageUrl = task.getResult().getString("profileImageUrl");
-                updateUserDetails(profileImageUrl);
+                updateFacilityDetails(profileImageUrl);
             }
         }).addOnFailureListener(e -> {
             Log.e("ProfileFragment", "failed to load user profile: " + e.getMessage());
         });
     }
 
-    /**
-     * Updates the UI components with user profile information.
-     * Handles profile image loading and placeholder generation.
-     *
-     * @param profileImageUrl URL of user's profile image in Firebase Storage
-     */
-    private void updateUserDetails(String profileImageUrl) {
-        nameTextView.setText(userName);
-        emailTextView.setText(userEmail);
-        phoneTextView.setText(userPhone);
+    private void updateFacilityDetails(String profileImageUrl) {
+        nameTextView.setText(facilityName);
+        emailTextView.setText(facilityEmail);
+        phoneTextView.setText(facilityPhone);
         if (profileImageUrl != null) {
             Glide.with(this)
                     .load(profileImageUrl)
@@ -130,16 +104,10 @@ public class ProfileFragment extends Fragment {
                     .error(R.drawable.ic_placeholder)
                     .into(profileImageView);
         } else {
-            generateLetterAvatar(userName);
+            generateLetterAvatar(facilityName);
         }
     }
 
-    /**
-     * Generates a letter avatar when no profile image is set.
-     * Creates circular avatar with user initials.
-     *
-     * @param name User's display name for initial generation
-     */
     private void generateLetterAvatar(String name) {
         String[] nameParts = name.split("\\s+");
         String initials = "";
@@ -147,32 +115,28 @@ public class ProfileFragment extends Fragment {
             initials += '-';
         }
         else if (nameParts.length > 0) {
-            initials += nameParts[0].charAt(0); 
+            initials += nameParts[0].charAt(0);
         }
         if (nameParts.length > 1) {
-            initials += nameParts[1].charAt(0); 
+            initials += nameParts[1].charAt(0);
         }
-    
+
         Bitmap bitmap = Bitmap.createBitmap(100, 100, Bitmap.Config.ARGB_8888);
         Canvas canvas = new Canvas(bitmap);
         Paint paint = new Paint();
         paint.setColor(Color.GRAY);
-        canvas.drawCircle(50, 50, 50, paint); 
-    
+        canvas.drawCircle(50, 50, 50, paint);
+
         paint.setColor(Color.WHITE);
         paint.setTextSize(40);
         paint.setTextAlign(Paint.Align.CENTER);
-        canvas.drawText(initials, 50, 65, paint); 
-    
+        canvas.drawText(initials, 50, 65, paint);
+
         profileImageView.setImageBitmap(bitmap);
     }
 
-    /**
-     * Displays dialog for editing profile information.
-     * Allows modification of name, email and phone number.
-     */
     private void showEditDialog() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Edit Profile");
 
         View dialogView = getLayoutInflater().inflate(R.layout.edit_dialog, null);
@@ -180,27 +144,23 @@ public class ProfileFragment extends Fragment {
         final EditText emailInput = dialogView.findViewById(R.id.emailInput);
         final EditText phoneInput = dialogView.findViewById(R.id.phoneInput);
 
-        setEditTextValue(nameInput, userName, "Enter your name");
-        setEditTextValue(emailInput, userEmail, "Enter your email");
-        setEditTextValue(phoneInput, userPhone, "Enter your phone number");
+        setEditTextValue(nameInput, facilityName, "Enter your name");
+        setEditTextValue(emailInput, facilityEmail, "Enter your email");
+        setEditTextValue(phoneInput, facilityPhone, "Enter your phone number");
 
         builder.setView(dialogView)
                 .setPositiveButton("save", (dialog, which) -> {
-                    userName = nameInput.getText().toString().trim();
-                    userEmail = emailInput.getText().toString().trim();
-                    userPhone = phoneInput.getText().toString().trim();
-                    updateUserDetails(null);
-                    saveUserDataToFirestore(installationId, null);
+                    facilityName = nameInput.getText().toString().trim();
+                    facilityEmail = emailInput.getText().toString().trim();
+                    facilityPhone = phoneInput.getText().toString().trim();
+                    updateFacilityDetails(null);
+                    saveFacilityDataToFirestore(installationId, null);
                 })
                 .setNegativeButton("cancel", (dialog, which) -> dialog.dismiss());
 
         builder.create().show();
     }
 
-    /**
-     * Launches system image picker for profile photo selection.
-     * Initiates intent for image content type.
-     */
     private void selectImage() {
         Intent intent = new Intent();
         intent.setType("image/*");
@@ -208,21 +168,13 @@ public class ProfileFragment extends Fragment {
         startActivityForResult(Intent.createChooser(intent, "select image"), 1);
     }
 
-    /**
-     * Handles result from image selection activity.
-     * Processes selected image and initiates upload.
-     *
-     * @param requestCode Activity request identifier
-     * @param resultCode Result status from image picker
-     * @param data Intent containing selected image data
-     */
     @Override
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == 1 && resultCode == RESULT_OK && data != null && data.getData() != null) {
             profileImageUri = data.getData();
             try {
-                Bitmap bitmap = MediaStore.Images.Media.getBitmap(getActivity().getContentResolver(), profileImageUri);
+                Bitmap bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), profileImageUri);
                 profileImageView.setImageBitmap(bitmap);
                 uploadProfileImage();
             } catch (IOException e) {
@@ -231,14 +183,6 @@ public class ProfileFragment extends Fragment {
         }
     }
 
-    /**
-     * Sets value or hint text for EditText components.
-     * Handles null or empty input values.
-     *
-     * @param editText Target EditText component
-     * @param value Text value to set
-     * @param hint Hint text for empty state
-     */
     private void setEditTextValue(EditText editText, String value, String hint) {
         if (value == null || value.isEmpty()) {
             editText.setHint(hint);
@@ -247,13 +191,9 @@ public class ProfileFragment extends Fragment {
         }
     }
 
-    /**
-     * Manages profile image upload process to Firebase Storage.
-     * Handles existing image deletion and new image upload.
-     */
     private void uploadProfileImage() {
         if (profileImageUri != null) {
-            DocumentReference docRef = firestore.collection("users").document(installationId);
+            DocumentReference docRef = firestore.collection("facilities").document(installationId);
             docRef.get().addOnCompleteListener(task -> {
                 if (task.isSuccessful() && task.getResult() != null && task.getResult().exists()) {
                     String oldImageUri = task.getResult().getString("profileImageUrl");
@@ -278,17 +218,13 @@ public class ProfileFragment extends Fragment {
         }
     }
 
-    /**
-     * Performs new image upload to Firebase Storage.
-     * Creates unique filename and updates profile data.
-     */
     private void uploadNewImage() {
-        final StorageReference profileImageRef = storageReference.child("profileImages/" + UUID.randomUUID().toString() + ".jpg");
+        final StorageReference profileImageRef = storageReference.child("facility_profileImages/" + UUID.randomUUID().toString() + ".jpg");
         profileImageRef.putFile(profileImageUri)
                 .addOnSuccessListener(taskSnapshot -> {
                     profileImageRef.getDownloadUrl().addOnSuccessListener(uri -> {
                         String profileImageUrl = uri.toString();
-                        saveUserDataToFirestore(installationId, profileImageUrl);
+                        saveFacilityDataToFirestore(installationId, profileImageUrl);
                     });
                 })
                 .addOnFailureListener(e -> {
@@ -296,12 +232,8 @@ public class ProfileFragment extends Fragment {
                 });
     }
 
-    /**
-     * Removes current profile image from storage.
-     * Updates profile to use default avatar.
-     */
     private void removeProfileImage() {
-        DocumentReference docRef = firestore.collection("users").document(installationId);
+        DocumentReference docRef = firestore.collection("facilities").document(installationId);
         docRef.get().addOnCompleteListener(task -> {
             if (task.isSuccessful() && task.getResult() != null && task.getResult().exists()) {
                 String oldImageUri = task.getResult().getString("profileImageUrl");
@@ -309,14 +241,14 @@ public class ProfileFragment extends Fragment {
                     StorageReference oldImageRef = FirebaseStorage.getInstance().getReferenceFromUrl(oldImageUri);
                     oldImageRef.delete().addOnSuccessListener(aVoid -> {
                         Log.d("ProfileFragment", "Old image deleted successfully.");
-                        saveUserDataToFirestore(installationId, null);
-                        loadUserProfile(installationId);
+                        saveFacilityDataToFirestore(installationId, null);
+                        loadFacilityProfile(installationId);
                     }).addOnFailureListener(e -> {
                         Log.e("ProfileFragment", "Failed to delete old image: " + e.getMessage());
                     });
                 } else {
-                    saveUserDataToFirestore(installationId, null);
-                    loadUserProfile(installationId);
+                    saveFacilityDataToFirestore(installationId, null);
+                    loadFacilityProfile(installationId);
                 }
             } else {
                 Log.e("ProfileFragment", "No existing user document found.");
@@ -326,23 +258,16 @@ public class ProfileFragment extends Fragment {
         });
     }
 
-    /**
-     * Persists user profile data to Firestore database.
-     * Creates or updates existing user document.
-     *
-     * @param installationId Device installation identifier
-     * @param profileImageUrl Storage URL of profile image
-     */
-    private void saveUserDataToFirestore(String installationId, String profileImageUrl) {
+    private void saveFacilityDataToFirestore(String installationId, String profileImageUrl) {
         if (installationId == null) {
             Log.e("ProfileFragment", "installationId is null");
             return;
         }
 
-        User user = new User(userName, userEmail, userPhone, profileImageUrl);
-        firestore.collection("users")
-                .document(installationId) 
-                .set(user)
+        Facility facility = new Facility(facilityName, facilityEmail, facilityPhone, profileImageUrl);
+        firestore.collection("facilities")
+                .document(installationId)
+                .set(facility)
                 .addOnSuccessListener(aVoid ->
                         Log.d("ProfileFragment", "profile updated successfully"))
                 .addOnFailureListener(e ->
