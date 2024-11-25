@@ -42,6 +42,7 @@ public class UserEventDetailActivity extends AppCompatActivity {
     private String eventTime;
     private String eventId;
     private String userId;
+    private TextView eventFacilityTextView; // new
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,6 +62,7 @@ public class UserEventDetailActivity extends AppCompatActivity {
         lotteryCountTextView = findViewById(R.id.lotteryCountTextView);
         eventDescriptionTextView = findViewById(R.id.eventDescriptionTextView);
         eventStatusValueTextView = findViewById(R.id.eventStatusValueTextView);
+        eventFacilityTextView = findViewById(R.id.eventFacilityTextView);
         cancelRegistrationButton = findViewById(R.id.cancelRegistrationButton);
         acceptButton = findViewById(R.id.acceptButton);
         declineButton = findViewById(R.id.declineButton);
@@ -89,6 +91,7 @@ public class UserEventDetailActivity extends AppCompatActivity {
                     if (documentSnapshot.exists()) {
                         String eventName = documentSnapshot.getString("name");
                         String eventDescription = documentSnapshot.getString("description");
+                        String eventFacility = documentSnapshot.getString("facility");
                         eventTime = documentSnapshot.getString("time"); // 获取活动时间
                         registrationDeadline = documentSnapshot.getString("registrationDeadline");
                         lotteryTime = documentSnapshot.getString("lotteryTime");
@@ -102,6 +105,7 @@ public class UserEventDetailActivity extends AppCompatActivity {
                         waitingListCountTextView.setText(waitingListCount);
                         lotteryCountTextView.setText(lotteryCount);
                         eventDescriptionTextView.setText(eventDescription);
+                        eventFacilityTextView.setText(eventFacility);
 
                         String posterUrl = documentSnapshot.getString("posterUrl");
                         if (posterUrl != null && !posterUrl.isEmpty()) {

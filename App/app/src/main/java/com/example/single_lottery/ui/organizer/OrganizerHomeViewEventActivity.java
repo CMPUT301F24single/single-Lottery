@@ -47,6 +47,8 @@ public class OrganizerHomeViewEventActivity extends AppCompatActivity {
             textViewLotteryTime, textViewWaitingListCount, textViewLotteryCount, textViewEventDescription;
     private ImageView imageViewPoster;
     private Button buttonViewWaitingList, buttonViewSelectedUsers, buttonViewAcceptedUsers, buttonGenerateQRCode;
+    private TextView textViewEventFacility; // new
+
 
     /**
      * Initializes the event viewing interface and sets up:
@@ -84,6 +86,7 @@ public class OrganizerHomeViewEventActivity extends AppCompatActivity {
         // Initialize back button
         textViewEventName = findViewById(R.id.textViewEventName);
         textViewEventDescription = findViewById(R.id.textViewEventDescription);
+        textViewEventFacility = findViewById(R.id.textViewEventFacility); // new
         textViewEventTime = findViewById(R.id.textViewEventTime);
         textViewRegistrationDeadline = findViewById(R.id.textViewRegistrationDeadline);
         textViewLotteryTime = findViewById(R.id.textViewLotteryTime);
@@ -93,6 +96,7 @@ public class OrganizerHomeViewEventActivity extends AppCompatActivity {
         buttonViewWaitingList = findViewById(R.id.buttonViewWaitingList);
         buttonViewSelectedUsers = findViewById(R.id.buttonViewSelectedUsers);
         buttonViewAcceptedUsers = findViewById(R.id.buttonViewAcceptedUsers);
+
 
         // Get event ID from intent
         String eventId = getIntent().getStringExtra("event_id");
@@ -140,11 +144,13 @@ public class OrganizerHomeViewEventActivity extends AppCompatActivity {
                         if (event != null) {
                             textViewEventName.setText(event.getName());
                             textViewEventDescription.setText(event.getDescription());
+                            textViewEventFacility.setText(event.getFacility());
                             textViewEventTime.setText(event.getTime());
                             textViewRegistrationDeadline.setText(event.getRegistrationDeadline());
                             textViewLotteryTime.setText(event.getLotteryTime());
                             textViewWaitingListCount.setText(String.valueOf(event.getWaitingListCount()));
                             textViewLotteryCount.setText(String.valueOf(event.getLotteryCount()));
+
 
                             // Use Glide to display event posters
                             if (event.getPosterUrl() != null) {

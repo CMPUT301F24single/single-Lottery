@@ -26,6 +26,7 @@ public class EventModel implements Serializable {
     private String email;
     private String phone;
     private String info;
+    private String facility;
 
     public EventModel() {
         // No-argument constructor, required for Firestore data binding
@@ -152,5 +153,12 @@ public class EventModel implements Serializable {
         this.info = info;
     }
 
+    public String getFacility() {
+        return facility;
+    }
+
+    public void setFacility(String facility) {
+        this.facility = facility;
+    }
 }
 
