@@ -211,7 +211,8 @@ public class OrganizerHomeViewEventActivity extends AppCompatActivity {
                                                         NotificationActivity.sendNotification(
                                                                 OrganizerHomeViewEventActivity.this,
                                                                 notificationTitle,  // Use the dynamic event name in the title
-                                                                customMessage
+                                                                customMessage,
+                                                                "waiting"
                                                         );
                                                         Toast.makeText(this, "Notification sent to waiting list users.", Toast.LENGTH_SHORT).show();
                                                     } else {
@@ -275,14 +276,15 @@ public class OrganizerHomeViewEventActivity extends AppCompatActivity {
                                             final EditText input = new EditText(this);
                                             messageDialog.setView(input);
                                             messageDialog.setPositiveButton("Send", (innerDialog, which1) -> {
-                                                String message = input.getText().toString().trim();
-                                                if (!message.isEmpty()) {
+                                                String customMessage = input.getText().toString().trim();
+                                                if (!customMessage.isEmpty()) {
                                                     // Send custom notification with event name in the title
                                                     String notificationTitle = "Event Notification - " + eventName;
                                                     NotificationActivity.sendNotification(
                                                             OrganizerHomeViewEventActivity.this,
                                                             notificationTitle,
-                                                            message
+                                                            customMessage,
+                                                            "Winner"
                                                     );
                                                     Toast.makeText(this, "Notification sent to winners.", Toast.LENGTH_SHORT).show();
                                                 } else {
@@ -351,7 +353,8 @@ public class OrganizerHomeViewEventActivity extends AppCompatActivity {
                                                         NotificationActivity.sendNotification(
                                                                 OrganizerHomeViewEventActivity.this,
                                                                 notificationTitle,  // Use the dynamic event name in the title
-                                                                customMessage
+                                                                customMessage,
+                                                                "Losers"
                                                         );
                                                         Toast.makeText(this, "Notification sent to losers.", Toast.LENGTH_SHORT).show();
                                                     } else {
@@ -424,7 +427,8 @@ public class OrganizerHomeViewEventActivity extends AppCompatActivity {
                                                         NotificationActivity.sendNotification(
                                                                 OrganizerHomeViewEventActivity.this,
                                                                 notificationTitle,  // Use the dynamic event name in the title
-                                                                customMessage
+                                                                customMessage,
+                                                                "Accepted Users"
                                                         );
                                                         Toast.makeText(this, "Notification sent to accepted users.", Toast.LENGTH_SHORT).show();
                                                     } else {
@@ -497,7 +501,8 @@ public class OrganizerHomeViewEventActivity extends AppCompatActivity {
                                                         NotificationActivity.sendNotification(
                                                                 OrganizerHomeViewEventActivity.this,
                                                                 notificationTitle,  // Use the dynamic event name in the title
-                                                                customMessage
+                                                                customMessage,
+                                                                "Cancelled Users"
                                                         );
                                                         Toast.makeText(this, "Notification sent to cancelled users.", Toast.LENGTH_SHORT).show();
                                                     } else {
