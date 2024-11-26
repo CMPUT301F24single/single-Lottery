@@ -23,7 +23,8 @@ import com.google.firebase.firestore.FirebaseFirestore;
 
 /**
  * Activity for viewing event details by organizers.
- * Provides comprehensive view of event information and management tools including:
+ * Provides comprehensive view of event information and management tools
+ * including:
  * - Basic event information display
  * - Participant list management
  * - QR code generation
@@ -46,7 +47,9 @@ public class OrganizerHomeViewEventActivity extends AppCompatActivity {
     private TextView textViewEventName, textViewEventTime, textViewRegistrationDeadline,
             textViewLotteryTime, textViewWaitingListCount, textViewLotteryCount, textViewEventDescription;
     private ImageView imageViewPoster;
-    private Button buttonViewWaitingList, buttonViewSelectedUsers, buttonViewAcceptedUsers, buttonGenerateQRCode;
+    private TextView textViewEventFacility; // new
+    private Button buttonViewWaitingList, buttonViewWinners, buttonViewLosers, buttonViewCancelledUsers,
+            buttonViewAcceptedUsers, buttonGenerateQRCode;
 
     /**
      * Initializes the event viewing interface and sets up:
@@ -55,8 +58,10 @@ public class OrganizerHomeViewEventActivity extends AppCompatActivity {
      * - Button click listeners
      * - Navigation handlers
      *
-     * @param savedInstanceState If the activity is being re-initialized after previously being shut down,
-     *                          this Bundle contains the data it most recently supplied
+     * @param savedInstanceState If the activity is being re-initialized after
+     *                           previously being shut down,
+     *                           this Bundle contains the data it most recently
+     *                           supplied
      */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -124,8 +129,8 @@ public class OrganizerHomeViewEventActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        String eventId = getIntent().getStringExtra("event_id");  // Make sure you pass the correct eventId
-        loadEventData(eventId);  // Reload activity data every time you return to the page
+        String eventId = getIntent().getStringExtra("event_id"); // Make sure you pass the correct eventId
+        loadEventData(eventId); // Reload activity data every time you return to the page
     }
 
     /**
@@ -149,7 +154,6 @@ public class OrganizerHomeViewEventActivity extends AppCompatActivity {
                             textViewLotteryTime.setText(event.getLotteryTime());
                             textViewWaitingListCount.setText(String.valueOf(event.getWaitingListCount()));
                             textViewLotteryCount.setText(String.valueOf(event.getLotteryCount()));
-
 
                             // Use Glide to display event posters
                             if (event.getPosterUrl() != null) {
@@ -206,17 +210,21 @@ public class OrganizerHomeViewEventActivity extends AppCompatActivity {
                                                     String customMessage = input.getText().toString().trim();
 
                                                     if (!customMessage.isEmpty()) {
-                                                        // Send the notification to waiting list users with the event name in the title
-                                                        String notificationTitle = "Event Notification - " + eventName;  // Updated title
+                                                        // Send the notification to waiting list users with the event
+                                                        // name in the title
+                                                        String notificationTitle = "Event Notification - " + eventName; // Updated
+                                                                                                                        // title
                                                         NotificationActivity.sendNotification(
                                                                 OrganizerHomeViewEventActivity.this,
-                                                                notificationTitle,  // Use the dynamic event name in the title
+                                                                notificationTitle, // Use the dynamic event name in the
+                                                                                   // title
                                                                 customMessage,
-                                                                "waiting"
-                                                        );
-                                                        Toast.makeText(this, "Notification sent to waiting list users.", Toast.LENGTH_SHORT).show();
+                                                                "waiting");
+                                                        Toast.makeText(this, "Notification sent to waiting list users.",
+                                                                Toast.LENGTH_SHORT).show();
                                                     } else {
-                                                        Toast.makeText(this, "Message cannot be empty.", Toast.LENGTH_SHORT).show();
+                                                        Toast.makeText(this, "Message cannot be empty.",
+                                                                Toast.LENGTH_SHORT).show();
                                                     }
                                                 });
 
@@ -227,13 +235,13 @@ public class OrganizerHomeViewEventActivity extends AppCompatActivity {
                                             })
                                             .show();
                                 })
-                                .addOnFailureListener(e -> Toast.makeText(this, "Failed to load waiting list.", Toast.LENGTH_SHORT).show());
+                                .addOnFailureListener(e -> Toast
+                                        .makeText(this, "Failed to load waiting list.", Toast.LENGTH_SHORT).show());
                     }
                 })
-                .addOnFailureListener(e -> Toast.makeText(this, "Failed to load event name.", Toast.LENGTH_SHORT).show());
+                .addOnFailureListener(
+                        e -> Toast.makeText(this, "Failed to load event name.", Toast.LENGTH_SHORT).show());
     }
-
-
 
     /**
      * Displays list of winners for the event.
@@ -284,11 +292,12 @@ public class OrganizerHomeViewEventActivity extends AppCompatActivity {
                                                             OrganizerHomeViewEventActivity.this,
                                                             notificationTitle,
                                                             customMessage,
-                                                            "Winner"
-                                                    );
-                                                    Toast.makeText(this, "Notification sent to winners.", Toast.LENGTH_SHORT).show();
+                                                            "Winner");
+                                                    Toast.makeText(this, "Notification sent to winners.",
+                                                            Toast.LENGTH_SHORT).show();
                                                 } else {
-                                                    Toast.makeText(this, "Message cannot be empty.", Toast.LENGTH_SHORT).show();
+                                                    Toast.makeText(this, "Message cannot be empty.", Toast.LENGTH_SHORT)
+                                                            .show();
                                                 }
                                             });
                                             messageDialog.setNegativeButton("Cancel", null);
@@ -296,12 +305,12 @@ public class OrganizerHomeViewEventActivity extends AppCompatActivity {
                                         })
                                         .show();
                             })
-                            .addOnFailureListener(e -> Toast.makeText(this, "Failed to load winners.", Toast.LENGTH_SHORT).show());
+                            .addOnFailureListener(
+                                    e -> Toast.makeText(this, "Failed to load winners.", Toast.LENGTH_SHORT).show());
                 })
-                .addOnFailureListener(e -> Toast.makeText(this, "Failed to load event details.", Toast.LENGTH_SHORT).show());
+                .addOnFailureListener(
+                        e -> Toast.makeText(this, "Failed to load event details.", Toast.LENGTH_SHORT).show());
     }
-
-
 
     /**
      * Displays list of losers for the event.
@@ -348,17 +357,21 @@ public class OrganizerHomeViewEventActivity extends AppCompatActivity {
                                                     String customMessage = input.getText().toString().trim();
 
                                                     if (!customMessage.isEmpty()) {
-                                                        // Send the notification to losers with the event name in the title
-                                                        String notificationTitle = "Event Notification - " + eventName;  // Updated title
+                                                        // Send the notification to losers with the event name in the
+                                                        // title
+                                                        String notificationTitle = "Event Notification - " + eventName; // Updated
+                                                                                                                        // title
                                                         NotificationActivity.sendNotification(
                                                                 OrganizerHomeViewEventActivity.this,
-                                                                notificationTitle,  // Use the dynamic event name in the title
+                                                                notificationTitle, // Use the dynamic event name in the
+                                                                                   // title
                                                                 customMessage,
-                                                                "Not Selected"
-                                                        );
-                                                        Toast.makeText(this, "Notification sent to losers.", Toast.LENGTH_SHORT).show();
+                                                                "Not Selected");
+                                                        Toast.makeText(this, "Notification sent to losers.",
+                                                                Toast.LENGTH_SHORT).show();
                                                     } else {
-                                                        Toast.makeText(this, "Message cannot be empty.", Toast.LENGTH_SHORT).show();
+                                                        Toast.makeText(this, "Message cannot be empty.",
+                                                                Toast.LENGTH_SHORT).show();
                                                     }
                                                 });
 
@@ -369,13 +382,13 @@ public class OrganizerHomeViewEventActivity extends AppCompatActivity {
                                             })
                                             .show();
                                 })
-                                .addOnFailureListener(e -> Toast.makeText(this, "Failed to load losers.", Toast.LENGTH_SHORT).show());
+                                .addOnFailureListener(
+                                        e -> Toast.makeText(this, "Failed to load losers.", Toast.LENGTH_SHORT).show());
                     }
                 })
-                .addOnFailureListener(e -> Toast.makeText(this, "Failed to load event name.", Toast.LENGTH_SHORT).show());
+                .addOnFailureListener(
+                        e -> Toast.makeText(this, "Failed to load event name.", Toast.LENGTH_SHORT).show());
     }
-
-
 
     /**
      * Displays list of accepted users for the event.
@@ -422,17 +435,21 @@ public class OrganizerHomeViewEventActivity extends AppCompatActivity {
                                                     String customMessage = input.getText().toString().trim();
 
                                                     if (!customMessage.isEmpty()) {
-                                                        // Send the notification to accepted users with the event name in the title
-                                                        String notificationTitle = "Event Notification - " + eventName;  // Updated title
+                                                        // Send the notification to accepted users with the event name
+                                                        // in the title
+                                                        String notificationTitle = "Event Notification - " + eventName; // Updated
+                                                                                                                        // title
                                                         NotificationActivity.sendNotification(
                                                                 OrganizerHomeViewEventActivity.this,
-                                                                notificationTitle,  // Use the dynamic event name in the title
+                                                                notificationTitle, // Use the dynamic event name in the
+                                                                                   // title
                                                                 customMessage,
-                                                                "Accepted"
-                                                        );
-                                                        Toast.makeText(this, "Notification sent to accepted users.", Toast.LENGTH_SHORT).show();
+                                                                "Accepted");
+                                                        Toast.makeText(this, "Notification sent to accepted users.",
+                                                                Toast.LENGTH_SHORT).show();
                                                     } else {
-                                                        Toast.makeText(this, "Message cannot be empty.", Toast.LENGTH_SHORT).show();
+                                                        Toast.makeText(this, "Message cannot be empty.",
+                                                                Toast.LENGTH_SHORT).show();
                                                     }
                                                 });
 
@@ -443,13 +460,13 @@ public class OrganizerHomeViewEventActivity extends AppCompatActivity {
                                             })
                                             .show();
                                 })
-                                .addOnFailureListener(e -> Toast.makeText(this, "Failed to load accepted users.", Toast.LENGTH_SHORT).show());
+                                .addOnFailureListener(e -> Toast
+                                        .makeText(this, "Failed to load accepted users.", Toast.LENGTH_SHORT).show());
                     }
                 })
-                .addOnFailureListener(e -> Toast.makeText(this, "Failed to load event name.", Toast.LENGTH_SHORT).show());
+                .addOnFailureListener(
+                        e -> Toast.makeText(this, "Failed to load event name.", Toast.LENGTH_SHORT).show());
     }
-
-
 
     /**
      * Displays list of cancelled users for the event.
@@ -496,17 +513,21 @@ public class OrganizerHomeViewEventActivity extends AppCompatActivity {
                                                     String customMessage = input.getText().toString().trim();
 
                                                     if (!customMessage.isEmpty()) {
-                                                        // Send the notification to cancelled users with the event name in the title
-                                                        String notificationTitle = "Event Cancellation - " + eventName;  // Updated title
+                                                        // Send the notification to cancelled users with the event name
+                                                        // in the title
+                                                        String notificationTitle = "Event Cancellation - " + eventName; // Updated
+                                                                                                                        // title
                                                         NotificationActivity.sendNotification(
                                                                 OrganizerHomeViewEventActivity.this,
-                                                                notificationTitle,  // Use the dynamic event name in the title
+                                                                notificationTitle, // Use the dynamic event name in the
+                                                                                   // title
                                                                 customMessage,
-                                                                "Declined"
-                                                        );
-                                                        Toast.makeText(this, "Notification sent to cancelled users.", Toast.LENGTH_SHORT).show();
+                                                                "Declined");
+                                                        Toast.makeText(this, "Notification sent to cancelled users.",
+                                                                Toast.LENGTH_SHORT).show();
                                                     } else {
-                                                        Toast.makeText(this, "Message cannot be empty.", Toast.LENGTH_SHORT).show();
+                                                        Toast.makeText(this, "Message cannot be empty.",
+                                                                Toast.LENGTH_SHORT).show();
                                                     }
                                                 });
 
@@ -517,10 +538,12 @@ public class OrganizerHomeViewEventActivity extends AppCompatActivity {
                                             })
                                             .show();
                                 })
-                                .addOnFailureListener(e -> Toast.makeText(this, "Failed to load cancelled users.", Toast.LENGTH_SHORT).show());
+                                .addOnFailureListener(e -> Toast
+                                        .makeText(this, "Failed to load cancelled users.", Toast.LENGTH_SHORT).show());
                     }
                 })
-                .addOnFailureListener(e -> Toast.makeText(this, "Failed to load event name.", Toast.LENGTH_SHORT).show());
+                .addOnFailureListener(
+                        e -> Toast.makeText(this, "Failed to load event name.", Toast.LENGTH_SHORT).show());
     }
 
 }

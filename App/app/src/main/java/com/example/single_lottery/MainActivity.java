@@ -18,9 +18,20 @@ import com.example.single_lottery.ui.admin.AdminLoginActivity;
 import com.example.single_lottery.ui.organizer.OrganizerActivity;
 
 import com.example.single_lottery.ui.user.UserActivity;
+
+import com.google.firebase.FirebaseApp;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.appcheck.FirebaseAppCheck;
+import com.google.firebase.appcheck.debug.DebugAppCheckProviderFactory;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
@@ -51,7 +62,6 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-
         // Check if the initial landing screen is displayed
         showLandingScreen = getIntent().getBooleanExtra("showLandingScreen", true);
 
@@ -61,7 +71,7 @@ public class MainActivity extends AppCompatActivity {
             Button buttonUser = findViewById(R.id.button_user);
             Button buttonOrganizer = findViewById(R.id.button_organizer);
             Button buttonAdmin = findViewById(R.id.button_admin);
-            //ImageView event_alert = findViewById(R.id.event_alert);
+            // ImageView event_alert = findViewById(R.id.event_alert);
 
             // Set up button click listeners
             View.OnClickListener listener = v -> {
@@ -92,7 +102,7 @@ public class MainActivity extends AppCompatActivity {
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             if (checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
-                requestPermissions(new String[]{Manifest.permission.POST_NOTIFICATIONS}, REQUEST_CODE);
+                requestPermissions(new String[] { Manifest.permission.POST_NOTIFICATIONS }, REQUEST_CODE);
             }
         }
 
@@ -100,36 +110,38 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
+            @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         if (requestCode == REQUEST_CODE) {
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 Log.d("Permission", "Notification permission granted.");
             } else {
                 Log.d("Permission", "Notification permission denied.");
-                Toast.makeText(this, "You need to grant notification permission to use Single Lottery.", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "You need to grant notification permission to use Single Lottery.",
+                        Toast.LENGTH_SHORT).show();
             }
         }
     }
 
     private void getFirebaseMessagingToken() {
         FirebaseMessaging.getInstance().getToken()
-               .addOnCompleteListener(task -> {
-                   if (!task.isSuccessful()) {
-                       Log.d("MainActivity","Fetching FCM registration token failed",task.getException());
-                       return;
-                   }
-                   
-                   String token = task.getResult();
-                   Log.d("MainActivity","FCM Token: " + token);
+                .addOnCompleteListener(task -> {
+                    if (!task.isSuccessful()) {
+                        Log.d("MainActivity", "Fetching FCM registration token failed", task.getException());
+                        return;
+                    }
 
-                   storeTokenInFirestore(token);
-                });  
+                    String token = task.getResult();
+                    Log.d("MainActivity", "FCM Token: " + token);
+
+                    storeTokenInFirestore(token);
+                });
     }
 
     private void storeTokenInFirestore(String token) {
         FirebaseFirestore firestore = FirebaseFirestore.getInstance();
-        
+
         FirebaseInstallations.getInstance().getId()
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
@@ -141,18 +153,19 @@ public class MainActivity extends AppCompatActivity {
 
                         firestore.collection("users").document(installationId)
                                 .set(tokenData, SetOptions.merge())
-                                .addOnSuccessListener(aVoid -> Log.d("MainActivity", "Token successfully saved to Firestore!"))
+                                .addOnSuccessListener(
+                                        aVoid -> Log.d("MainActivity", "Token successfully saved to Firestore!"))
                                 .addOnFailureListener(e -> Log.e("MainActivity", "Error saving token to Firestore", e));
                         firestore.collection("organizers").document(installationId)
                                 .set(tokenData, SetOptions.merge())
-                                .addOnSuccessListener(aVoid -> Log.d("MainActivity", "Token successfully saved to Firestore!"))
+                                .addOnSuccessListener(
+                                        aVoid -> Log.d("MainActivity", "Token successfully saved to Firestore!"))
                                 .addOnFailureListener(e -> Log.e("MainActivity", "Error saving token to Firestore", e));
                     } else {
                         Log.w("MainActivity", "Failed to get installation ID");
                     }
                 });
     }
-
 
     /**
      * Checks all events and performs lottery draws if deadline is reached.
@@ -236,7 +249,8 @@ public class MainActivity extends AppCompatActivity {
                         for (DocumentSnapshot winnerDoc : winners) {
                             db.collection("registered_events").document(winnerDoc.getId())
                                     .update("status", "Winner")
-                                    .addOnSuccessListener(aVoid -> Log.d("Lottery", "User " + winnerDoc.getString("userId") + " has won the lottery"))
+                                    .addOnSuccessListener(aVoid -> Log.d("Lottery",
+                                            "User " + winnerDoc.getString("userId") + " has won the lottery"))
                                     .addOnFailureListener(e -> Log.e("Lottery", "Failed to update winner status", e));
                         }
 
@@ -245,11 +259,13 @@ public class MainActivity extends AppCompatActivity {
                         for (DocumentSnapshot loserDoc : losers) {
                             db.collection("registered_events").document(loserDoc.getId())
                                     .update("status", "Not Selected")
-                                    .addOnSuccessListener(aVoid -> Log.d("Lottery", "User " + loserDoc.getString("userId") + " did not win"))
+                                    .addOnSuccessListener(aVoid -> Log.d("Lottery",
+                                            "User " + loserDoc.getString("userId") + " did not win"))
                                     .addOnFailureListener(e -> Log.e("Lottery", "Failed to update loser status", e));
                         }
 
-                        Toast.makeText(this, "Lottery completed. Winners have been selected.", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(this, "Lottery completed. Winners have been selected.", Toast.LENGTH_SHORT)
+                                .show();
                     } else {
                         Log.d("Lottery", "No users registered for event " + eventId);
                     }
