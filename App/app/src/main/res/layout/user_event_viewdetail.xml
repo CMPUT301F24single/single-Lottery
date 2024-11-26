@@ -66,6 +66,24 @@
             android:textSize="17sp"
             android:paddingTop="4dp" />
 
+        <!-- Event Facility -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Event Facility"
+            android:textStyle="bold"
+            android:textSize="17sp"
+            android:paddingTop="8dp" />
+
+        <TextView
+            android:id="@+id/eventFacilityTextView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Facility"
+            android:textSize="17sp"
+            android:paddingTop="4dp" />
+
+
         <!-- Event Time -->
         <LinearLayout
             android:layout_width="match_parent"

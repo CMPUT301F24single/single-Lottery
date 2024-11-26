@@ -6,7 +6,7 @@
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
-
+    <uses-permission android:name="android.permission.INTERNET"/>
 
 
     <uses-feature
@@ -27,6 +27,11 @@
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="${GOOGLE_MAPS_API_KEY}" />
+
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_channel_id"
+            android:value="default" />
+
         <activity
             android:name=".MainActivity"
             android:exported="true"
@@ -69,6 +74,14 @@
         <activity android:name=".ui.user.events.UserEventDetailActivity" />
 
         <activity android:name=".ui.admin.AdminActivity" />
+
+        <activity android:name=".ui.admin.AdminEventDetailActivity" />
+
+        <activity android:name=".ui.admin.AdminLoginActivity" />
+
+        <activity android:name=".ui.admin.AdminOrganizerDetailActivity" />
+
+        <activity android:name=".ui.admin.AdminUserDetailActivity" />
 
         <service
             android:name=".ui.notification.MyFireBaseMessagingService"

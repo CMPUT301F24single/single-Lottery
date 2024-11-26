@@ -14,9 +14,18 @@ import android.widget.Toast;
 import android.Manifest;
 
 import com.example.single_lottery.ui.admin.AdminActivity;
+import com.example.single_lottery.ui.admin.AdminLoginActivity;
 import com.example.single_lottery.ui.organizer.OrganizerActivity;
 
 import com.example.single_lottery.ui.user.UserActivity;
+
+import com.google.firebase.FirebaseApp;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.appcheck.FirebaseAppCheck;
+import com.google.firebase.appcheck.debug.DebugAppCheckProviderFactory;
+
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
@@ -57,6 +66,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+
         // Check if the initial landing screen is displayed
         showLandingScreen = getIntent().getBooleanExtra("showLandingScreen", true);
 
@@ -68,22 +78,26 @@ public class MainActivity extends AppCompatActivity {
             Button buttonAdmin = findViewById(R.id.button_admin);
             //ImageView event_alert = findViewById(R.id.event_alert);
 
-            // Lottery check when any button is clicked
+            // Set up button click listeners
             View.OnClickListener listener = v -> {
                 performLotteryCheck(); // Perform draw check
 
-                // Jump to different activities based on the button clicked
-                Intent intent;
+                Intent intent = null;
+
                 if (v.getId() == R.id.button_user) {
                     intent = new Intent(MainActivity.this, UserActivity.class);
                 } else if (v.getId() == R.id.button_organizer) {
                     intent = new Intent(MainActivity.this, OrganizerActivity.class);
-                } else {
-                    intent = new Intent(MainActivity.this, AdminActivity.class);
+                } else if (v.getId() == R.id.button_admin) {
+                    // Admin Login verification
+                    intent = new Intent(MainActivity.this, AdminLoginActivity.class);
                 }
-                intent.putExtra("showLandingScreen", false);
-                startActivity(intent);
-                finish();
+
+                if (intent != null) {
+                    intent.putExtra("showLandingScreen", false);
+                    startActivity(intent);
+                    finish();
+                }
             };
 
             buttonUser.setOnClickListener(listener);
@@ -189,7 +203,7 @@ public class MainActivity extends AppCompatActivity {
     /**
      * Verifies if lottery has already been performed for an event.
      *
-     * @param eventId Event to check
+     * @param eventId      Event to check
      * @param lotteryCount Number of winners to select
      */
     private void checkIfAlreadyDrawn(String eventId, int lotteryCount) {
@@ -210,13 +224,12 @@ public class MainActivity extends AppCompatActivity {
                 .addOnFailureListener(e -> Log.e("MainActivity", "Error checking if lottery already drawn", e));
     }
 
-
     /**
      * Executes lottery draw for an event.
      * Randomly selects winners, updates participant status,
      * and notifies users of results.
      *
-     * @param eventId Event to perform lottery for
+     * @param eventId      Event to perform lottery for
      * @param lotteryCount Number of winners to select
      */
     private void performLottery(String eventId, int lotteryCount) {
