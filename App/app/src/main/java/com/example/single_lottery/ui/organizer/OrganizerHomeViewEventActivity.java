@@ -257,7 +257,7 @@ public class OrganizerHomeViewEventActivity extends AppCompatActivity {
                             .whereEqualTo("status", "Winner")
                             .get()
                             .addOnSuccessListener(querySnapshot -> {
-                                StringBuilder winnersList = new StringBuilder("Winners:\n");
+                                StringBuilder winnersList = new StringBuilder();
 
                                 for (DocumentSnapshot document : querySnapshot.getDocuments()) {
                                     String userId = document.getString("userId");
