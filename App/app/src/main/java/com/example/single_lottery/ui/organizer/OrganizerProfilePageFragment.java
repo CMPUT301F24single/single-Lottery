@@ -34,7 +34,7 @@ import java.util.UUID;
 
 public class OrganizerProfilePageFragment extends Fragment {
     private TextView nameTextView, emailTextView, phoneTextView, infoTextView;
-    private Button editButton, uploadButton, removeImageButton, facilityButton;
+    private Button editButton, uploadButton, removeImageButton;
     private ImageView profileImageView;
 
     private String organizerName;
@@ -61,7 +61,6 @@ public class OrganizerProfilePageFragment extends Fragment {
         uploadButton = view.findViewById(R.id.uploadButton);
         removeImageButton = view.findViewById(R.id.removeImageButton);
         profileImageView = view.findViewById(R.id.profileImageView);
-        facilityButton = view.findViewById(R.id.facilityButton);
 
         firestore = FirebaseFirestore.getInstance();
         storage = FirebaseStorage.getInstance();
@@ -80,7 +79,6 @@ public class OrganizerProfilePageFragment extends Fragment {
         editButton.setOnClickListener(v -> showEditDialog());
         uploadButton.setOnClickListener(v -> selectImage());
         removeImageButton.setOnClickListener(v -> removeProfileImage());
-        facilityButton.setOnClickListener(v -> openFacilityProfile());
 
         return view;
     }
@@ -133,10 +131,6 @@ public class OrganizerProfilePageFragment extends Fragment {
         }
     }
 
-    private void openFacilityProfile() {
-        Intent intent = new Intent(getActivity(), FacilityProfile.class); // 确保 FacilityProfile 是一个 Activity
-        startActivity(intent);
-    }
 
     private void generateLetterAvatar(String name) {
         String[] nameParts = name.split("\\s+");
