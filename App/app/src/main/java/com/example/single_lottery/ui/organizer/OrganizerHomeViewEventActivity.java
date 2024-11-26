@@ -4,20 +4,20 @@ import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.content.Intent;
 
-
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import com.example.single_lottery.MapsActivity;
-
 import com.bumptech.glide.Glide;
 import com.example.single_lottery.R;
 import com.example.single_lottery.EventModel;
+import com.example.single_lottery.ui.notification.NotificationActivity;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
@@ -46,7 +46,7 @@ public class OrganizerHomeViewEventActivity extends AppCompatActivity {
     private TextView textViewEventName, textViewEventTime, textViewRegistrationDeadline,
             textViewLotteryTime, textViewWaitingListCount, textViewLotteryCount, textViewEventDescription;
     private ImageView imageViewPoster;
-    private Button buttonViewWaitingList, buttonViewSelectedUsers, buttonViewAcceptedUsers, buttonGenerateQRCode;
+    private Button buttonViewWaitingList, buttonViewWinners, buttonViewLosers, buttonViewCancelledUsers, buttonViewAcceptedUsers, buttonGenerateQRCode;
 
     /**
      * Initializes the event viewing interface and sets up:
@@ -80,7 +80,6 @@ public class OrganizerHomeViewEventActivity extends AppCompatActivity {
             }
         });
 
-
         // Initialize back button
         textViewEventName = findViewById(R.id.textViewEventName);
         textViewEventDescription = findViewById(R.id.textViewEventDescription);
@@ -91,8 +90,10 @@ public class OrganizerHomeViewEventActivity extends AppCompatActivity {
         textViewLotteryCount = findViewById(R.id.textViewLotteryCount);
         imageViewPoster = findViewById(R.id.imageViewPoster);
         buttonViewWaitingList = findViewById(R.id.buttonViewWaitingList);
-        buttonViewSelectedUsers = findViewById(R.id.buttonViewSelectedUsers);
         buttonViewAcceptedUsers = findViewById(R.id.buttonViewAcceptedUsers);
+        buttonViewLosers = findViewById(R.id.buttonViewLosers);
+        buttonViewWinners = findViewById(R.id.buttonViewWinners);
+        buttonViewCancelledUsers = findViewById(R.id.buttonViewCancelledUsers);
 
         // Get event ID from intent
         String eventId = getIntent().getStringExtra("event_id");
@@ -109,10 +110,14 @@ public class OrganizerHomeViewEventActivity extends AppCompatActivity {
         buttonViewWaitingList.setOnClickListener(v -> viewWaitingList(eventId));
 
         // Set the click event of the user button to view the selected and unselected
-        buttonViewSelectedUsers.setOnClickListener(v -> viewSelectedAndNotSelectedUsers(eventId));
+        buttonViewWinners.setOnClickListener(v -> viewWinners(eventId));
+        buttonViewLosers.setOnClickListener(v -> viewLosers(eventId));
 
         // Set the click event of the View Accepted User Button
         buttonViewAcceptedUsers.setOnClickListener(v -> viewAcceptedUsers(eventId));
+
+        // Set the click event for the cancelled users button
+        buttonViewCancelledUsers.setOnClickListener(v -> viewCancelledUsers(eventId));
     }
 
     /**
@@ -166,66 +171,211 @@ public class OrganizerHomeViewEventActivity extends AppCompatActivity {
     private void viewWaitingList(String eventId) {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
 
-        db.collection("registered_events")
-                .whereEqualTo("eventId", eventId)
-                .get()
-                .addOnSuccessListener(querySnapshot -> {
-                    StringBuilder waitingList = new StringBuilder();
-                    for (DocumentSnapshot document : querySnapshot.getDocuments()) {
-                        String userId = document.getString("userId");
-                        waitingList.append(userId).append("\n");
-                    }
+        // First, get the event name by querying the events collection
+        db.collection("events").document(eventId).get()
+                .addOnSuccessListener(eventDocumentSnapshot -> {
+                    if (eventDocumentSnapshot.exists()) {
+                        String eventName = eventDocumentSnapshot.getString("name"); // Extract event name
 
-                    new AlertDialog.Builder(this)
-                            .setTitle("Waiting List")
-                            .setMessage(waitingList.toString())
-                            .setPositiveButton("OK", null)
-                            .show();
+                        // Now fetch the registered users for this event's waiting list
+                        db.collection("registered_events")
+                                .whereEqualTo("eventId", eventId)
+                                .get()
+                                .addOnSuccessListener(querySnapshot -> {
+                                    StringBuilder waitingList = new StringBuilder();
+                                    for (DocumentSnapshot document : querySnapshot.getDocuments()) {
+                                        String userId = document.getString("userId");
+                                        waitingList.append(userId).append("\n");
+                                    }
+
+                                    // Show waiting list in dialog with custom message input
+                                    new AlertDialog.Builder(this)
+                                            .setTitle("Waiting List")
+                                            .setMessage(waitingList.toString())
+                                            .setPositiveButton("OK", null)
+                                            .setNegativeButton("Notify", (dialog, which) -> {
+                                                // Create an input dialog for custom message
+                                                AlertDialog.Builder inputDialog = new AlertDialog.Builder(this);
+                                                inputDialog.setTitle("Enter Custom Message");
+
+                                                // Set up the input field for custom message
+                                                final EditText input = new EditText(this);
+                                                inputDialog.setView(input);
+
+                                                inputDialog.setPositiveButton("Send", (dialog1, which1) -> {
+                                                    String customMessage = input.getText().toString().trim();
+
+                                                    if (!customMessage.isEmpty()) {
+                                                        // Send the notification to waiting list users with the event name in the title
+                                                        String notificationTitle = "Event Notification - " + eventName;  // Updated title
+                                                        NotificationActivity.sendNotification(
+                                                                OrganizerHomeViewEventActivity.this,
+                                                                notificationTitle,  // Use the dynamic event name in the title
+                                                                customMessage
+                                                        );
+                                                        Toast.makeText(this, "Notification sent to waiting list users.", Toast.LENGTH_SHORT).show();
+                                                    } else {
+                                                        Toast.makeText(this, "Message cannot be empty.", Toast.LENGTH_SHORT).show();
+                                                    }
+                                                });
+
+                                                inputDialog.setNegativeButton("Cancel", null);
+
+                                                // Show the input dialog
+                                                inputDialog.show();
+                                            })
+                                            .show();
+                                })
+                                .addOnFailureListener(e -> Toast.makeText(this, "Failed to load waiting list.", Toast.LENGTH_SHORT).show());
+                    }
                 })
-                .addOnFailureListener(e -> Toast.makeText(this, "Failed to load waiting list.", Toast.LENGTH_SHORT).show());
+                .addOnFailureListener(e -> Toast.makeText(this, "Failed to load event name.", Toast.LENGTH_SHORT).show());
     }
 
+
+
     /**
-     * Displays lists of selected and non-selected users for the event.
-     * Shows both winners and non-winners in an AlertDialog.
+     * Displays list of winners for the event.
+     * Shows winners list in an AlertDialog.
      *
-     * @param eventId ID of the event to view selected users for
+     * @param eventId ID of the event to view winners for
      */
-    private void viewSelectedAndNotSelectedUsers(String eventId) {
+    private void viewWinners(String eventId) {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
 
-        db.collection("registered_events")
-                .whereEqualTo("eventId", eventId)
+        // Retrieve the event name first
+        db.collection("events")
+                .document(eventId)
                 .get()
-                .addOnSuccessListener(querySnapshot -> {
-                    StringBuilder winnersList = new StringBuilder("Winners:\n");
-                    StringBuilder nonWinnersList = new StringBuilder("Non-Winners:\n");
+                .addOnSuccessListener(eventDoc -> {
+                    String eventName = eventDoc.getString("name");
 
-                    for (DocumentSnapshot document : querySnapshot.getDocuments()) {
-                        String userId = document.getString("userId");
-                        String status = document.getString("status");
+                    // Retrieve the list of winners
+                    db.collection("registered_events")
+                            .whereEqualTo("eventId", eventId)
+                            .whereEqualTo("status", "Winner")
+                            .get()
+                            .addOnSuccessListener(querySnapshot -> {
+                                StringBuilder winnersList = new StringBuilder("Winners:\n");
 
-                        // Check and add users to the corresponding list
-                        if ("Winner".equals(status)) {
-                            winnersList.append(userId).append("\n");
-                        } else if ("Not Selected".equals(status)) {
-                            nonWinnersList.append(userId).append("\n");
-                        }
-                    }
+                                for (DocumentSnapshot document : querySnapshot.getDocuments()) {
+                                    String userId = document.getString("userId");
+                                    winnersList.append(userId).append("\n");
+                                }
 
-                    // Make sure the data is displayed in the pop-up box
-                    new AlertDialog.Builder(this)
-                            .setTitle("Selected Users")
-                            .setMessage(winnersList.toString() + "\n" + nonWinnersList.toString())
-                            .setPositiveButton("OK", null)
-                            .show();
+                                // Show winners list in dialog with "Notify" button
+                                new AlertDialog.Builder(this)
+                                        .setTitle("Winners List")
+                                        .setMessage(winnersList.toString())
+                                        .setPositiveButton("OK", null)
+                                        .setNegativeButton("Notify", (dialog, which) -> {
+                                            // Show dialog to input custom message
+                                            AlertDialog.Builder messageDialog = new AlertDialog.Builder(this);
+                                            messageDialog.setTitle("Custom Message");
+                                            final EditText input = new EditText(this);
+                                            messageDialog.setView(input);
+                                            messageDialog.setPositiveButton("Send", (innerDialog, which1) -> {
+                                                String message = input.getText().toString().trim();
+                                                if (!message.isEmpty()) {
+                                                    // Send custom notification with event name in the title
+                                                    String notificationTitle = "Event Notification - " + eventName;
+                                                    NotificationActivity.sendNotification(
+                                                            OrganizerHomeViewEventActivity.this,
+                                                            notificationTitle,
+                                                            message
+                                                    );
+                                                    Toast.makeText(this, "Notification sent to winners.", Toast.LENGTH_SHORT).show();
+                                                } else {
+                                                    Toast.makeText(this, "Message cannot be empty.", Toast.LENGTH_SHORT).show();
+                                                }
+                                            });
+                                            messageDialog.setNegativeButton("Cancel", null);
+                                            messageDialog.show();
+                                        })
+                                        .show();
+                            })
+                            .addOnFailureListener(e -> Toast.makeText(this, "Failed to load winners.", Toast.LENGTH_SHORT).show());
                 })
-                .addOnFailureListener(e -> Toast.makeText(this, "Failed to load selected users.", Toast.LENGTH_SHORT).show());
+                .addOnFailureListener(e -> Toast.makeText(this, "Failed to load event details.", Toast.LENGTH_SHORT).show());
     }
 
 
+
     /**
-     * Displays list of users who have accepted their selection for the event.
+     * Displays list of losers for the event.
+     * Shows losers list in an AlertDialog.
+     *
+     * @param eventId ID of the event to view losers for
+     */
+    private void viewLosers(String eventId) {
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+
+        // First, get the event name by querying the events collection
+        db.collection("events").document(eventId).get()
+                .addOnSuccessListener(eventDocumentSnapshot -> {
+                    if (eventDocumentSnapshot.exists()) {
+                        String eventName = eventDocumentSnapshot.getString("name"); // Extract event name
+
+                        // Now fetch the registered users for this event's losers
+                        db.collection("registered_events")
+                                .whereEqualTo("eventId", eventId)
+                                .whereEqualTo("status", "Loser")
+                                .get()
+                                .addOnSuccessListener(querySnapshot -> {
+                                    StringBuilder losersList = new StringBuilder();
+                                    for (DocumentSnapshot document : querySnapshot.getDocuments()) {
+                                        String userId = document.getString("userId");
+                                        losersList.append(userId).append("\n");
+                                    }
+
+                                    // Show losers list in dialog with custom message input
+                                    new AlertDialog.Builder(this)
+                                            .setTitle("Losers List")
+                                            .setMessage(losersList.toString())
+                                            .setPositiveButton("OK", null)
+                                            .setNegativeButton("Notify", (dialog, which) -> {
+                                                // Create an input dialog for custom message
+                                                AlertDialog.Builder inputDialog = new AlertDialog.Builder(this);
+                                                inputDialog.setTitle("Enter Custom Message");
+
+                                                // Set up the input field for custom message
+                                                final EditText input = new EditText(this);
+                                                inputDialog.setView(input);
+
+                                                inputDialog.setPositiveButton("Send", (dialog1, which1) -> {
+                                                    String customMessage = input.getText().toString().trim();
+
+                                                    if (!customMessage.isEmpty()) {
+                                                        // Send the notification to losers with the event name in the title
+                                                        String notificationTitle = "Event Notification - " + eventName;  // Updated title
+                                                        NotificationActivity.sendNotification(
+                                                                OrganizerHomeViewEventActivity.this,
+                                                                notificationTitle,  // Use the dynamic event name in the title
+                                                                customMessage
+                                                        );
+                                                        Toast.makeText(this, "Notification sent to losers.", Toast.LENGTH_SHORT).show();
+                                                    } else {
+                                                        Toast.makeText(this, "Message cannot be empty.", Toast.LENGTH_SHORT).show();
+                                                    }
+                                                });
+
+                                                inputDialog.setNegativeButton("Cancel", null);
+
+                                                // Show the input dialog
+                                                inputDialog.show();
+                                            })
+                                            .show();
+                                })
+                                .addOnFailureListener(e -> Toast.makeText(this, "Failed to load losers.", Toast.LENGTH_SHORT).show());
+                    }
+                })
+                .addOnFailureListener(e -> Toast.makeText(this, "Failed to load event name.", Toast.LENGTH_SHORT).show());
+    }
+
+
+
+    /**
+     * Displays list of accepted users for the event.
      * Shows accepted users in an AlertDialog.
      *
      * @param eventId ID of the event to view accepted users for
@@ -233,23 +383,77 @@ public class OrganizerHomeViewEventActivity extends AppCompatActivity {
     private void viewAcceptedUsers(String eventId) {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
 
-        db.collection("registered_events")
-                .whereEqualTo("eventId", eventId)
-                .whereEqualTo("status", "Accepted")  // Only query users whose status is Accepted
-                .get()
-                .addOnSuccessListener(querySnapshot -> {
-                    StringBuilder acceptedUsersList = new StringBuilder();
-                    for (DocumentSnapshot document : querySnapshot.getDocuments()) {
-                        String userId = document.getString("userId");
-                        acceptedUsersList.append(userId).append("\n");
-                    }
+        // First, get the event name by querying the events collection
+        db.collection("events").document(eventId).get()
+                .addOnSuccessListener(eventDocumentSnapshot -> {
+                    if (eventDocumentSnapshot.exists()) {
+                        String eventName = eventDocumentSnapshot.getString("name"); // Extract event name
 
-                    new AlertDialog.Builder(this)
-                            .setTitle("Accepted Users")
-                            .setMessage(acceptedUsersList.toString())
-                            .setPositiveButton("OK", null)
-                            .show();
+                        // Now fetch the registered users for this event's accepted users
+                        db.collection("registered_events")
+                                .whereEqualTo("eventId", eventId)
+                                .whereEqualTo("status", "Accepted")
+                                .get()
+                                .addOnSuccessListener(querySnapshot -> {
+                                    StringBuilder acceptedList = new StringBuilder();
+                                    for (DocumentSnapshot document : querySnapshot.getDocuments()) {
+                                        String userId = document.getString("userId");
+                                        acceptedList.append(userId).append("\n");
+                                    }
+
+                                    // Show accepted users list in dialog with custom message input
+                                    new AlertDialog.Builder(this)
+                                            .setTitle("Accepted Users")
+                                            .setMessage(acceptedList.toString())
+                                            .setPositiveButton("OK", null)
+                                            .setNegativeButton("Notify", (dialog, which) -> {
+                                                // Create an input dialog for custom message
+                                                AlertDialog.Builder inputDialog = new AlertDialog.Builder(this);
+                                                inputDialog.setTitle("Enter Custom Message");
+
+                                                // Set up the input field for custom message
+                                                final EditText input = new EditText(this);
+                                                inputDialog.setView(input);
+
+                                                inputDialog.setPositiveButton("Send", (dialog1, which1) -> {
+                                                    String customMessage = input.getText().toString().trim();
+
+                                                    if (!customMessage.isEmpty()) {
+                                                        // Send the notification to accepted users with the event name in the title
+                                                        String notificationTitle = "Event Notification - " + eventName;  // Updated title
+                                                        NotificationActivity.sendNotification(
+                                                                OrganizerHomeViewEventActivity.this,
+                                                                notificationTitle,  // Use the dynamic event name in the title
+                                                                customMessage
+                                                        );
+                                                        Toast.makeText(this, "Notification sent to accepted users.", Toast.LENGTH_SHORT).show();
+                                                    } else {
+                                                        Toast.makeText(this, "Message cannot be empty.", Toast.LENGTH_SHORT).show();
+                                                    }
+                                                });
+
+                                                inputDialog.setNegativeButton("Cancel", null);
+
+                                                // Show the input dialog
+                                                inputDialog.show();
+                                            })
+                                            .show();
+                                })
+                                .addOnFailureListener(e -> Toast.makeText(this, "Failed to load accepted users.", Toast.LENGTH_SHORT).show());
+                    }
                 })
-                .addOnFailureListener(e -> Toast.makeText(this, "Failed to load accepted users.", Toast.LENGTH_SHORT).show());
+                .addOnFailureListener(e -> Toast.makeText(this, "Failed to load event name.", Toast.LENGTH_SHORT).show());
+    }
+
+
+
+    /**
+     * Displays list of cancelled users for the event.
+     * This function is left blank as requested.
+     *
+     * @param eventId ID of the event to view cancelled users for
+     */
+    private void viewCancelledUsers(String eventId) {
+        // to be completed
     }
 }
