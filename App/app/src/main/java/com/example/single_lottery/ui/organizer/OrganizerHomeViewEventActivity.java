@@ -354,7 +354,7 @@ public class OrganizerHomeViewEventActivity extends AppCompatActivity {
                                                                 OrganizerHomeViewEventActivity.this,
                                                                 notificationTitle,  // Use the dynamic event name in the title
                                                                 customMessage,
-                                                                "Losers"
+                                                                "Not Selected"
                                                         );
                                                         Toast.makeText(this, "Notification sent to losers.", Toast.LENGTH_SHORT).show();
                                                     } else {
@@ -428,7 +428,7 @@ public class OrganizerHomeViewEventActivity extends AppCompatActivity {
                                                                 OrganizerHomeViewEventActivity.this,
                                                                 notificationTitle,  // Use the dynamic event name in the title
                                                                 customMessage,
-                                                                "Accepted Users"
+                                                                "Accepted"
                                                         );
                                                         Toast.makeText(this, "Notification sent to accepted users.", Toast.LENGTH_SHORT).show();
                                                     } else {
@@ -502,7 +502,7 @@ public class OrganizerHomeViewEventActivity extends AppCompatActivity {
                                                                 OrganizerHomeViewEventActivity.this,
                                                                 notificationTitle,  // Use the dynamic event name in the title
                                                                 customMessage,
-                                                                "Cancelled Users"
+                                                                "Declined"
                                                         );
                                                         Toast.makeText(this, "Notification sent to cancelled users.", Toast.LENGTH_SHORT).show();
                                                     } else {
