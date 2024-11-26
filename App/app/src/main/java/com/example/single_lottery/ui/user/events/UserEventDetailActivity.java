@@ -19,8 +19,11 @@ import com.example.single_lottery.R;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Collections;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 
 /**
@@ -74,7 +77,24 @@ public class UserEventDetailActivity extends AppCompatActivity {
 
         cancelRegistrationButton.setOnClickListener(v -> cancelRegistration(eventId));
         acceptButton.setOnClickListener(v -> updateLotteryStatus("Accepted"));
-        declineButton.setOnClickListener(v -> updateLotteryStatus("Declined"));
+        declineButton.setOnClickListener(v -> {
+            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault());
+            try {
+                Date eventStartDate = dateFormat.parse(eventTime);
+                Date currentDate = new Date();
+
+                if (currentDate.before(eventStartDate)) {
+                    // 如果当前时间早于活动开始时间，执行替补抽取逻辑
+                    handleDeclineAndSelectReplacement();
+                } else {
+                    // 如果活动已经开始，仅更新状态为 Declined
+                    updateLotteryStatus("Declined");
+                }
+            } catch (ParseException e) {
+                e.printStackTrace();
+                Toast.makeText(this, "Error processing decline action.", Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     /**
@@ -253,5 +273,46 @@ public class UserEventDetailActivity extends AppCompatActivity {
                     }
                 })
                 .addOnFailureListener(e -> Log.e("UserEventDetailActivity", "Error canceling registration", e));
+    }
+
+    private void handleDeclineAndSelectReplacement() {
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+
+        // 查询所有未被选中的用户
+        db.collection("registered_events")
+                .whereEqualTo("eventId", eventId) // 筛选当前活动
+                .whereEqualTo("status", "Not Selected") // 筛选未被选中的用户
+                .get()
+                .addOnSuccessListener(querySnapshot -> {
+                    if (!querySnapshot.isEmpty()) {
+                        List<DocumentSnapshot> notSelectedUsers = querySnapshot.getDocuments();
+
+                        // 随机选取一名替补用户
+                        Collections.shuffle(notSelectedUsers);
+                        DocumentSnapshot replacementUser = notSelectedUsers.get(0);
+
+                        // 更新替补用户的状态为 Winner
+                        db.collection("registered_events").document(replacementUser.getId())
+                                .update("status", "Winner")
+                                .addOnSuccessListener(aVoid -> {
+                                    Toast.makeText(this, "Replacement user selected as Winner.", Toast.LENGTH_SHORT).show();
+
+                                    // 将当前用户状态更新为 Declined
+                                    updateLotteryStatus("Declined");
+                                })
+                                .addOnFailureListener(e -> {
+                                    Toast.makeText(this, "Failed to update replacement user.", Toast.LENGTH_SHORT).show();
+                                    Log.e("UserEventDetailActivity", "Error updating replacement user", e);
+                                });
+                    } else {
+                        // 如果没有未被选中的用户，仅更新当前用户状态为 Declined
+                        Toast.makeText(this, "No replacement user available.", Toast.LENGTH_SHORT).show();
+                        updateLotteryStatus("Declined");
+                    }
+                })
+                .addOnFailureListener(e -> {
+                    Toast.makeText(this, "Failed to fetch not selected users.", Toast.LENGTH_SHORT).show();
+                    Log.e("UserEventDetailActivity", "Error fetching not selected users", e);
+                });
     }
 }
