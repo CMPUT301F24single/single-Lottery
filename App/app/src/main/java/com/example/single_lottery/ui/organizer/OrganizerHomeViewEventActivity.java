@@ -2,6 +2,7 @@ package com.example.single_lottery.ui.organizer;
 
 import android.annotation.SuppressLint;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -68,8 +69,15 @@ public class OrganizerHomeViewEventActivity extends AppCompatActivity {
 
         Button mapButton = findViewById(R.id.mapButton);
         mapButton.setOnClickListener(v -> {
-            Intent intent = new Intent(OrganizerHomeViewEventActivity.this, MapsActivity.class);
-            startActivity(intent);
+            String eventId = getIntent().getStringExtra("event_id");
+            Log.d("OrganizerHomeViewEventActivity", "event_id: " + eventId);
+            if (eventId != null) {
+                Intent intent = new Intent(OrganizerHomeViewEventActivity.this, MapsActivity.class);
+                intent.putExtra("eventId", eventId);
+                startActivity(intent);
+            } else {
+                Toast.makeText(this, "Event ID is null", Toast.LENGTH_SHORT).show();
+            }
         });
 
 
@@ -93,7 +101,7 @@ public class OrganizerHomeViewEventActivity extends AppCompatActivity {
         loadEventData(eventId);
 
         buttonGenerateQRCode.setOnClickListener(v -> {
-            Intent intent = new Intent(OrganizerHomeViewEventActivity.this, QRCodeActivity.class);
+            Intent intent = new Intent(OrganizerHomeViewEventActivity.this, OrganizerQRCode.class);
             intent.putExtra("event_id", eventId);
             startActivity(intent);
         });

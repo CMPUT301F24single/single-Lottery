@@ -3,6 +3,9 @@ package com.example.single_lottery.ui.organizer;
 import android.app.AlertDialog;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
 import android.net.Uri;
 import android.os.Bundle;
 import androidx.annotation.NonNull;
@@ -98,20 +101,37 @@ public class OrganizerProfilePageFragment extends Fragment {
      * @param installationId Unique identifier for the organizer
      */
     private void loadOrganizerProfile(String installationId) {
-        DocumentReference docRef = firestore.collection("organizers").document(installationId);
-        docRef.get().addOnCompleteListener(task -> {
-            if (task.isSuccessful() && task.getResult() != null && task.getResult().exists()) {
-                organizerName = task.getResult().getString("name");
-                organizerEmail = task.getResult().getString("email");
-                organizerPhone = task.getResult().getString("phone");
-                companyInfo = task.getResult().getString("info");
-                String profileImageUrl = task.getResult().getString("profileImageUrl");
+        DocumentReference userDocRef = firestore.collection("users").document(installationId);
+        userDocRef.get().addOnCompleteListener(userTask -> {
+            if (userTask.isSuccessful() && userTask.getResult() != null && userTask.getResult().exists()) {
+                organizerName = userTask.getResult().getString("name");
+                organizerEmail = userTask.getResult().getString("email");
+                organizerPhone = userTask.getResult().getString("phone");
+                companyInfo = userTask.getResult().getString("info");
+                String profileImageUrl = userTask.getResult().getString("profileImageUrl");
                 updateOrganizerDetails(profileImageUrl);
+            } else {
+                DocumentReference orgDocRef = firestore.collection("organizers").document(installationId);
+                orgDocRef.get().addOnCompleteListener(orgTask -> {
+                    if (orgTask.isSuccessful() && orgTask.getResult() != null && orgTask.getResult().exists()) {
+                        organizerName = orgTask.getResult().getString("name");
+                        organizerEmail = orgTask.getResult().getString("email");
+                        organizerPhone = orgTask.getResult().getString("phone");
+                        companyInfo = orgTask.getResult().getString("info");
+                        String profileImageUrl = orgTask.getResult().getString("profileImageUrl");
+                        updateOrganizerDetails(profileImageUrl);
+                    } else {
+                        Log.e("OrganizerProfilePageFragment", "No existing user or organizer profile found.");
+                    }
+                }).addOnFailureListener(e -> {
+                    Log.e("OrganizerProfilePageFragment", "failed to load organizer profile: " + e.getMessage());
+                });
             }
         }).addOnFailureListener(e -> {
             Log.e("OrganizerProfilePageFragment", "failed to load user profile: " + e.getMessage());
         });
     }
+    
 
     /**
      * Updates UI with organizer profile information.
@@ -130,8 +150,41 @@ public class OrganizerProfilePageFragment extends Fragment {
                     .error(R.drawable.org)
                     .into(profileImageView);
         } else {
-            profileImageView.setImageResource(R.drawable.org);
+            generateLetterAvatar(organizerName);
         }
+    }
+
+    /**
+     * Generates a letter avatar when no profile image is set.
+     * Creates circular avatar with user initials.
+     *
+     * @param name User's display name for initial generation
+     */
+    private void generateLetterAvatar(String name) {
+        String[] nameParts = name.split("\\s+");
+        String initials = "";
+        if(name.isEmpty()){
+            initials += '-';
+        }
+        else if (nameParts.length > 0) {
+            initials += nameParts[0].charAt(0);
+        }
+        if (nameParts.length > 1) {
+            initials += nameParts[1].charAt(0);
+        }
+
+        Bitmap bitmap = Bitmap.createBitmap(100, 100, Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(bitmap);
+        Paint paint = new Paint();
+        paint.setColor(Color.GRAY);
+        canvas.drawCircle(50, 50, 50, paint);
+
+        paint.setColor(Color.WHITE);
+        paint.setTextSize(40);
+        paint.setTextAlign(Paint.Align.CENTER);
+        canvas.drawText(initials, 50, 65, paint);
+
+        profileImageView.setImageBitmap(bitmap);
     }
 
     /**
@@ -282,15 +335,23 @@ public class OrganizerProfilePageFragment extends Fragment {
             Log.e("OrganizerProfilePageFragment", "installationId is null");
             return;
         }
-
+    
         OrganizerProfile organizerProfile = new OrganizerProfile(organizerName, organizerEmail, organizerPhone, companyInfo, profileImageUri);
+        
+        firestore.collection("users").document(installationId)
+                .set(organizerProfile)  
+                .addOnSuccessListener(aVoid ->
+                        Log.d("OrganizerProfilePageFragment", "user profile updated successfully"))
+                .addOnFailureListener(e ->
+                        Log.e("OrganizerProfilePageFragment", "user profile update failed: " + e.getMessage()));
+        
         firestore.collection("organizers")
                 .document(installationId)
                 .set(organizerProfile)
                 .addOnSuccessListener(aVoid ->
-                        Log.d("OrganizerProfilePageFragment", "profile updated successfully"))
+                        Log.d("OrganizerProfilePageFragment", "organizer profile updated successfully"))
                 .addOnFailureListener(e ->
-                        Log.e("OrganizerProfilePageFragment", "profile update failed: " + e.getMessage()));
-
+                        Log.e("OrganizerProfilePageFragment", "organizer profile update failed: " + e.getMessage()));
     }
+    
 }

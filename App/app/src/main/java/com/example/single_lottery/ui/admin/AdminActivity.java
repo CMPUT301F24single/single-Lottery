@@ -1,10 +1,15 @@
 package com.example.single_lottery.ui.admin;
 
+import android.content.Intent;
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuItem;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.example.single_lottery.MainActivity;
 import com.example.single_lottery.R;
+
 /**
  * Activity class for the admin interface that provides administrative functions and management features.
  * This is the main entry point for admin users to manage the lottery system.
@@ -27,11 +32,33 @@ public class AdminActivity extends AppCompatActivity {
      * @see Bundle
      * @see AppCompatActivity#onCreate(Bundle)
      */
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.admin_homepage); // need to create a corresponding layout file
+        setContentView(R.layout.admin_homepage); // Set the layout for the admin homepage
+    }
 
+    // Inflate the menu in the action bar
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_actionbar, menu); // Ensure you have the correct menu XML
+        return true;
+    }
+
+    // Handle the item selection in the action bar
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+
+        if (id == R.id.action_return) {
+            // Return to homepage when the icon is clicked
+            Intent intent = new Intent(AdminActivity.this, MainActivity.class);
+            intent.putExtra("showLandingScreen", true); // Optionally pass extra to show the landing screen
+            startActivity(intent);
+            finish();  // Optionally finish the current activity
+            return true;
+        }
+
+        return super.onOptionsItemSelected(item);
     }
 }
