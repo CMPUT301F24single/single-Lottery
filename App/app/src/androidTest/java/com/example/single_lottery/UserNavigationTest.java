@@ -14,7 +14,9 @@ import org.hamcrest.TypeSafeMatcher;
 import org.junit.Before;
 import org.junit.Test;
 
-/*Testing user app navigation, asserting that everything is visible */
+/*Black box test for users.
+Asserts that navigation works properly and fragments have visible details.
+ */
 public class UserNavigationTest {
     public ActivityScenario<UserActivity> scenario;
 

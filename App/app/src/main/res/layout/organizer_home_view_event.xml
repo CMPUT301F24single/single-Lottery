@@ -186,33 +186,47 @@
                 android:id="@+id/buttonViewWaitingList"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="View Waiting List"
-                android:layout_marginTop="8dp"/>
+                android:text="Waiting List"/>
 
-            <!-- View Selected Users Button -->
+            <!-- View Winners Button -->
             <Button
-                android:id="@+id/buttonViewSelectedUsers"
+                android:id="@+id/buttonViewWinners"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="View Selected Users"/>
+                android:text="Lottery WINNERS" />
 
+            <!-- View Losers Button -->
+            <Button
+                android:id="@+id/buttonViewLosers"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="lottery LOSERS" />
+
+            <!-- View Cancelled Users Button -->
+            <Button
+                android:id="@+id/buttonViewCancelledUsers"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="CANCELLED USERS" />
+
+            <!-- View Accepted Users Button -->
             <Button
                 android:id="@+id/buttonViewAcceptedUsers"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Accepted Users"/>
+                android:text="Accepted Users" />
 
             <Button
                 android:id="@+id/mapButton"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Map"/>
+                android:text="Map" />
 
             <Button
                 android:id="@+id/buttonGenerateQRCode"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="QR Code"/>
+                android:text="QR Code" />
         </LinearLayout>
     </ScrollView>
 </RelativeLayout>

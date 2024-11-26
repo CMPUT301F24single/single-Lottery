@@ -36,6 +36,13 @@ import com.google.firebase.storage.StorageReference;
 import java.io.IOException;
 import java.util.UUID;
 
+/**
+ * Fragment for managing user profile and data in the Single Lottery application.
+ * Handles profile information display, editing capabilities and image management.
+ *
+ * @author [Haorui Gao]
+ * @version 1.0
+ */
 public class ProfileFragment extends Fragment {
     private TextView nameTextView, emailTextView, phoneTextView;
     private Button editButton, uploadButton, removeImageButton;
@@ -85,6 +92,12 @@ public class ProfileFragment extends Fragment {
         return view;
     }
 
+    /**
+     * Retrieves user profile data from Firestore database.
+     * Updates UI with fetched data or sets default values if no data exists.
+     *
+     * @param installationId Unique device installation identifier
+     */
     private void loadUserProfile(String installationId) {
         DocumentReference docRef = firestore.collection("users").document(installationId);
         docRef.get().addOnCompleteListener(task -> {
@@ -100,6 +113,12 @@ public class ProfileFragment extends Fragment {
         });
     }
 
+    /**
+     * Updates the UI components with user profile information.
+     * Handles profile image loading and placeholder generation.
+     *
+     * @param profileImageUrl URL of user's profile image in Firebase Storage
+     */
     private void updateUserDetails(String profileImageUrl) {
         nameTextView.setText(userName);
         emailTextView.setText(userEmail);
@@ -115,6 +134,12 @@ public class ProfileFragment extends Fragment {
         }
     }
 
+    /**
+     * Generates a letter avatar when no profile image is set.
+     * Creates circular avatar with user initials.
+     *
+     * @param name User's display name for initial generation
+     */
     private void generateLetterAvatar(String name) {
         String[] nameParts = name.split("\\s+");
         String initials = "";
@@ -142,6 +167,10 @@ public class ProfileFragment extends Fragment {
         profileImageView.setImageBitmap(bitmap);
     }
 
+    /**
+     * Displays dialog for editing profile information.
+     * Allows modification of name, email and phone number.
+     */
     private void showEditDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         builder.setTitle("Edit Profile");
@@ -168,6 +197,10 @@ public class ProfileFragment extends Fragment {
         builder.create().show();
     }
 
+    /**
+     * Launches system image picker for profile photo selection.
+     * Initiates intent for image content type.
+     */
     private void selectImage() {
         Intent intent = new Intent();
         intent.setType("image/*");
@@ -175,6 +208,14 @@ public class ProfileFragment extends Fragment {
         startActivityForResult(Intent.createChooser(intent, "select image"), 1);
     }
 
+    /**
+     * Handles result from image selection activity.
+     * Processes selected image and initiates upload.
+     *
+     * @param requestCode Activity request identifier
+     * @param resultCode Result status from image picker
+     * @param data Intent containing selected image data
+     */
     @Override
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -190,6 +231,14 @@ public class ProfileFragment extends Fragment {
         }
     }
 
+    /**
+     * Sets value or hint text for EditText components.
+     * Handles null or empty input values.
+     *
+     * @param editText Target EditText component
+     * @param value Text value to set
+     * @param hint Hint text for empty state
+     */
     private void setEditTextValue(EditText editText, String value, String hint) {
         if (value == null || value.isEmpty()) {
             editText.setHint(hint);
@@ -198,6 +247,10 @@ public class ProfileFragment extends Fragment {
         }
     }
 
+    /**
+     * Manages profile image upload process to Firebase Storage.
+     * Handles existing image deletion and new image upload.
+     */
     private void uploadProfileImage() {
         if (profileImageUri != null) {
             DocumentReference docRef = firestore.collection("users").document(installationId);
@@ -225,6 +278,10 @@ public class ProfileFragment extends Fragment {
         }
     }
 
+    /**
+     * Performs new image upload to Firebase Storage.
+     * Creates unique filename and updates profile data.
+     */
     private void uploadNewImage() {
         final StorageReference profileImageRef = storageReference.child("profileImages/" + UUID.randomUUID().toString() + ".jpg");
         profileImageRef.putFile(profileImageUri)
@@ -239,6 +296,10 @@ public class ProfileFragment extends Fragment {
                 });
     }
 
+    /**
+     * Removes current profile image from storage.
+     * Updates profile to use default avatar.
+     */
     private void removeProfileImage() {
         DocumentReference docRef = firestore.collection("users").document(installationId);
         docRef.get().addOnCompleteListener(task -> {
@@ -265,13 +326,20 @@ public class ProfileFragment extends Fragment {
         });
     }
 
-    private void saveUserDataToFirestore(String installationId, String profileImageUri) {
+    /**
+     * Persists user profile data to Firestore database.
+     * Creates or updates existing user document.
+     *
+     * @param installationId Device installation identifier
+     * @param profileImageUrl Storage URL of profile image
+     */
+    private void saveUserDataToFirestore(String installationId, String profileImageUrl) {
         if (installationId == null) {
             Log.e("ProfileFragment", "installationId is null");
             return;
         }
 
-        User user = new User(userName, userEmail, userPhone, profileImageUri);
+        User user = new User(userName, userEmail, userPhone, profileImageUrl);
         firestore.collection("users")
                 .document(installationId) 
                 .set(user)

@@ -24,10 +24,14 @@ import org.junit.Test;
 
 import java.util.concurrent.CountDownLatch;
 
+/*
+User profile fragment test that checks that fields are editable and up to date with firestore.
+ */
 public class ProfileFragmentTest {
     private String installationId;
 
     //https://stackoverflow.com/questions/29378552/in-espresso-how-to-avoid-ambiguousviewmatcherexception-when-multiple-views-matc
+    //Ensure that the correct button is clicked when overlapping buttons have the same id in .xml
     public static Matcher<View> withIndex(final Matcher<View> matcher, final int index) {
         return new TypeSafeMatcher<View>() {
             int currentIndex = 0;

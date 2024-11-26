@@ -1,0 +1,8 @@
+com.example.single_lottery
+com.example.single_lottery.ui.admin
+com.example.single_lottery.ui.organizer
+com.example.single_lottery.ui.scan
+com.example.single_lottery.ui.user
+com.example.single_lottery.ui.user.events
+com.example.single_lottery.ui.user.home
+com.example.single_lottery.ui.user.profile
