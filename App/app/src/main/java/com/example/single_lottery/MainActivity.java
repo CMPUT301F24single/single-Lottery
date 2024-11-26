@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.Toast;
 import android.Manifest;
 
@@ -65,6 +66,7 @@ public class MainActivity extends AppCompatActivity {
             Button buttonUser = findViewById(R.id.button_user);
             Button buttonOrganizer = findViewById(R.id.button_organizer);
             Button buttonAdmin = findViewById(R.id.button_admin);
+            //ImageView event_alert = findViewById(R.id.event_alert);
 
             // Lottery check when any button is clicked
             View.OnClickListener listener = v -> {
