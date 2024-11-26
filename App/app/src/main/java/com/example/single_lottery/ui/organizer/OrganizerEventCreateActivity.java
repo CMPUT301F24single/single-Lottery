@@ -223,8 +223,12 @@ public class OrganizerEventCreateActivity extends AppCompatActivity {
 
         db.collection("events").add(event).addOnSuccessListener(documentReference -> {
             Toast.makeText(this, "Event created successfully", Toast.LENGTH_SHORT).show();
+            Intent intent = new Intent(OrganizerEventCreateActivity.this, OrganizerActivity.class);
+            startActivity(intent);
+            finish(); // Optionally close this activity after redirecting
         }).addOnFailureListener(e -> {
             Toast.makeText(this, "Failed to create event", Toast.LENGTH_SHORT).show();
         });
+
     }
 }

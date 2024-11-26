@@ -319,7 +319,7 @@ public class OrganizerHomeViewEventActivity extends AppCompatActivity {
                         // Now fetch the registered users for this event's losers
                         db.collection("registered_events")
                                 .whereEqualTo("eventId", eventId)
-                                .whereEqualTo("status", "Loser")
+                                .whereEqualTo("status", "Not Selected")
                                 .get()
                                 .addOnSuccessListener(querySnapshot -> {
                                     StringBuilder losersList = new StringBuilder();
@@ -454,6 +454,68 @@ public class OrganizerHomeViewEventActivity extends AppCompatActivity {
      * @param eventId ID of the event to view cancelled users for
      */
     private void viewCancelledUsers(String eventId) {
-        // to be completed
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+
+        // First, get the event name by querying the events collection
+        db.collection("events").document(eventId).get()
+                .addOnSuccessListener(eventDocumentSnapshot -> {
+                    if (eventDocumentSnapshot.exists()) {
+                        String eventName = eventDocumentSnapshot.getString("name"); // Extract event name
+
+                        // Now fetch the cancelled users for this event (status = "Declined")
+                        db.collection("registered_events")
+                                .whereEqualTo("eventId", eventId)
+                                .whereEqualTo("status", "Declined")
+                                .get()
+                                .addOnSuccessListener(querySnapshot -> {
+                                    StringBuilder cancelledList = new StringBuilder();
+                                    for (DocumentSnapshot document : querySnapshot.getDocuments()) {
+                                        String userId = document.getString("userId");
+                                        cancelledList.append(userId).append("\n");
+                                    }
+
+                                    // Show cancelled users list in dialog with custom message input
+                                    new AlertDialog.Builder(this)
+                                            .setTitle("Cancelled Users")
+                                            .setMessage(cancelledList.toString())
+                                            .setPositiveButton("OK", null)
+                                            .setNegativeButton("Notify", (dialog, which) -> {
+                                                // Create an input dialog for custom message
+                                                AlertDialog.Builder inputDialog = new AlertDialog.Builder(this);
+                                                inputDialog.setTitle("Enter Custom Message");
+
+                                                // Set up the input field for custom message
+                                                final EditText input = new EditText(this);
+                                                inputDialog.setView(input);
+
+                                                inputDialog.setPositiveButton("Send", (dialog1, which1) -> {
+                                                    String customMessage = input.getText().toString().trim();
+
+                                                    if (!customMessage.isEmpty()) {
+                                                        // Send the notification to cancelled users with the event name in the title
+                                                        String notificationTitle = "Event Cancellation - " + eventName;  // Updated title
+                                                        NotificationActivity.sendNotification(
+                                                                OrganizerHomeViewEventActivity.this,
+                                                                notificationTitle,  // Use the dynamic event name in the title
+                                                                customMessage
+                                                        );
+                                                        Toast.makeText(this, "Notification sent to cancelled users.", Toast.LENGTH_SHORT).show();
+                                                    } else {
+                                                        Toast.makeText(this, "Message cannot be empty.", Toast.LENGTH_SHORT).show();
+                                                    }
+                                                });
+
+                                                inputDialog.setNegativeButton("Cancel", null);
+
+                                                // Show the input dialog
+                                                inputDialog.show();
+                                            })
+                                            .show();
+                                })
+                                .addOnFailureListener(e -> Toast.makeText(this, "Failed to load cancelled users.", Toast.LENGTH_SHORT).show());
+                    }
+                })
+                .addOnFailureListener(e -> Toast.makeText(this, "Failed to load event name.", Toast.LENGTH_SHORT).show());
     }
+
 }
