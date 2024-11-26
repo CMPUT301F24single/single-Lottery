@@ -19,6 +19,8 @@ import com.example.single_lottery.ui.scan.QRScannerActivity;
 import com.example.single_lottery.ui.user.home.UserHomeDetailActivity;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.database.annotations.Nullable;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
 import com.journeyapps.barcodescanner.ScanContract;
 import com.journeyapps.barcodescanner.ScanOptions;
 
@@ -88,7 +90,23 @@ public class HomeFragment extends Fragment {
      * Updates RecyclerView adapter with loaded events.
      */
     private void loadEventsFromDatabase() {
-        // Assume database fetching logic is implemented here.
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        db.collection("events").get().addOnSuccessListener(queryDocumentSnapshots -> {
+            if (queryDocumentSnapshots != null) {
+                eventList.clear(); // Clear previous data to avoid duplicates
+                for (DocumentSnapshot document : queryDocumentSnapshots) {
+                    EventModel event = document.toObject(EventModel.class);
+                    if (event != null) {
+                        event.setEventId(document.getId());
+                        eventList.add(event);
+                    }
+                }
+                userHomeAdapter.notifyDataSetChanged(); // Notify the adapter that data has changed
+                Log.d("HomeFragment", "Events loaded successfully.");
+            }
+        }).addOnFailureListener(e -> {
+            Log.e("HomeFragment", "Failed to load events from database", e);
+        });
     }
 
     /**
