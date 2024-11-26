@@ -80,7 +80,7 @@ public class OrganizerQRCode extends AppCompatActivity {
         String qrCodeId = UUID.randomUUID().toString();
         try {
             QRCodeWriter qrCodeWriter = new QRCodeWriter();
-            String qrCodeContent = "{ \"eventId\": \"" + eventId + "\", \"qrCodeId\": \"" + qrCodeId + "\", \"type\": \"Signup\" }";
+            String qrCodeContent = eventId;
             BitMatrix bitMatrix = qrCodeWriter.encode(qrCodeContent, BarcodeFormat.QR_CODE, 600, 600);
             BarcodeEncoder barcodeEncoder = new BarcodeEncoder();
             Bitmap bitmap = barcodeEncoder.createBitmap(bitMatrix);
