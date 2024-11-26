@@ -1,25 +1,52 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="horizontal"
-    android:padding="16dp">
+    android:padding="8dp">
 
-    <!-- Event Name TextView -->
-    <TextView
-        android:id="@+id/eventNameTextView"
+    <!-- Container for Event Name and Lottery Date -->
+    <LinearLayout
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:text="Event Name"
-        android:textSize="18sp"
-        android:textStyle="bold"
-        android:layout_weight="1" />
+        android:orientation="vertical"
+        android:layout_weight="1">
+
+        <!-- Event Name TextView -->
+        <TextView
+            android:id="@+id/eventNameTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/event_name"
+            android:textSize="17sp"
+            android:textStyle="bold" />
+
+        <!-- Lottery Date -->
+        <TextView
+            android:id="@+id/lotteryDate"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/lottery_date"
+            android:textSize="12sp"
+            android:layout_marginTop="4dp" />
+
+    </LinearLayout>
+
+    <ImageView
+        android:id="@+id/event_alert"
+        android:layout_width="20dp"
+        android:layout_height="20dp"
+        android:layout_marginEnd="8dp"
+        android:layout_gravity="center_vertical"
+        android:src="@drawable/event_alert"
+        android:visibility="gone" />
 
     <!-- View Details Button -->
     <Button
         android:id="@+id/viewButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="View Details" />
+        android:text="@string/view_details" />
 
 </LinearLayout>

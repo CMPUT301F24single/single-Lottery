@@ -2,32 +2,38 @@
 package com.example.single_lottery;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.Toast;
+import android.Manifest;
 
 import com.example.single_lottery.ui.admin.AdminActivity;
 import com.example.single_lottery.ui.admin.AdminLoginActivity;
 import com.example.single_lottery.ui.organizer.OrganizerActivity;
 
 import com.example.single_lottery.ui.user.UserActivity;
-import com.google.firebase.FirebaseApp;
-import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.appcheck.FirebaseAppCheck;
-import com.google.firebase.appcheck.debug.DebugAppCheckProviderFactory;
 
+
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 /**
  * Main entry point activity for Single Lottery application.
@@ -39,6 +45,7 @@ import java.util.Locale;
 public class MainActivity extends AppCompatActivity {
 
     private boolean showLandingScreen;
+    private static final int REQUEST_CODE = 100;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,6 +61,7 @@ public class MainActivity extends AppCompatActivity {
             Button buttonUser = findViewById(R.id.button_user);
             Button buttonOrganizer = findViewById(R.id.button_organizer);
             Button buttonAdmin = findViewById(R.id.button_admin);
+            //ImageView event_alert = findViewById(R.id.event_alert);
 
             // Set up button click listeners
             View.OnClickListener listener = v -> {
@@ -81,7 +89,70 @@ public class MainActivity extends AppCompatActivity {
             buttonOrganizer.setOnClickListener(listener);
             buttonAdmin.setOnClickListener(listener);
         }
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            if (checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
+                requestPermissions(new String[]{Manifest.permission.POST_NOTIFICATIONS}, REQUEST_CODE);
+            }
+        }
+
+        getFirebaseMessagingToken();
     }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == REQUEST_CODE) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                Log.d("Permission", "Notification permission granted.");
+            } else {
+                Log.d("Permission", "Notification permission denied.");
+                Toast.makeText(this, "You need to grant notification permission to use Single Lottery.", Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
+
+    private void getFirebaseMessagingToken() {
+        FirebaseMessaging.getInstance().getToken()
+               .addOnCompleteListener(task -> {
+                   if (!task.isSuccessful()) {
+                       Log.d("MainActivity","Fetching FCM registration token failed",task.getException());
+                       return;
+                   }
+                   
+                   String token = task.getResult();
+                   Log.d("MainActivity","FCM Token: " + token);
+
+                   storeTokenInFirestore(token);
+                });  
+    }
+
+    private void storeTokenInFirestore(String token) {
+        FirebaseFirestore firestore = FirebaseFirestore.getInstance();
+        
+        FirebaseInstallations.getInstance().getId()
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        String installationId = task.getResult();
+                        Log.d("MainActivity", "Installation ID: " + installationId);
+
+                        Map<String, Object> tokenData = new HashMap<>();
+                        tokenData.put("fcm_token", token);
+
+                        firestore.collection("users").document(installationId)
+                                .set(tokenData, SetOptions.merge())
+                                .addOnSuccessListener(aVoid -> Log.d("MainActivity", "Token successfully saved to Firestore!"))
+                                .addOnFailureListener(e -> Log.e("MainActivity", "Error saving token to Firestore", e));
+                        firestore.collection("organizers").document(installationId)
+                                .set(tokenData, SetOptions.merge())
+                                .addOnSuccessListener(aVoid -> Log.d("MainActivity", "Token successfully saved to Firestore!"))
+                                .addOnFailureListener(e -> Log.e("MainActivity", "Error saving token to Firestore", e));
+                    } else {
+                        Log.w("MainActivity", "Failed to get installation ID");
+                    }
+                });
+    }
+
 
     /**
      * Checks all events and performs lottery draws if deadline is reached.

@@ -6,15 +6,32 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:padding="8dp">
 
-    <!-- Event Name TextView -->
-    <TextView
-        android:id="@+id/eventNameTextView"
+    <!-- Container for Event Name and Lottery Date -->
+    <LinearLayout
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:text="Event Name"
-        android:textSize="17sp"
-        android:textStyle="bold"
-        android:layout_weight="1" />
+        android:orientation="vertical"
+        android:layout_weight="1">
+
+        <!-- Event Name TextView -->
+        <TextView
+            android:id="@+id/eventNameTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Event Name"
+            android:textSize="17sp"
+            android:textStyle="bold" />
+
+        <!-- Lottery Date -->
+        <TextView
+            android:id="@+id/lotteryDate"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Lottery Date: "
+            android:textSize="12sp"
+            android:layout_marginTop="4dp" />
+
+    </LinearLayout>
 
     <!-- View Button -->
     <Button
