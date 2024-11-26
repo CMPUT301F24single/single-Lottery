@@ -37,18 +37,18 @@ public class AdminActivity extends AppCompatActivity {
         bottomNavigationView.setOnItemSelectedListener(item -> {
             Fragment selectedFragment;
 
-            // 根据选择的菜单项切换 Fragment
             if (item.getItemId() == R.id.nav_event) {
                 selectedFragment = new AdminEventFragment();
             } else if (item.getItemId() == R.id.nav_organizer) {
                 selectedFragment = new AdminOrganizerFragment();
             } else if (item.getItemId() == R.id.nav_user) {
                 selectedFragment = new AdminUserFragment();
+            } else if (item.getItemId() == R.id.nav_facility) {
+                selectedFragment = new AdminFacilityFragment(); // 新增 Facility Fragment
             } else {
                 return false;
             }
 
-            // 切换到选中的 Fragment
             getSupportFragmentManager().beginTransaction()
                     .replace(R.id.admin_fragment_container, selectedFragment)
                     .commit();
