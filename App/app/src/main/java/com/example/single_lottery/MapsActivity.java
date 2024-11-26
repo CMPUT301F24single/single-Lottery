@@ -77,7 +77,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     Log.e("MapsActivity", "Error getting documents: ", e);
                 });
     }
-    
+
     private void addMarkersToMap(ArrayList<LatLng> locations) {
         if (locations != null && !locations.isEmpty()) {
             for (LatLng location : locations) {

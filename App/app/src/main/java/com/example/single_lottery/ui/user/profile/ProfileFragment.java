@@ -331,15 +331,15 @@ public class ProfileFragment extends Fragment {
      * Creates or updates existing user document.
      *
      * @param installationId Device installation identifier
-     * @param profileImageUri Storage URL of profile image
+     * @param profileImageUrl Storage URL of profile image
      */
-    private void saveUserDataToFirestore(String installationId, String profileImageUri) {
+    private void saveUserDataToFirestore(String installationId, String profileImageUrl) {
         if (installationId == null) {
             Log.e("ProfileFragment", "installationId is null");
             return;
         }
 
-        User user = new User(userName, userEmail, userPhone, profileImageUri);
+        User user = new User(userName, userEmail, userPhone, profileImageUrl);
         firestore.collection("users")
                 .document(installationId) 
                 .set(user)
