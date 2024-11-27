@@ -46,8 +46,8 @@ public class OrganizerHomeViewEventActivity extends AppCompatActivity {
     private TextView textViewEventName, textViewEventTime, textViewRegistrationDeadline,
             textViewLotteryTime, textViewWaitingListCount, textViewLotteryCount, textViewEventDescription;
     private ImageView imageViewPoster;
+    private TextView textViewEventFacility; // new
     private Button buttonViewWaitingList, buttonViewWinners, buttonViewLosers, buttonViewCancelledUsers, buttonViewAcceptedUsers, buttonGenerateQRCode;
-
     /**
      * Initializes the event viewing interface and sets up:
      * - UI component references
@@ -83,6 +83,7 @@ public class OrganizerHomeViewEventActivity extends AppCompatActivity {
         // Initialize back button
         textViewEventName = findViewById(R.id.textViewEventName);
         textViewEventDescription = findViewById(R.id.textViewEventDescription);
+        textViewEventFacility = findViewById(R.id.textViewEventFacility); // new
         textViewEventTime = findViewById(R.id.textViewEventTime);
         textViewRegistrationDeadline = findViewById(R.id.textViewRegistrationDeadline);
         textViewLotteryTime = findViewById(R.id.textViewLotteryTime);
@@ -94,6 +95,7 @@ public class OrganizerHomeViewEventActivity extends AppCompatActivity {
         buttonViewLosers = findViewById(R.id.buttonViewLosers);
         buttonViewWinners = findViewById(R.id.buttonViewWinners);
         buttonViewCancelledUsers = findViewById(R.id.buttonViewCancelledUsers);
+
 
         // Get event ID from intent
         String eventId = getIntent().getStringExtra("event_id");
@@ -145,11 +147,13 @@ public class OrganizerHomeViewEventActivity extends AppCompatActivity {
                         if (event != null) {
                             textViewEventName.setText(event.getName());
                             textViewEventDescription.setText(event.getDescription());
+                            textViewEventFacility.setText(event.getFacility());
                             textViewEventTime.setText(event.getTime());
                             textViewRegistrationDeadline.setText(event.getRegistrationDeadline());
                             textViewLotteryTime.setText(event.getLotteryTime());
                             textViewWaitingListCount.setText(String.valueOf(event.getWaitingListCount()));
                             textViewLotteryCount.setText(String.valueOf(event.getLotteryCount()));
+
 
                             // Use Glide to display event posters
                             if (event.getPosterUrl() != null) {
@@ -354,7 +358,7 @@ public class OrganizerHomeViewEventActivity extends AppCompatActivity {
                                                                 OrganizerHomeViewEventActivity.this,
                                                                 notificationTitle,  // Use the dynamic event name in the title
                                                                 customMessage,
-                                                                "Losers"
+                                                                "Not Selected"
                                                         );
                                                         Toast.makeText(this, "Notification sent to losers.", Toast.LENGTH_SHORT).show();
                                                     } else {
@@ -428,7 +432,7 @@ public class OrganizerHomeViewEventActivity extends AppCompatActivity {
                                                                 OrganizerHomeViewEventActivity.this,
                                                                 notificationTitle,  // Use the dynamic event name in the title
                                                                 customMessage,
-                                                                "Accepted Users"
+                                                                "Accepted"
                                                         );
                                                         Toast.makeText(this, "Notification sent to accepted users.", Toast.LENGTH_SHORT).show();
                                                     } else {
@@ -502,7 +506,7 @@ public class OrganizerHomeViewEventActivity extends AppCompatActivity {
                                                                 OrganizerHomeViewEventActivity.this,
                                                                 notificationTitle,  // Use the dynamic event name in the title
                                                                 customMessage,
-                                                                "Cancelled Users"
+                                                                "Declined"
                                                         );
                                                         Toast.makeText(this, "Notification sent to cancelled users.", Toast.LENGTH_SHORT).show();
                                                     } else {

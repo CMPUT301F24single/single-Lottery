@@ -12,9 +12,23 @@ import android.widget.Toast;
 import android.Manifest;
 
 import com.example.single_lottery.ui.admin.AdminActivity;
+import com.example.single_lottery.ui.admin.AdminLoginActivity;
 import com.example.single_lottery.ui.organizer.OrganizerActivity;
 
 import com.example.single_lottery.ui.user.UserActivity;
+
+import com.google.firebase.FirebaseApp;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.appcheck.FirebaseAppCheck;
+import com.google.firebase.appcheck.debug.DebugAppCheckProviderFactory;
+
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.SetOptions;
 import com.google.firebase.installations.FirebaseInstallations;
@@ -53,6 +67,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         scheduleLotteryWorker();
 
+
         // Check if the initial landing screen is displayed
         showLandingScreen = getIntent().getBooleanExtra("showLandingScreen", true);
 
@@ -64,23 +79,27 @@ public class MainActivity extends AppCompatActivity {
             Button buttonAdmin = findViewById(R.id.button_admin);
             //ImageView event_alert = findViewById(R.id.event_alert);
 
-            // Lottery check when any button is clicked
+            // Set up button click listeners
             View.OnClickListener listener = v -> {
                 OneTimeWorkRequest lotteryWorkRequest = new OneTimeWorkRequest.Builder(LotteryWorker.class).build();
                 WorkManager.getInstance(this).enqueue(lotteryWorkRequest);
 
-                // Jump to different activities based on the button clicked
-                Intent intent;
+                Intent intent = null;
+
                 if (v.getId() == R.id.button_user) {
                     intent = new Intent(MainActivity.this, UserActivity.class);
                 } else if (v.getId() == R.id.button_organizer) {
                     intent = new Intent(MainActivity.this, OrganizerActivity.class);
-                } else {
-                    intent = new Intent(MainActivity.this, AdminActivity.class);
+                } else if (v.getId() == R.id.button_admin) {
+                    // Admin Login verification
+                    intent = new Intent(MainActivity.this, AdminLoginActivity.class);
                 }
-                intent.putExtra("showLandingScreen", false);
-                startActivity(intent);
-                finish();
+
+                if (intent != null) {
+                    intent.putExtra("showLandingScreen", false);
+                    startActivity(intent);
+                    finish();
+                }
             };
 
             buttonUser.setOnClickListener(listener);
@@ -156,8 +175,95 @@ public class MainActivity extends AppCompatActivity {
         PeriodicWorkRequest lotteryWorkRequest = new PeriodicWorkRequest.Builder(LotteryWorker.class,
                 15, TimeUnit.MINUTES // Check every 15 mins
         ).build();
+    /**
+     * Checks all events and performs lottery draws if deadline is reached.
+     * Verifies lottery time and triggers draw for eligible events.
+     */
+    private void performLotteryCheck() {
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+
+        db.collection("events")
+                .get()
+                .addOnSuccessListener(queryDocumentSnapshots -> {
+                    for (DocumentSnapshot document : queryDocumentSnapshots.getDocuments()) {
+                        String eventId = document.getId();
+                        String lotteryTime = document.getString("lotteryTime");
+                        int lotteryCount = document.getLong("lotteryCount").intValue();
+
+                        // Check if the lottery time has arrived
+                        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault());
+                        try {
+                            Date lotteryDate = dateFormat.parse(lotteryTime);
+                            Date currentDate = new Date();
+                            if (currentDate.after(lotteryDate)) {
+                                checkIfAlreadyDrawn(eventId, lotteryCount);
+                            }
+                        } catch (ParseException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                })
+                .addOnFailureListener(e -> Log.e("MainActivity", "Error checking lottery time", e));
+    }
+
+    /**
+     * Verifies if lottery has already been performed for an event.
+     *
+     * @param eventId      Event to check
+     * @param lotteryCount Number of winners to select
+     */
+    private void checkIfAlreadyDrawn(String eventId, int lotteryCount) {
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
 
         WorkManager.getInstance(this).enqueue(lotteryWorkRequest);
     }
 
+}
+    /**
+     * Executes lottery draw for an event.
+     * Randomly selects winners, updates participant status,
+     * and notifies users of results.
+     *
+     * @param eventId      Event to perform lottery for
+     * @param lotteryCount Number of winners to select
+     */
+    private void performLottery(String eventId, int lotteryCount) {
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+
+        db.collection("registered_events")
+                .whereEqualTo("eventId", eventId)
+                .get()
+                .addOnSuccessListener(queryDocumentSnapshots -> {
+                    if (!queryDocumentSnapshots.isEmpty()) {
+                        List<DocumentSnapshot> registeredUsers = queryDocumentSnapshots.getDocuments();
+                        int winnersCount = Math.min(registeredUsers.size(), lotteryCount);
+
+                        // Random draw logic
+                        Collections.shuffle(registeredUsers); // Randomly shuffle registered users
+                        List<DocumentSnapshot> winners = registeredUsers.subList(0, winnersCount);
+
+                        // Update winner status
+                        for (DocumentSnapshot winnerDoc : winners) {
+                            db.collection("registered_events").document(winnerDoc.getId())
+                                    .update("status", "Winner")
+                                    .addOnSuccessListener(aVoid -> Log.d("Lottery", "User " + winnerDoc.getString("userId") + " has won the lottery"))
+                                    .addOnFailureListener(e -> Log.e("Lottery", "Failed to update winner status", e));
+                        }
+
+                        // Update non-winner status
+                        List<DocumentSnapshot> losers = registeredUsers.subList(winnersCount, registeredUsers.size());
+                        for (DocumentSnapshot loserDoc : losers) {
+                            db.collection("registered_events").document(loserDoc.getId())
+                                    .update("status", "Not Selected")
+                                    .addOnSuccessListener(aVoid -> Log.d("Lottery", "User " + loserDoc.getString("userId") + " did not win"))
+                                    .addOnFailureListener(e -> Log.e("Lottery", "Failed to update loser status", e));
+                        }
+
+                        Toast.makeText(this, "Lottery completed. Winners have been selected.", Toast.LENGTH_SHORT).show();
+                    } else {
+                        Log.d("Lottery", "No users registered for event " + eventId);
+                    }
+                })
+                .addOnFailureListener(e -> Log.e("Lottery", "Error performing lottery", e));
+    }
 }

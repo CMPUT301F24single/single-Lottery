@@ -72,6 +72,8 @@ public class OrganizerEventCreateActivity extends AppCompatActivity {
     private EditText eventNameEditText, eventDescriptionEditText, waitingListCountEditText, lotteryCountEditText;
     private TextView eventTimeTextView, registrationDeadlineTextView, lotteryTimeTextView, selectedEventTimeTextView, selectedRegistrationDeadlineTextView, selectedLotteryTimeTextView;  // 改为 TextView
     private Uri posterUri;
+    private EditText eventFacilityEditText; // New
+
 
     private FirebaseFirestore db;
     private StorageReference storageRef;
@@ -93,6 +95,7 @@ public class OrganizerEventCreateActivity extends AppCompatActivity {
         eventPosterImageView = findViewById(R.id.eventPosterImageView);
         eventNameEditText = findViewById(R.id.eventNameEditText);
         eventDescriptionEditText = findViewById(R.id.eventDescriptionEditText);
+        eventFacilityEditText = findViewById(R.id.eventFacilityEditText); // new
         eventTimeTextView = findViewById(R.id.eventTimeTextView);  // 改为 TextView
         registrationDeadlineTextView = findViewById(R.id.registrationDeadlineTextView);  // 改为 TextView
         waitingListCountEditText = findViewById(R.id.waitingListCountEditText);
@@ -155,6 +158,7 @@ public class OrganizerEventCreateActivity extends AppCompatActivity {
         String registrationDeadline = selectedRegistrationDeadlineTextView.getText().toString().trim();
         String lotteryTime = selectedLotteryTimeTextView.getText().toString().trim();
         String eventDescription = eventDescriptionEditText.getText().toString().trim();
+        String facility = eventFacilityEditText.getText().toString().trim();//new
 
         // Get device code
         String organizerDeviceID = Settings.Secure.getString(getContentResolver(), Settings.Secure.ANDROID_ID);
@@ -163,6 +167,13 @@ public class OrganizerEventCreateActivity extends AppCompatActivity {
         if (eventName.isEmpty() || eventTime.isEmpty() || registrationDeadline.isEmpty() || lotteryTime.isEmpty()) {
             Toast.makeText(this, "Please fill in all required fields", Toast.LENGTH_SHORT).show();
             Log.d("OrganizerEventCreateActivity", "Required fields are missing");
+            return;
+        }
+
+        // new
+        if (facility.isEmpty()) {
+            Toast.makeText(this, "Please fill in the event facility", Toast.LENGTH_SHORT).show();
+            Log.d("OrganizerEventCreateActivity", "Facility field is missing");
             return;
         }
 
@@ -195,7 +206,7 @@ public class OrganizerEventCreateActivity extends AppCompatActivity {
             posterRef.putFile(posterUri).addOnSuccessListener(taskSnapshot ->
                     posterRef.getDownloadUrl().addOnSuccessListener(uri -> {
                         Log.d("OrganizerEventCreateActivity", "Poster uploaded, URL: " + uri.toString());
-                        saveEventData(uri.toString(), eventName, eventTime, registrationDeadline, lotteryTime, waitingListCount, lotteryCount, organizerDeviceID, eventDescription);
+                        saveEventData(uri.toString(), eventName, eventTime, registrationDeadline, lotteryTime, waitingListCount, lotteryCount, organizerDeviceID, eventDescription,facility);
                     })
             ).addOnFailureListener(e -> {
                 Toast.makeText(this, "Failed to upload poster", Toast.LENGTH_SHORT).show();
@@ -203,13 +214,13 @@ public class OrganizerEventCreateActivity extends AppCompatActivity {
             });
         } else {
             Log.d("OrganizerEventCreateActivity", "No poster, saving event data directly");
-            saveEventData(null, eventName, eventTime, registrationDeadline, lotteryTime, waitingListCount, lotteryCount, organizerDeviceID, eventDescription);
+            saveEventData(null, eventName, eventTime, registrationDeadline, lotteryTime, waitingListCount, lotteryCount, organizerDeviceID, eventDescription, facility);
         }
     }
 
     private void saveEventData(String posterUrl, String eventName, String eventTime,
                                String registrationDeadline, String lotteryTime,
-                               int waitingListCount, int lotteryCount, String organizerDeviceID, String eventDescription) {
+                               int waitingListCount, int lotteryCount, String organizerDeviceID, String eventDescription, String facility) {
         Map<String, Object> event = new HashMap<>();
         event.put("name", eventName);
         event.put("time", eventTime);
@@ -221,6 +232,7 @@ public class OrganizerEventCreateActivity extends AppCompatActivity {
         event.put("organizerDeviceID", organizerDeviceID);
         event.put("description", eventDescription);
         event.put("drawnStatus", false);
+        event.put("facility", facility); //new
 
         db.collection("events").add(event).addOnSuccessListener(documentReference -> {
             Toast.makeText(this, "Event created successfully", Toast.LENGTH_SHORT).show();

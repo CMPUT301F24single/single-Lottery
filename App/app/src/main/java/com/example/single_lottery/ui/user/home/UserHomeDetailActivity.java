@@ -52,6 +52,8 @@ public class UserHomeDetailActivity extends AppCompatActivity {
     private String eventId;
     private String registrationDeadline;
     private static final int LOCATION_PERMISSION_REQUEST_CODE = 100;
+    private TextView textViewEventFacility; // new
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -71,6 +73,7 @@ public class UserHomeDetailActivity extends AppCompatActivity {
 
         textViewEventName = findViewById(R.id.textViewEventName);
         textViewEventDescription = findViewById(R.id.textViewEventDescription);
+        textViewEventFacility = findViewById(R.id.textViewEventFacility); // new
         textViewEventTime = findViewById(R.id.textViewEventTime);
         textViewRegistrationDeadline = findViewById(R.id.textViewRegistrationDeadline);
         textViewLotteryTime = findViewById(R.id.textViewLotteryTime);
@@ -99,6 +102,7 @@ public class UserHomeDetailActivity extends AppCompatActivity {
                         if (event != null) {
                             textViewEventName.setText(event.getName());
                             textViewEventDescription.setText(event.getDescription());
+                            textViewEventFacility.setText(event.getFacility());
                             textViewEventTime.setText(event.getTime());
                             textViewRegistrationDeadline.setText(event.getRegistrationDeadline());
                             textViewLotteryTime.setText(event.getLotteryTime());
