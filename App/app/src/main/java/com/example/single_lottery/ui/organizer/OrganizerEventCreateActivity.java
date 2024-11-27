@@ -232,6 +232,7 @@ public class OrganizerEventCreateActivity extends AppCompatActivity {
         event.put("organizerDeviceID", organizerDeviceID);
         event.put("description", eventDescription);
         event.put("facility", facility); //new
+        event.put("drawnStatus", false);
 
         db.collection("events").add(event).addOnSuccessListener(documentReference -> {
             Toast.makeText(this, "Event created successfully", Toast.LENGTH_SHORT).show();
