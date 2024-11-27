@@ -2,10 +2,13 @@
 agp = "8.7.2"
 compiler = "4.12.0"
 core = "3.3.0"
+coreVersion = "3.4.1"
 firebaseAnalytics = "22.1.2"
 firebaseAuth = "23.1.0"
 firebaseBom = "33.5.0"
+firebaseBomVersion = "33.6.0"
 firebaseInstallations = "18.0.0"
+firebaseMessaging = "24.1.0"
 firebaseStorage = "21.0.1"
 glide = "4.12.0"
 junit = "4.13.2"
@@ -30,14 +33,19 @@ firebaseAppcheckDebug = "18.0.0"
 [libraries]
 compiler = { module = "com.github.bumptech.glide:compiler", version.ref = "compiler" }
 core = { module = "com.google.zxing:core", version.ref = "core" }
+core-v341 = { module = "com.google.zxing:core", version.ref = "coreVersion" }
 firebase-analytics = { module = "com.google.firebase:firebase-analytics", version.ref = "firebaseAnalytics" }
+firebase-appcheck = { module = "com.google.firebase:firebase-appcheck" }
 firebase-auth = { module = "com.google.firebase:firebase-auth", version.ref = "firebaseAuth" }
 firebase-bom = { module = "com.google.firebase:firebase-bom", version.ref = "firebaseBom" }
+firebase-bom-v3360 = { module = "com.google.firebase:firebase-bom", version.ref = "firebaseBomVersion" }
 firebase-database-ktx = { module = "com.google.firebase:firebase-database-ktx" }
 firebase-firestore = { module = "com.google.firebase:firebase-firestore" }
 firebase-installations = { module = "com.google.firebase:firebase-installations", version.ref = "firebaseInstallations" }
+firebase-messaging = { module = "com.google.firebase:firebase-messaging", version.ref = "firebaseMessaging" }
 firebase-storage = { module = "com.google.firebase:firebase-storage", version.ref = "firebaseStorage" }
 glide = { module = "com.github.bumptech.glide:glide", version.ref = "glide" }
+google-firebase-auth = { module = "com.google.firebase:firebase-auth" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 ext-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
 espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCore" }

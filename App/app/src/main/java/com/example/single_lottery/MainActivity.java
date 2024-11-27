@@ -111,7 +111,6 @@ public class MainActivity extends AppCompatActivity {
             }
         }
 
-        getFirebaseMessagingToken();
     }
 
     @Override
@@ -125,47 +124,6 @@ public class MainActivity extends AppCompatActivity {
                 Toast.makeText(this, "You need to grant notification permission to use Single Lottery.", Toast.LENGTH_SHORT).show();
             }
         }
-    }
-
-    private void getFirebaseMessagingToken() {
-        FirebaseMessaging.getInstance().getToken()
-                .addOnCompleteListener(task -> {
-                    if (!task.isSuccessful()) {
-                        Log.d("MainActivity","Fetching FCM registration token failed",task.getException());
-                        return;
-                    }
-
-                    String token = task.getResult();
-                    Log.d("MainActivity","FCM Token: " + token);
-
-                    storeTokenInFirestore(token);
-                });
-    }
-
-    private void storeTokenInFirestore(String token) {
-        FirebaseFirestore firestore = FirebaseFirestore.getInstance();
-
-        FirebaseInstallations.getInstance().getId()
-                .addOnCompleteListener(task -> {
-                    if (task.isSuccessful()) {
-                        String installationId = task.getResult();
-                        Log.d("MainActivity", "Installation ID: " + installationId);
-
-                        Map<String, Object> tokenData = new HashMap<>();
-                        tokenData.put("fcm_token", token);
-
-                        firestore.collection("users").document(installationId)
-                                .set(tokenData, SetOptions.merge())
-                                .addOnSuccessListener(aVoid -> Log.d("MainActivity", "Token successfully saved to Firestore!"))
-                                .addOnFailureListener(e -> Log.e("MainActivity", "Error saving token to Firestore", e));
-                        firestore.collection("organizers").document(installationId)
-                                .set(tokenData, SetOptions.merge())
-                                .addOnSuccessListener(aVoid -> Log.d("MainActivity", "Token successfully saved to Firestore!"))
-                                .addOnFailureListener(e -> Log.e("MainActivity", "Error saving token to Firestore", e));
-                    } else {
-                        Log.w("MainActivity", "Failed to get installation ID");
-                    }
-                });
     }
 
 
