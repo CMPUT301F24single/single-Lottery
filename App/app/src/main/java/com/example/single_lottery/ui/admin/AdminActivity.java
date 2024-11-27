@@ -58,4 +58,5 @@ public class AdminActivity extends AppCompatActivity {
                     .commit();
             return true;
         });
+    }
 }

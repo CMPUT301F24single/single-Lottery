@@ -106,7 +106,8 @@ public class ProfileFragment extends Fragment {
                 userEmail = task.getResult().getString("email");
                 userPhone = task.getResult().getString("phone");
                 String profileImageUrl = task.getResult().getString("profileImageUrl");
-                updateUserDetails(profileImageUrl);
+                updateUserDetails();
+                updateImage(profileImageUrl);
             }
         }).addOnFailureListener(e -> {
             Log.e("ProfileFragment", "failed to load user profile: " + e.getMessage());
@@ -116,13 +117,14 @@ public class ProfileFragment extends Fragment {
     /**
      * Updates the UI components with user profile information.
      * Handles profile image loading and placeholder generation.
-     *
-     * @param profileImageUrl URL of user's profile image in Firebase Storage
      */
-    private void updateUserDetails(String profileImageUrl) {
+    private void updateUserDetails() {
         nameTextView.setText(userName);
         emailTextView.setText(userEmail);
         phoneTextView.setText(userPhone);
+    }
+
+    private void updateImage(String profileImageUrl) {
         if (profileImageUrl != null) {
             Glide.with(this)
                     .load(profileImageUrl)
@@ -189,7 +191,7 @@ public class ProfileFragment extends Fragment {
                     userName = nameInput.getText().toString().trim();
                     userEmail = emailInput.getText().toString().trim();
                     userPhone = phoneInput.getText().toString().trim();
-                    updateUserDetails(null);
+                    updateUserDetails();
                     saveUserDataToFirestore(installationId, null);
                 })
                 .setNegativeButton("cancel", (dialog, which) -> dialog.dismiss());
@@ -331,15 +333,15 @@ public class ProfileFragment extends Fragment {
      * Creates or updates existing user document.
      *
      * @param installationId Device installation identifier
-     * @param profileImageUrl Storage URL of profile image
+     * @param profileImageUri Storage URL of profile image
      */
-    private void saveUserDataToFirestore(String installationId, String profileImageUrl) {
+    private void saveUserDataToFirestore(String installationId, String profileImageUri) {
         if (installationId == null) {
             Log.e("ProfileFragment", "installationId is null");
             return;
         }
 
-        User user = new User(userName, userEmail, userPhone, profileImageUrl);
+        User user = new User(userName, userEmail, userPhone, profileImageUri);
         firestore.collection("users")
                 .document(installationId) 
                 .set(user)

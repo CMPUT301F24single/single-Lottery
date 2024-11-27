@@ -80,13 +80,6 @@
 
         <activity android:name=".ui.admin.AdminUserDetailActivity" />
 
-        <service
-            android:name=".ui.notification.MyFireBaseMessagingService"
-            android:exported="false">
-            <intent-filter>
-                <action android:name="com.google.firebase.MESSAGING_EVENT"/>
-            </intent-filter>
-        </service>
         <meta-data
             android:name="com.google.firebase.messaging.default_notification_channel_id"
             android:value="notification_channel" />

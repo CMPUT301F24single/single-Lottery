@@ -180,8 +180,7 @@ public class OrganizerProfilePageFragment extends Fragment {
                     organizerEmail = emailInput.getText().toString().trim();
                     organizerPhone = phoneInput.getText().toString().trim();
                     companyInfo = infoInput.getText().toString().trim();
-                    updateOrganizerDetails(null); // 更新界面
-                    // 保存数据时保持图片 URL
+                    updateOrganizerDetails(null);
                     saveOrganizerDataToFirestore(installationId, profileImageUri != null ? profileImageUri.toString() : null);
                 })
                 .setNegativeButton("cancel", (dialog, which) -> dialog.dismiss());
@@ -233,10 +232,10 @@ public class OrganizerProfilePageFragment extends Fragment {
                             uploadNewImage();
                         }).addOnFailureListener(e -> {
                             Log.e("OrgProfileFragment", "Failed to delete old image: " + e.getMessage());
-                            uploadNewImage(); // 尝试上传新图片
+                            uploadNewImage();
                         });
                     } else {
-                        uploadNewImage(); // 如果没有旧图像，则直接上传
+                        uploadNewImage();
                     }
                 }
             }).addOnFailureListener(e -> {

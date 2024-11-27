@@ -26,7 +26,6 @@ import com.google.firebase.appcheck.debug.DebugAppCheckProviderFactory;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
-import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -39,12 +38,18 @@ import com.example.single_lottery.LotteryWorker;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.net.ParseException;
 import androidx.work.PeriodicWorkRequest;
 import androidx.work.WorkManager;
 import androidx.work.OneTimeWorkRequest;
-import androidx.work.WorkManager;
 
+
+import java.text.SimpleDateFormat;
+import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
@@ -112,8 +117,6 @@ public class MainActivity extends AppCompatActivity {
                 requestPermissions(new String[]{Manifest.permission.POST_NOTIFICATIONS}, REQUEST_CODE);
             }
         }
-
-        getFirebaseMessagingToken();
     }
 
     @Override
@@ -127,47 +130,6 @@ public class MainActivity extends AppCompatActivity {
                 Toast.makeText(this, "You need to grant notification permission to use Single Lottery.", Toast.LENGTH_SHORT).show();
             }
         }
-    }
-
-    private void getFirebaseMessagingToken() {
-        FirebaseMessaging.getInstance().getToken()
-               .addOnCompleteListener(task -> {
-                   if (!task.isSuccessful()) {
-                       Log.d("MainActivity","Fetching FCM registration token failed",task.getException());
-                       return;
-                   }
-                   
-                   String token = task.getResult();
-                   Log.d("MainActivity","FCM Token: " + token);
-
-                   storeTokenInFirestore(token);
-                });  
-    }
-
-    private void storeTokenInFirestore(String token) {
-        FirebaseFirestore firestore = FirebaseFirestore.getInstance();
-        
-        FirebaseInstallations.getInstance().getId()
-                .addOnCompleteListener(task -> {
-                    if (task.isSuccessful()) {
-                        String installationId = task.getResult();
-                        Log.d("MainActivity", "Installation ID: " + installationId);
-
-                        Map<String, Object> tokenData = new HashMap<>();
-                        tokenData.put("fcm_token", token);
-
-                        firestore.collection("users").document(installationId)
-                                .set(tokenData, SetOptions.merge())
-                                .addOnSuccessListener(aVoid -> Log.d("MainActivity", "Token successfully saved to Firestore!"))
-                                .addOnFailureListener(e -> Log.e("MainActivity", "Error saving token to Firestore", e));
-                        firestore.collection("organizers").document(installationId)
-                                .set(tokenData, SetOptions.merge())
-                                .addOnSuccessListener(aVoid -> Log.d("MainActivity", "Token successfully saved to Firestore!"))
-                                .addOnFailureListener(e -> Log.e("MainActivity", "Error saving token to Firestore", e));
-                    } else {
-                        Log.w("MainActivity", "Failed to get installation ID");
-                    }
-                });
     }
 
 
@@ -214,7 +176,6 @@ public class MainActivity extends AppCompatActivity {
      */
     private void checkIfAlreadyDrawn(String eventId, int lotteryCount) {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
-
         WorkManager.getInstance(this).enqueue(lotteryWorkRequest);
     }
 
