@@ -2,12 +2,14 @@
 package com.example.single_lottery;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.Toast;
 import android.Manifest;
 
@@ -32,11 +34,10 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.SetOptions;
 import com.google.firebase.installations.FirebaseInstallations;
 import com.google.firebase.messaging.FirebaseMessaging;
-import com.example.single_lottery.LotteryWorker;
-
 
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.net.ParseException;
 import androidx.work.PeriodicWorkRequest;
@@ -50,10 +51,9 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.List;
+import java.util.Locale;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
-
-
 
 /**
  * Main entry point activity for Single Lottery application.
@@ -70,7 +70,6 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        scheduleLotteryWorker();
 
 
         // Check if the initial landing screen is displayed
@@ -86,8 +85,7 @@ public class MainActivity extends AppCompatActivity {
 
             // Set up button click listeners
             View.OnClickListener listener = v -> {
-                OneTimeWorkRequest lotteryWorkRequest = new OneTimeWorkRequest.Builder(LotteryWorker.class).build();
-                WorkManager.getInstance(this).enqueue(lotteryWorkRequest);
+                performLotteryCheck(); // Perform draw check
 
                 Intent intent = null;
 
@@ -130,6 +128,47 @@ public class MainActivity extends AppCompatActivity {
                 Toast.makeText(this, "You need to grant notification permission to use Single Lottery.", Toast.LENGTH_SHORT).show();
             }
         }
+    }
+
+    private void getFirebaseMessagingToken() {
+        FirebaseMessaging.getInstance().getToken()
+               .addOnCompleteListener(task -> {
+                   if (!task.isSuccessful()) {
+                       Log.d("MainActivity","Fetching FCM registration token failed",task.getException());
+                       return;
+                   }
+                   
+                   String token = task.getResult();
+                   Log.d("MainActivity","FCM Token: " + token);
+
+                   storeTokenInFirestore(token);
+                });  
+    }
+
+    private void storeTokenInFirestore(String token) {
+        FirebaseFirestore firestore = FirebaseFirestore.getInstance();
+        
+        FirebaseInstallations.getInstance().getId()
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        String installationId = task.getResult();
+                        Log.d("MainActivity", "Installation ID: " + installationId);
+
+                        Map<String, Object> tokenData = new HashMap<>();
+                        tokenData.put("fcm_token", token);
+
+                        firestore.collection("users").document(installationId)
+                                .set(tokenData, SetOptions.merge())
+                                .addOnSuccessListener(aVoid -> Log.d("MainActivity", "Token successfully saved to Firestore!"))
+                                .addOnFailureListener(e -> Log.e("MainActivity", "Error saving token to Firestore", e));
+                        firestore.collection("organizers").document(installationId)
+                                .set(tokenData, SetOptions.merge())
+                                .addOnSuccessListener(aVoid -> Log.d("MainActivity", "Token successfully saved to Firestore!"))
+                                .addOnFailureListener(e -> Log.e("MainActivity", "Error saving token to Firestore", e));
+                    } else {
+                        Log.w("MainActivity", "Failed to get installation ID");
+                    }
+                });
     }
 
 
@@ -180,6 +219,22 @@ public class MainActivity extends AppCompatActivity {
     }
 
 }
+
+        db.collection("registered_events")
+                .whereEqualTo("eventId", eventId)
+                .whereEqualTo("status", "Winner") // Check if there is already a record with "Winner" status
+                .get()
+                .addOnSuccessListener(querySnapshot -> {
+                    if (querySnapshot.isEmpty()) {
+                        // If there is no record with "Winner" status, execute the lottery
+                        performLottery(eventId, lotteryCount);
+                    } else {
+                        Log.d("MainActivity", "Lottery already performed for event: " + eventId);
+                    }
+                })
+                .addOnFailureListener(e -> Log.e("MainActivity", "Error checking if lottery already drawn", e));
+    }
+
     /**
      * Executes lottery draw for an event.
      * Randomly selects winners, updates participant status,
