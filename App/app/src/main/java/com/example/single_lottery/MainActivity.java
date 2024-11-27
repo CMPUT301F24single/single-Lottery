@@ -2,14 +2,12 @@
 package com.example.single_lottery;
 
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
-import android.widget.ImageView;
 import android.widget.Toast;
 import android.Manifest;
 
@@ -35,20 +33,22 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.SetOptions;
 import com.google.firebase.installations.FirebaseInstallations;
 import com.google.firebase.messaging.FirebaseMessaging;
+import com.example.single_lottery.LotteryWorker;
+
 
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.work.PeriodicWorkRequest;
+import androidx.work.WorkManager;
+import androidx.work.OneTimeWorkRequest;
+import androidx.work.WorkManager;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Collections;
-import java.util.Date;
 import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
+
+
 
 /**
  * Main entry point activity for Single Lottery application.
@@ -65,6 +65,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        scheduleLotteryWorker();
 
 
         // Check if the initial landing screen is displayed
@@ -80,7 +81,8 @@ public class MainActivity extends AppCompatActivity {
 
             // Set up button click listeners
             View.OnClickListener listener = v -> {
-                performLotteryCheck(); // Perform draw check
+                OneTimeWorkRequest lotteryWorkRequest = new OneTimeWorkRequest.Builder(LotteryWorker.class).build();
+                WorkManager.getInstance(this).enqueue(lotteryWorkRequest);
 
                 Intent intent = null;
 
@@ -169,6 +171,10 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
+    private void scheduleLotteryWorker() {
+        PeriodicWorkRequest lotteryWorkRequest = new PeriodicWorkRequest.Builder(LotteryWorker.class,
+                15, TimeUnit.MINUTES // Check every 15 mins
+        ).build();
     /**
      * Checks all events and performs lottery draws if deadline is reached.
      * Verifies lottery time and triggers draw for eligible events.
@@ -209,21 +215,10 @@ public class MainActivity extends AppCompatActivity {
     private void checkIfAlreadyDrawn(String eventId, int lotteryCount) {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
 
-        db.collection("registered_events")
-                .whereEqualTo("eventId", eventId)
-                .whereEqualTo("status", "Winner") // Check if there is already a record with "Winner" status
-                .get()
-                .addOnSuccessListener(querySnapshot -> {
-                    if (querySnapshot.isEmpty()) {
-                        // If there is no record with "Winner" status, execute the lottery
-                        performLottery(eventId, lotteryCount);
-                    } else {
-                        Log.d("MainActivity", "Lottery already performed for event: " + eventId);
-                    }
-                })
-                .addOnFailureListener(e -> Log.e("MainActivity", "Error checking if lottery already drawn", e));
+        WorkManager.getInstance(this).enqueue(lotteryWorkRequest);
     }
 
+}
     /**
      * Executes lottery draw for an event.
      * Randomly selects winners, updates participant status,

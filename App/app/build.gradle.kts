@@ -64,6 +64,8 @@ dependencies {
     implementation("com.journeyapps:zxing-android-embedded:4.3.0")
     implementation(libs.firebase.appcheck.debug)
     implementation("com.google.android.material:material:1.9.0")
+    implementation("androidx.work:work-runtime-ktx:2.8.0")
+
     annotationProcessor(libs.compiler)
     implementation(libs.picasso)
     testImplementation(libs.junit)

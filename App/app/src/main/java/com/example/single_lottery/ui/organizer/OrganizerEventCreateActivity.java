@@ -231,6 +231,7 @@ public class OrganizerEventCreateActivity extends AppCompatActivity {
         event.put("posterUrl", posterUrl);
         event.put("organizerDeviceID", organizerDeviceID);
         event.put("description", eventDescription);
+        event.put("drawnStatus", false);
         event.put("facility", facility); //new
 
         db.collection("events").add(event).addOnSuccessListener(documentReference -> {
