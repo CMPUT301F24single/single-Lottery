@@ -28,6 +28,7 @@ import com.google.firebase.appcheck.debug.DebugAppCheckProviderFactory;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -39,18 +40,12 @@ import com.google.firebase.messaging.FirebaseMessaging;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.net.ParseException;
-import androidx.work.PeriodicWorkRequest;
-import androidx.work.WorkManager;
-import androidx.work.OneTimeWorkRequest;
 
-
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -115,6 +110,8 @@ public class MainActivity extends AppCompatActivity {
                 requestPermissions(new String[]{Manifest.permission.POST_NOTIFICATIONS}, REQUEST_CODE);
             }
         }
+
+        getFirebaseMessagingToken();
     }
 
     @Override
@@ -132,22 +129,22 @@ public class MainActivity extends AppCompatActivity {
 
     private void getFirebaseMessagingToken() {
         FirebaseMessaging.getInstance().getToken()
-               .addOnCompleteListener(task -> {
-                   if (!task.isSuccessful()) {
-                       Log.d("MainActivity","Fetching FCM registration token failed",task.getException());
-                       return;
-                   }
-                   
-                   String token = task.getResult();
-                   Log.d("MainActivity","FCM Token: " + token);
+                .addOnCompleteListener(task -> {
+                    if (!task.isSuccessful()) {
+                        Log.d("MainActivity","Fetching FCM registration token failed",task.getException());
+                        return;
+                    }
 
-                   storeTokenInFirestore(token);
-                });  
+                    String token = task.getResult();
+                    Log.d("MainActivity","FCM Token: " + token);
+
+                    storeTokenInFirestore(token);
+                });
     }
 
     private void storeTokenInFirestore(String token) {
         FirebaseFirestore firestore = FirebaseFirestore.getInstance();
-        
+
         FirebaseInstallations.getInstance().getId()
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
@@ -172,10 +169,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    private void scheduleLotteryWorker() {
-        PeriodicWorkRequest lotteryWorkRequest = new PeriodicWorkRequest.Builder(LotteryWorker.class,
-                15, TimeUnit.MINUTES // Check every 15 mins
-        ).build();
     /**
      * Checks all events and performs lottery draws if deadline is reached.
      * Verifies lottery time and triggers draw for eligible events.
@@ -215,10 +208,6 @@ public class MainActivity extends AppCompatActivity {
      */
     private void checkIfAlreadyDrawn(String eventId, int lotteryCount) {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
-        WorkManager.getInstance(this).enqueue(lotteryWorkRequest);
-    }
-
-}
 
         db.collection("registered_events")
                 .whereEqualTo("eventId", eventId)
