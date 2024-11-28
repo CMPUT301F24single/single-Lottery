@@ -42,6 +42,7 @@ public class UserEventDetailActivity extends AppCompatActivity {
     private String eventTime;
     private String eventId;
     private String userId;
+    private TextView eventFacilityTextView; // new
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,11 +62,17 @@ public class UserEventDetailActivity extends AppCompatActivity {
         lotteryCountTextView = findViewById(R.id.lotteryCountTextView);
         eventDescriptionTextView = findViewById(R.id.eventDescriptionTextView);
         eventStatusValueTextView = findViewById(R.id.eventStatusValueTextView);
+        eventFacilityTextView = findViewById(R.id.eventFacilityTextView);
         cancelRegistrationButton = findViewById(R.id.cancelRegistrationButton);
         acceptButton = findViewById(R.id.acceptButton);
         declineButton = findViewById(R.id.declineButton);
 
         eventId = getIntent().getStringExtra("event_id");
+        if (eventId == null) {
+            Toast.makeText(this, "Event ID not found", Toast.LENGTH_SHORT).show();
+            finish();
+            return;
+        }
         userId = Settings.Secure.getString(getContentResolver(), Settings.Secure.ANDROID_ID);
 
         loadEventDetails(eventId);
@@ -89,6 +96,7 @@ public class UserEventDetailActivity extends AppCompatActivity {
                     if (documentSnapshot.exists()) {
                         String eventName = documentSnapshot.getString("name");
                         String eventDescription = documentSnapshot.getString("description");
+                        String eventFacility = documentSnapshot.getString("facility");
                         eventTime = documentSnapshot.getString("time"); // 获取活动时间
                         registrationDeadline = documentSnapshot.getString("registrationDeadline");
                         lotteryTime = documentSnapshot.getString("lotteryTime");
@@ -102,6 +110,7 @@ public class UserEventDetailActivity extends AppCompatActivity {
                         waitingListCountTextView.setText(waitingListCount);
                         lotteryCountTextView.setText(lotteryCount);
                         eventDescriptionTextView.setText(eventDescription);
+                        eventFacilityTextView.setText(eventFacility);
 
                         String posterUrl = documentSnapshot.getString("posterUrl");
                         if (posterUrl != null && !posterUrl.isEmpty()) {
@@ -242,7 +251,27 @@ public class UserEventDetailActivity extends AppCompatActivity {
                             db.collection("registered_events").document(document.getId()).delete()
                                     .addOnSuccessListener(aVoid -> {
                                         Toast.makeText(this, "Registration canceled", Toast.LENGTH_SHORT).show();
-                                        finish();
+    
+                                        db.collection("user_locations")
+                                                .whereEqualTo("userId", userId) 
+                                                .get()
+                                                .addOnSuccessListener(locationQuerySnapshot -> {
+                                                    if (!locationQuerySnapshot.isEmpty()) {
+                                                        for (DocumentSnapshot locationDocument : locationQuerySnapshot.getDocuments()) {
+                                                            db.collection("user_locations").document(locationDocument.getId()).delete()
+                                                                    .addOnSuccessListener(aVoid1 -> {
+                                                                        Log.d("UserEventDetailActivity", "User location deleted successfully.");
+                                                                    })
+                                                                    .addOnFailureListener(e -> {
+                                                                        Toast.makeText(this, "Failed to delete user location", Toast.LENGTH_SHORT).show();
+                                                                        Log.e("UserEventDetailActivity", "Error deleting user location", e);
+                                                                    });
+                                                        }
+                                                    }
+                                                })
+                                                .addOnFailureListener(e -> Log.e("UserEventDetailActivity", "Error querying user location", e));
+    
+                                        finish(); 
                                     })
                                     .addOnFailureListener(e -> Toast.makeText(this, "Failed to cancel registration", Toast.LENGTH_SHORT).show());
                         }

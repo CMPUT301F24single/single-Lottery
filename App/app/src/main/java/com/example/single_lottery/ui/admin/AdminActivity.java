@@ -6,9 +6,11 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.Fragment;
 
 import com.example.single_lottery.MainActivity;
 import com.example.single_lottery.R;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 /**
  * Activity class for the admin interface that provides administrative functions and management features.
@@ -22,43 +24,39 @@ import com.example.single_lottery.R;
 
 public class AdminActivity extends AppCompatActivity {
 
-    /**
-     * Initializes the admin interface and sets up the necessary components.
-     * This method is called when the activity is first created.
-     *
-     * @param savedInstanceState If the activity is being re-initialized after previously being shut down,
-     *                          this Bundle contains the data it most recently supplied.
-     *                          Otherwise it is null.
-     * @see Bundle
-     * @see AppCompatActivity#onCreate(Bundle)
-     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.admin_homepage); // Set the layout for the admin homepage
-    }
+        setContentView(R.layout.admin_homepage);
 
-    // Inflate the menu in the action bar
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu_actionbar, menu); // Ensure you have the correct menu XML
-        return true;
-    }
+        BottomNavigationView bottomNavigationView = findViewById(R.id.admin_nav_bottom_navigation);
 
-    // Handle the item selection in the action bar
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        int id = item.getItemId();
-
-        if (id == R.id.action_return) {
-            // Return to homepage when the icon is clicked
-            Intent intent = new Intent(AdminActivity.this, MainActivity.class);
-            intent.putExtra("showLandingScreen", true); // Optionally pass extra to show the landing screen
-            startActivity(intent);
-            finish();  // Optionally finish the current activity
-            return true;
+        // 默认加载 AdminEventFragment
+        if (savedInstanceState == null) {
+            getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.admin_fragment_container, new AdminEventFragment())
+                    .commit();
         }
 
-        return super.onOptionsItemSelected(item);
+        bottomNavigationView.setOnItemSelectedListener(item -> {
+            Fragment selectedFragment;
+
+            if (item.getItemId() == R.id.nav_event) {
+                selectedFragment = new AdminEventFragment();
+            } else if (item.getItemId() == R.id.nav_organizer) {
+                selectedFragment = new AdminOrganizerFragment();
+            } else if (item.getItemId() == R.id.nav_user) {
+                selectedFragment = new AdminUserFragment();
+            } else if (item.getItemId() == R.id.nav_facility) {
+                selectedFragment = new AdminFacilityFragment(); // 新增 Facility Fragment
+            } else {
+                return false;
+            }
+
+            getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.admin_fragment_container, selectedFragment)
+                    .commit();
+            return true;
+        });
     }
 }
