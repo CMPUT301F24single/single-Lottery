@@ -157,6 +157,13 @@
                 android:textColor="@android:color/black" />
         </LinearLayout>
 
+        <Switch
+            android:id="@+id/locationRequirementSwitch"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Require Location Access"/>
+
+
         <Button
             android:id="@+id/createEventButton"
             android:layout_width="match_parent"

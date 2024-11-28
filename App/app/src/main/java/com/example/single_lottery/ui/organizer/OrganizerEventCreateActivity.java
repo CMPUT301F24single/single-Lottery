@@ -13,6 +13,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.Toolbar;
@@ -73,6 +74,7 @@ public class OrganizerEventCreateActivity extends AppCompatActivity {
     private TextView eventTimeTextView, registrationDeadlineTextView, lotteryTimeTextView, selectedEventTimeTextView, selectedRegistrationDeadlineTextView, selectedLotteryTimeTextView;  // 改为 TextView
     private Uri posterUri;
     private EditText eventFacilityEditText; // New
+    private Switch locationRequirementSwitch;
 
 
     private FirebaseFirestore db;
@@ -104,6 +106,7 @@ public class OrganizerEventCreateActivity extends AppCompatActivity {
         selectedEventTimeTextView = findViewById(R.id.selectedEventTimeTextView);  // 改为 TextView
         selectedRegistrationDeadlineTextView = findViewById(R.id.selectedRegistrationDeadlineTextView);  // 改为 TextView
         selectedLotteryTimeTextView = findViewById(R.id.selectedLotteryTimeTextView);  // 改为 TextView
+        locationRequirementSwitch = findViewById(R.id.locationRequirementSwitch);
 
         Button uploadPosterButton = findViewById(R.id.uploadPosterButton);
         Button createEventButton = findViewById(R.id.createEventButton);
@@ -159,6 +162,7 @@ public class OrganizerEventCreateActivity extends AppCompatActivity {
         String lotteryTime = selectedLotteryTimeTextView.getText().toString().trim();
         String eventDescription = eventDescriptionEditText.getText().toString().trim();
         String facility = eventFacilityEditText.getText().toString().trim();//new
+        boolean requiresLocation = locationRequirementSwitch.isChecked();
 
         // Get device code
         String organizerDeviceID = Settings.Secure.getString(getContentResolver(), Settings.Secure.ANDROID_ID);
@@ -206,7 +210,7 @@ public class OrganizerEventCreateActivity extends AppCompatActivity {
             posterRef.putFile(posterUri).addOnSuccessListener(taskSnapshot ->
                     posterRef.getDownloadUrl().addOnSuccessListener(uri -> {
                         Log.d("OrganizerEventCreateActivity", "Poster uploaded, URL: " + uri.toString());
-                        saveEventData(uri.toString(), eventName, eventTime, registrationDeadline, lotteryTime, waitingListCount, lotteryCount, organizerDeviceID, eventDescription,facility);
+                        saveEventData(uri.toString(), eventName, eventTime, registrationDeadline, lotteryTime, waitingListCount, lotteryCount, organizerDeviceID, eventDescription, facility, requiresLocation);
                     })
             ).addOnFailureListener(e -> {
                 Toast.makeText(this, "Failed to upload poster", Toast.LENGTH_SHORT).show();
@@ -214,13 +218,13 @@ public class OrganizerEventCreateActivity extends AppCompatActivity {
             });
         } else {
             Log.d("OrganizerEventCreateActivity", "No poster, saving event data directly");
-            saveEventData(null, eventName, eventTime, registrationDeadline, lotteryTime, waitingListCount, lotteryCount, organizerDeviceID, eventDescription, facility);
+            saveEventData(null, eventName, eventTime, registrationDeadline, lotteryTime, waitingListCount, lotteryCount, organizerDeviceID, eventDescription, facility, requiresLocation);
         }
     }
 
     private void saveEventData(String posterUrl, String eventName, String eventTime,
                                String registrationDeadline, String lotteryTime,
-                               int waitingListCount, int lotteryCount, String organizerDeviceID, String eventDescription, String facility) {
+                               int waitingListCount, int lotteryCount, String organizerDeviceID, String eventDescription, String facility, boolean requiresLocation) {
         Map<String, Object> event = new HashMap<>();
         event.put("name", eventName);
         event.put("time", eventTime);
@@ -233,6 +237,7 @@ public class OrganizerEventCreateActivity extends AppCompatActivity {
         event.put("description", eventDescription);
         event.put("facility", facility); //new
         event.put("drawnStatus", false);
+        event.put("requiresLocation", requiresLocation);
 
         db.collection("events").add(event).addOnSuccessListener(documentReference -> {
             Toast.makeText(this, "Event created successfully", Toast.LENGTH_SHORT).show();

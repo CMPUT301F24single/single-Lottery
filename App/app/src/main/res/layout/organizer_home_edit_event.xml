@@ -183,6 +183,11 @@
                     android:inputType="textMultiLine"
                     android:layout_marginStart="8dp" />
 
+                <Switch
+                    android:id="@+id/locationRequirementSwitch"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Require Location Access"/>
 
                 <Button
                     android:id="@+id/buttonUpdateEvent"

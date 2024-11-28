@@ -78,6 +78,13 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:textSize="17sp"/>
+                    <TextView
+                        android:id="@+id/textViewLocationRequirement"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Location is required: No"
+                        android:textSize="16sp"
+                        android:layout_marginTop="16dp"/>
                 </LinearLayout>
 
                 <!-- Event Facility -->

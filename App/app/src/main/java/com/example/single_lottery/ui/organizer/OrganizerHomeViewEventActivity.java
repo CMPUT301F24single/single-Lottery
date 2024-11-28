@@ -47,6 +47,7 @@ public class OrganizerHomeViewEventActivity extends AppCompatActivity {
             textViewLotteryTime, textViewWaitingListCount, textViewLotteryCount, textViewEventDescription;
     private ImageView imageViewPoster;
     private TextView textViewEventFacility; // new
+    private TextView textViewLocationRequirement; // new
     private Button buttonViewWaitingList, buttonViewWinners, buttonViewLosers, buttonViewCancelledUsers, buttonViewAcceptedUsers, buttonGenerateQRCode;
     /**
      * Initializes the event viewing interface and sets up:
@@ -89,6 +90,7 @@ public class OrganizerHomeViewEventActivity extends AppCompatActivity {
         textViewLotteryTime = findViewById(R.id.textViewLotteryTime);
         textViewWaitingListCount = findViewById(R.id.textViewWaitingListCount);
         textViewLotteryCount = findViewById(R.id.textViewLotteryCount);
+        textViewLocationRequirement = findViewById(R.id.textViewLocationRequirement); // Initialize loocation requirement text view
         imageViewPoster = findViewById(R.id.imageViewPoster);
         buttonViewWaitingList = findViewById(R.id.buttonViewWaitingList);
         buttonViewAcceptedUsers = findViewById(R.id.buttonViewAcceptedUsers);
@@ -153,6 +155,7 @@ public class OrganizerHomeViewEventActivity extends AppCompatActivity {
                             textViewLotteryTime.setText(event.getLotteryTime());
                             textViewWaitingListCount.setText(String.valueOf(event.getWaitingListCount()));
                             textViewLotteryCount.setText(String.valueOf(event.getLotteryCount()));
+                            textViewLocationRequirement.setText("Geolocation: " + (event.isRequiresLocation() ? "Yes" : "No"));
 
 
                             // Use Glide to display event posters
