@@ -5,10 +5,12 @@ import android.os.Bundle;
 import android.text.TextUtils;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.example.single_lottery.MainActivity;
 import com.example.single_lottery.R;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.annotations.Nullable;
@@ -31,6 +33,17 @@ public class AdminLoginActivity extends AppCompatActivity {
         emailInput = findViewById(R.id.emailInput);
         passwordInput = findViewById(R.id.passwordInput);
         loginButton = findViewById(R.id.loginButton);
+
+        // back button functionality
+        ImageButton loginBackButton = findViewById(R.id.backButton);
+        loginBackButton.setOnClickListener(v -> {
+            Intent intent = new Intent(AdminLoginActivity.this, MainActivity.class);
+            // Clear the back stack to avoid returning to the login activity after navigating back
+            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+            startActivity(intent);
+            finish(); // Optionally finish this activity
+        });
+
 
         // 登录按钮点击事件
         loginButton.setOnClickListener(v -> {

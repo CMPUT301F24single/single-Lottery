@@ -2,11 +2,13 @@ package com.example.single_lottery.ui.admin;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.MenuItem;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -53,6 +55,14 @@ public class AdminUserDetailActivity extends AppCompatActivity {
             // 删除用户按钮逻辑
             btnDeleteProfile.setOnClickListener(v -> deleteProfile(user));
         }
+    }
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        if (item.getItemId() == android.R.id.home) { // 返回按钮的 ID
+            onBackPressed(); // 返回上一页
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     // 删除用户文档逻辑

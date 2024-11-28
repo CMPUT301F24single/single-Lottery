@@ -92,9 +92,9 @@ public class AdminEventDetailActivity extends AppCompatActivity {
     }
 
     private void initViews() {
-        textViewName = findViewById(R.id.textViewName);
-        textViewDescription = findViewById(R.id.textViewDescription);
-        textViewTime = findViewById(R.id.textViewTime);
+        textViewName = findViewById(R.id.textViewEventName);
+        textViewDescription = findViewById(R.id.textViewEventDescription);
+        textViewTime = findViewById(R.id.textViewEventTime);
         textViewRegistrationDeadline = findViewById(R.id.textViewRegistrationDeadline);
         textViewLotteryTime = findViewById(R.id.textViewLotteryTime);
         textViewWaitingListCount = findViewById(R.id.textViewWaitingListCount);

@@ -14,116 +14,209 @@
             android:layout_width="match_parent"
             android:layout_height="200dp"
             android:scaleType="centerCrop"
-            android:contentDescription="Event Poster" />
+            android:contentDescription="Event Poster"
+            android:background="@color/backgroundGrey"/>
 
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Event:"
-            android:textStyle="bold"
-            android:layout_marginTop="8dp" />
-
-        <TextView
-            android:id="@+id/textViewName"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:textSize="18sp" />
-
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Description:"
-            android:textStyle="bold"
-            android:layout_marginTop="8dp" />
-
-        <TextView
-            android:id="@+id/textViewDescription"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
-
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Time:"
-            android:textStyle="bold"
-            android:layout_marginTop="8dp" />
-
-        <TextView
-            android:id="@+id/textViewTime"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
-
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Registration Deadline:"
-            android:textStyle="bold"
-            android:layout_marginTop="8dp" />
-
-        <TextView
-            android:id="@+id/textViewRegistrationDeadline"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
-
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Lottery Time:"
-            android:textStyle="bold"
-            android:layout_marginTop="8dp" />
-
-        <TextView
-            android:id="@+id/textViewLotteryTime"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
-
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Waiting List Count:"
-            android:textStyle="bold"
-            android:layout_marginTop="8dp" />
-
-        <TextView
-            android:id="@+id/textViewWaitingListCount"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
-
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Lottery Count:"
-            android:textStyle="bold"
-            android:layout_marginTop="8dp" />
-
-        <TextView
-            android:id="@+id/textViewLotteryCount"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
-
+        <!-- Delete Poster button -->
         <Button
             android:id="@+id/buttonDeletePoster"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
+            android:layout_marginTop="8dp"
             android:text="Delete Poster"
             android:textColor="@android:color/white"
             android:layout_gravity="center_horizontal" />
 
-        <Button
-            android:id="@+id/buttonDeleteEvent"
+        <!-- Event Details Container with Padding -->
+        <LinearLayout
+            android:layout_marginTop="8dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:text="Delete Event"
-            android:backgroundTint="@color/purple_500"
-            android:textColor="@android:color/white" />
-        <Button
-            android:id="@+id/buttonDeleteQRCode"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Delete QR Code"
-            android:layout_marginTop="16dp" />
+            android:orientation="vertical"
+            android:background="@drawable/rounded_corners_grey"
+            android:padding="12dp">
 
-    </LinearLayout>
-</ScrollView>
+            <!-- Event Name -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginStart="8dp">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Event: "
+                    android:textStyle="bold"
+                    android:textSize="17sp"/>
+                <TextView
+                    android:id="@+id/textViewEventName"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:textSize="17sp"/>
+            </LinearLayout>
+
+            <!-- Event Description -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_marginStart="8dp">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Description: "
+                    android:textStyle="bold"
+                    android:textSize="17sp"/>
+                <TextView
+                    android:id="@+id/textViewEventDescription"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textSize="17sp"/>
+                <TextView
+                    android:id="@+id/textViewLocationRequirement"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Location is required: No"
+                    android:textSize="16sp"
+                    android:layout_marginTop="16dp"/>
+            </LinearLayout>
+
+            <!-- Event Facility -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_marginStart="8dp">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Facility: "
+                    android:textStyle="bold"
+                    android:textSize="17sp"/>
+                <TextView
+                    android:id="@+id/textViewEventFacility"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textSize="17sp"/>
+            </LinearLayout>
+
+
+            <!-- Event Time -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginStart="8dp">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Time: "
+                    android:textStyle="bold"
+                    android:textSize="17sp"/>
+                <TextView
+                    android:id="@+id/textViewEventTime"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:textSize="17sp"/>
+            </LinearLayout>
+
+            <!-- Registration Deadline -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginStart="8dp">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Registration Deadline: "
+                    android:textStyle="bold"
+                    android:textSize="17sp"/>
+                <TextView
+                    android:id="@+id/textViewRegistrationDeadline"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:textSize="17sp"/>
+            </LinearLayout>
+
+            <!-- Waiting List Count -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginStart="8dp">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Waiting List Count: "
+                    android:textStyle="bold"
+                    android:textSize="17sp"/>
+                <TextView
+                    android:id="@+id/textViewWaitingListCount"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:textSize="17sp"/>
+            </LinearLayout>
+
+            <!-- Lottery Time -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginStart="8dp">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Lottery Time: "
+                    android:textStyle="bold"
+                    android:textSize="17sp"/>
+                <TextView
+                    android:id="@+id/textViewLotteryTime"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:textSize="17sp"/>
+            </LinearLayout>
+
+            <!-- Lottery Count -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginStart="8dp">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Lottery Count:"
+                    android:textStyle="bold"
+                    android:textSize="17sp"/>
+                <TextView
+                    android:id="@+id/textViewLotteryCount"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:textSize="17sp"/>
+            </LinearLayout>
+        </LinearLayout>
+
+    <!-- Buttons for Deleting Event and QR Code -->
+    <Button
+        android:id="@+id/buttonDeleteEvent"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Delete Event"
+        android:layout_marginTop="8dp"
+        android:backgroundTint="@color/purple_500"
+        android:textColor="@android:color/white" />
+
+    <Button
+        android:id="@+id/buttonDeleteQRCode"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Delete QR Code" />
+</LinearLayout>
+    </ScrollView>

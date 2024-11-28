@@ -43,19 +43,19 @@ public class AdminOrganizerDetailActivity extends AppCompatActivity {
         profileImageUrl = getIntent().getStringExtra("organizerProfileImageUrl");
 
         // 初始化视图
-        TextView textViewName = findViewById(R.id.textViewOrganizerName);
-        TextView textViewEmail = findViewById(R.id.textViewOrganizerEmail);
-        TextView textViewPhone = findViewById(R.id.textViewOrganizerPhone);
-        TextView textViewInfo = findViewById(R.id.textViewOrganizerInfo);
+        TextView textViewName = findViewById(R.id.nameTextView);
+        TextView textViewEmail = findViewById(R.id.emailTextView);
+        TextView textViewPhone = findViewById(R.id.phoneTextView);
+        TextView textViewInfo = findViewById(R.id.infoTextView);
         ImageView imageViewProfile = findViewById(R.id.imageViewOrganizerProfile);
         Button buttonDeleteAvatar = findViewById(R.id.buttonDeleteAvatar);
         Button buttonDeleteProfile = findViewById(R.id.buttonDeleteProfile);
 
         // 设置值
-        textViewName.setText("Name: " + organizerName);
-        textViewEmail.setText("Email: " + organizerEmail);
-        textViewPhone.setText("Phone: " + organizerPhone);
-        textViewInfo.setText("Info: " + organizerInfo);
+        textViewName.setText(organizerName);
+        textViewEmail.setText(organizerEmail);
+        textViewPhone.setText(organizerPhone);
+        textViewInfo.setText(organizerInfo);
 
         if (profileImageUrl != null && !profileImageUrl.isEmpty()) {
             Glide.with(this).load(profileImageUrl).into(imageViewProfile);
