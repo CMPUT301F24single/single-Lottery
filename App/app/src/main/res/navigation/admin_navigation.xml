@@ -1,26 +1,31 @@
 <?xml version="1.0" encoding="utf-8"?>
-<menu xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
-    <item
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/admin_navigatin"
+    app:startDestination="@+id/nav_event">
+
+    <fragment
         android:id="@+id/nav_event"
-        android:icon="@drawable/ic_event"
-        android:title="Event"
-        app:showAsAction="ifRoom" />
-    <item
+        android:name="com.example.single_lottery.ui.admin.AdminEventFragment"
+        android:label="Event"
+        tools:layout="@layout/fragment_admin_event" />
+
+    <fragment
         android:id="@+id/nav_organizer"
-        android:icon="@drawable/ic_profile"
-        android:title="Organizer"
-        app:showAsAction="ifRoom" />
+        android:name="com.example.single_lottery.ui.admin.AdminOrganizerFragment"
+        android:label="Organizer"
+        tools:layout="@layout/fragment_admin_organizer" />
 
-    <item
+    <fragment
         android:id="@+id/nav_facility"
-        android:icon="@drawable/ic_profile"
-        android:title="Facility"
-        app:showAsAction="ifRoom" />
+        android:name="com.example.single_lottery.ui.admin.AdminFacilityFragment"
+        android:label="Facility"
+        tools:layout="@layout/fragment_admin_facility" />
 
-    <item
+    <fragment
         android:id="@+id/nav_user"
-        android:icon="@drawable/ic_profile"
-        android:title="User"
-        app:showAsAction="ifRoom" />
-</menu>
+        android:name="com.example.single_lottery.ui.admin.AdminUserFragment"
+        android:label="User"
+        tools:layout="@layout/fragment_admin_user" />
+</navigation>

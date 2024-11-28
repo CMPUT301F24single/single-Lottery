@@ -9,6 +9,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -41,6 +42,13 @@ public class AdminFacilityFragment extends Fragment {
 
         facilityAdapter = new AdminFacilityAdapter(facilitiesWithEvents, this::deleteEventsByFacility);
         recyclerView.setAdapter(facilityAdapter);
+
+        // Add DividerItemDecoration (for dividing list of events)
+        DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(
+                recyclerView.getContext(),
+                LinearLayoutManager.VERTICAL
+        );
+        recyclerView.addItemDecoration(dividerItemDecoration);
 
         loadFacilitiesFromFirestore();
 

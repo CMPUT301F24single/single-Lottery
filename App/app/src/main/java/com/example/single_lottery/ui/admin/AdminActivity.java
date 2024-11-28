@@ -1,5 +1,6 @@
 package com.example.single_lottery.ui.admin;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
@@ -10,6 +11,7 @@ import androidx.fragment.app.Fragment;
 
 import com.example.single_lottery.MainActivity;
 import com.example.single_lottery.R;
+import com.example.single_lottery.ui.organizer.OrganizerActivity;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 /**
@@ -58,5 +60,30 @@ public class AdminActivity extends AppCompatActivity {
                     .commit();
             return true;
         });
+    }
+
+
+    // Inflate the menu in the action bar
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_actionbar, menu);
+        return true;
+    }
+
+    // Handle the item selection in the action bar
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+
+        if (id == R.id.action_return) {
+            // Return to homepage when the icon is clicked
+            Intent intent = new Intent(AdminActivity.this, MainActivity.class);
+            intent.putExtra("showLandingScreen", true); // Ensure you have the landing screen logic in MainActivity
+            startActivity(intent);
+            finish();  // Optionally finish the current activity
+            return true;
+        }
+
+        return super.onOptionsItemSelected(item);
     }
 }

@@ -12,6 +12,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -44,6 +45,13 @@ public class AdminUserFragment extends Fragment {
         userList = new ArrayList<>();
         userAdapter = new AdminUserAdapter(requireContext(), userList);
         recyclerView.setAdapter(userAdapter);
+
+        // Add DividerItemDecoration (for dividing list of events)
+        DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(
+                recyclerView.getContext(),
+                LinearLayoutManager.VERTICAL
+        );
+        recyclerView.addItemDecoration(dividerItemDecoration);
 
 
         db = FirebaseFirestore.getInstance();
