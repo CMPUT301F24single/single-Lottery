@@ -10,6 +10,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -34,6 +35,13 @@ public class AdminOrganizerFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_admin_organizer, container, false);
         recyclerView = view.findViewById(R.id.recyclerViewOrganizers);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+
+        // Add DividerItemDecoration (for dividing list of events)
+        DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(
+                recyclerView.getContext(),
+                LinearLayoutManager.VERTICAL
+        );
+        recyclerView.addItemDecoration(dividerItemDecoration);
 
         adapter = new AdminOrganizerAdapter(getContext(), organizerList, organizer -> {
             Intent intent = new Intent(getContext(), AdminOrganizerDetailActivity.class);

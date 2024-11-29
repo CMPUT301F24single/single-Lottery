@@ -9,6 +9,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -38,6 +39,13 @@ public class AdminEventFragment extends Fragment {
         eventList = new ArrayList<>();
         eventAdapter = new AdminEventAdapter(getContext(), eventList);
         recyclerView.setAdapter(eventAdapter);
+
+        // Add DividerItemDecoration (for dividing list of events)
+        DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(
+                recyclerView.getContext(),
+                LinearLayoutManager.VERTICAL
+        );
+        recyclerView.addItemDecoration(dividerItemDecoration);
 
         loadEventData();
 
