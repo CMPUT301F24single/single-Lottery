@@ -71,7 +71,7 @@ public class LotteryWorker extends Worker {
                 .addOnSuccessListener(eventSnapshot -> {
                     if (eventSnapshot.exists()) {
                         Boolean drawn = eventSnapshot.getBoolean("drawnStatus"); // Fetch the 'drawn' field
-                        if (!drawn) {
+                        if (Boolean.FALSE.equals(drawn)) {
                             // Lottery hasn't been drawn yet, proceed to perform the lottery
                             performLottery(eventId, lotteryCount);
                         } else {
