@@ -40,7 +40,7 @@ import java.util.UUID;
  * Fragment for managing user profile and data in the Single Lottery application.
  * Handles profile information display, editing capabilities and image management.
  *
- * @author [Jingyao Gu]
+ * @author [Haorui Gao]
  * @version 1.0
  */
 public class ProfileFragment extends Fragment {
@@ -106,7 +106,8 @@ public class ProfileFragment extends Fragment {
                 userEmail = task.getResult().getString("email");
                 userPhone = task.getResult().getString("phone");
                 String profileImageUrl = task.getResult().getString("profileImageUrl");
-                updateUserDetails(profileImageUrl);
+                updateUserDetails();
+                updateImage(profileImageUrl);
             }
         }).addOnFailureListener(e -> {
             Log.e("ProfileFragment", "failed to load user profile: " + e.getMessage());
@@ -116,13 +117,14 @@ public class ProfileFragment extends Fragment {
     /**
      * Updates the UI components with user profile information.
      * Handles profile image loading and placeholder generation.
-     *
-     * @param profileImageUrl URL of user's profile image in Firebase Storage
      */
-    private void updateUserDetails(String profileImageUrl) {
+    private void updateUserDetails() {
         nameTextView.setText(userName);
         emailTextView.setText(userEmail);
         phoneTextView.setText(userPhone);
+    }
+
+    private void updateImage(String profileImageUrl) {
         if (profileImageUrl != null) {
             Glide.with(this)
                     .load(profileImageUrl)
@@ -189,7 +191,7 @@ public class ProfileFragment extends Fragment {
                     userName = nameInput.getText().toString().trim();
                     userEmail = emailInput.getText().toString().trim();
                     userPhone = phoneInput.getText().toString().trim();
-                    updateUserDetails(null);
+                    updateUserDetails();
                     saveUserDataToFirestore(installationId, null);
                 })
                 .setNegativeButton("cancel", (dialog, which) -> dialog.dismiss());

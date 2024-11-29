@@ -11,12 +11,6 @@
         android:label="@string/title_home"
         tools:layout="@layout/fragment_home" />
 
-    <fragment
-        android:id="@+id/CameraFragment"
-        android:name="com.example.single_lottery.ui.scan.CameraFragment"
-        android:label="Camera Fragment" />
-
-
 
     <fragment
         android:id="@+id/navigation_dashboard"

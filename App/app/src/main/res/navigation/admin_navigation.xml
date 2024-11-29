@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/admin_navigatin"
+    app:startDestination="@+id/nav_event">
+
+    <fragment
+        android:id="@+id/nav_event"
+        android:name="com.example.single_lottery.ui.admin.AdminEventFragment"
+        android:label="Event"
+        tools:layout="@layout/fragment_admin_event" />
+
+    <fragment
+        android:id="@+id/nav_organizer"
+        android:name="com.example.single_lottery.ui.admin.AdminOrganizerFragment"
+        android:label="Organizer"
+        tools:layout="@layout/fragment_admin_organizer" />
+
+    <fragment
+        android:id="@+id/nav_facility"
+        android:name="com.example.single_lottery.ui.admin.AdminFacilityFragment"
+        android:label="Facility"
+        tools:layout="@layout/fragment_admin_facility" />
+
+    <fragment
+        android:id="@+id/nav_user"
+        android:name="com.example.single_lottery.ui.admin.AdminUserFragment"
+        android:label="User"
+        tools:layout="@layout/fragment_admin_user" />
+</navigation>

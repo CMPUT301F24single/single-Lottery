@@ -52,6 +52,13 @@
             android:hint="Event Description" />
 
         <EditText
+            android:id="@+id/eventFacilityEditText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Event Facility" />
+
+
+        <EditText
             android:id="@+id/waitingListCountEditText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -149,6 +156,13 @@
                 android:padding="8dp"
                 android:textColor="@android:color/black" />
         </LinearLayout>
+
+        <Switch
+            android:id="@+id/locationRequirementSwitch"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Require Location Access"/>
+
 
         <Button
             android:id="@+id/createEventButton"
