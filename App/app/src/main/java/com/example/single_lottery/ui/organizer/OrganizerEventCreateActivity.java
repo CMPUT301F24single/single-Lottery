@@ -137,19 +137,28 @@ public class OrganizerEventCreateActivity extends AppCompatActivity {
 
     private void showDateTimePicker(final TextView textView) {
         final Calendar currentDate = Calendar.getInstance();
-        Calendar date = Calendar.getInstance();
-
-        new DatePickerDialog(this, (view, year, monthOfYear, dayOfMonth) -> {
+        final Calendar date = Calendar.getInstance();
+        DatePickerDialog datePickerDialog = new DatePickerDialog(this, (view, year, monthOfYear, dayOfMonth) -> {
             date.set(year, monthOfYear, dayOfMonth);
-
-            new TimePickerDialog(this, (view1, hourOfDay, minute) -> {
+            TimePickerDialog timePickerDialog = new TimePickerDialog(this, (view1, hourOfDay, minute) -> {
+                // Check if the selected time is before the current time on the same day
+                if (year == currentDate.get(Calendar.YEAR) && monthOfYear == currentDate.get(Calendar.MONTH) && dayOfMonth == currentDate.get(Calendar.DAY_OF_MONTH) &&
+                        (hourOfDay < currentDate.get(Calendar.HOUR_OF_DAY) || (hourOfDay == currentDate.get(Calendar.HOUR_OF_DAY) && minute < currentDate.get(Calendar.MINUTE)))) {
+                    // If the selected time is before current time, use current time
+                    hourOfDay = currentDate.get(Calendar.HOUR_OF_DAY);
+                    minute = currentDate.get(Calendar.MINUTE);
+                }
                 date.set(Calendar.HOUR_OF_DAY, hourOfDay);
                 date.set(Calendar.MINUTE, minute);
                 // Format and set date and time
                 SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault());
                 textView.setText(sdf.format(date.getTime()));
-            }, currentDate.get(Calendar.HOUR_OF_DAY), currentDate.get(Calendar.MINUTE), false).show();
-        }, currentDate.get(Calendar.YEAR), currentDate.get(Calendar.MONTH), currentDate.get(Calendar.DAY_OF_MONTH)).show();
+            }, currentDate.get(Calendar.HOUR_OF_DAY), currentDate.get(Calendar.MINUTE), false);
+            timePickerDialog.show();
+        }, currentDate.get(Calendar.YEAR), currentDate.get(Calendar.MONTH), currentDate.get(Calendar.DAY_OF_MONTH));
+        // Disable dates before the current date
+        datePickerDialog.getDatePicker().setMinDate(currentDate.getTimeInMillis());
+        datePickerDialog.show();
     }
 
     private void uploadEventToFirebase() {
@@ -183,6 +192,7 @@ public class OrganizerEventCreateActivity extends AppCompatActivity {
 
         int waitingListCount;
         int lotteryCount;
+
         try {
             String waitingListStr = waitingListCountEditText.getText().toString().trim();
             String lotteryCountStr = lotteryCountEditText.getText().toString().trim();
@@ -197,9 +207,26 @@ public class OrganizerEventCreateActivity extends AppCompatActivity {
                 Log.d("OrganizerEventCreateActivity", "Lottery count exceeds waiting list count");
                 return;
             }
+            if(lotteryCount <= 0){
+                Toast.makeText(this, "Invalid lottery count.", Toast.LENGTH_SHORT).show();
+                Log.d("OrganizerEventCreateActivity", "Lottery count was <= 0.");
+                return;
+            }
         } catch (NumberFormatException e) {
             Toast.makeText(this, "Please enter valid numbers for waiting list and lottery count", Toast.LENGTH_SHORT).show();
             Log.d("OrganizerEventCreateActivity", "Invalid number format for waiting list or lottery count");
+            return;
+        }
+
+        if(!(registrationDeadline.compareTo(lotteryTime) < 0)){
+            Toast.makeText(this, "Time of lottery must come after the registration deadline.", Toast.LENGTH_SHORT).show();
+            Log.d("OrganizerEventCreateActivity", "Tried to make lottery date come before the registration date for the event.");
+            return;
+        }
+
+        if(!(lotteryTime.compareTo(eventTime) < 0)){
+            Toast.makeText(this, "Time of event must come after the time of the lottery.", Toast.LENGTH_SHORT).show();
+            Log.d("OrganizerEventCreateActivity", "Tried to make event time come before time of the lottery.");
             return;
         }
 
