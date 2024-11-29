@@ -32,13 +32,6 @@ import com.google.firebase.storage.StorageReference;
 import java.io.IOException;
 import java.util.UUID;
 
-/**
- * Fragment for managing organizer profile details and image.
- * Handles profile data storage and updates in Firebase.
- *
- * @author [Haorui Gao]
- * @version 1.0
- */
 public class OrganizerProfilePageFragment extends Fragment {
     private TextView nameTextView, emailTextView, phoneTextView, infoTextView;
     private Button editButton, uploadButton, removeImageButton;
@@ -55,14 +48,9 @@ public class OrganizerProfilePageFragment extends Fragment {
     private FirebaseStorage storage;
     private StorageReference storageReference;
 
-    /**
-     * Creates and initializes the profile page interface.
-     * Sets up Firebase connections and loads existing profile data.
-     */
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-
         View view = inflater.inflate(R.layout.fragment_organizer_profile, container, false);
 
         nameTextView = view.findViewById(R.id.nameTextView);
@@ -95,11 +83,6 @@ public class OrganizerProfilePageFragment extends Fragment {
         return view;
     }
 
-    /**
-     * Retrieves organizer profile data from Firestore using installation ID.
-     *
-     * @param installationId Unique identifier for the organizer
-     */
     private void loadOrganizerProfile(String installationId) {
         DocumentReference userDocRef = firestore.collection("users").document(installationId);
         userDocRef.get().addOnCompleteListener(userTask -> {
@@ -131,13 +114,7 @@ public class OrganizerProfilePageFragment extends Fragment {
             Log.e("OrganizerProfilePageFragment", "failed to load user profile: " + e.getMessage());
         });
     }
-    
 
-    /**
-     * Updates UI with organizer profile information.
-     *
-     * @param profileImageUrl URL of profile image, null if no image exists
-     */
     private void updateOrganizerDetails(String profileImageUrl) {
         nameTextView.setText(organizerName);
         emailTextView.setText(organizerEmail);
@@ -154,12 +131,7 @@ public class OrganizerProfilePageFragment extends Fragment {
         }
     }
 
-    /**
-     * Generates a letter avatar when no profile image is set.
-     * Creates circular avatar with user initials.
-     *
-     * @param name User's display name for initial generation
-     */
+
     private void generateLetterAvatar(String name) {
         String[] nameParts = name.split("\\s+");
         String initials = "";
@@ -187,10 +159,6 @@ public class OrganizerProfilePageFragment extends Fragment {
         profileImageView.setImageBitmap(bitmap);
     }
 
-    /**
-     * Shows dialog for editing profile information.
-     * Updates Firestore on save.
-     */
     private void showEditDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         builder.setTitle("Edit Profile");
@@ -213,7 +181,7 @@ public class OrganizerProfilePageFragment extends Fragment {
                     organizerPhone = phoneInput.getText().toString().trim();
                     companyInfo = infoInput.getText().toString().trim();
                     updateOrganizerDetails(null);
-                    saveOrganizerDataToFirestore(installationId, null);
+                    saveOrganizerDataToFirestore(installationId, profileImageUri != null ? profileImageUri.toString() : null);
                 })
                 .setNegativeButton("cancel", (dialog, which) -> dialog.dismiss());
 
@@ -227,9 +195,6 @@ public class OrganizerProfilePageFragment extends Fragment {
         startActivityForResult(Intent.createChooser(intent, "select image"), 1);
     }
 
-    /**
-     * Handles image selection result and initiates upload.
-     */
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -238,8 +203,9 @@ public class OrganizerProfilePageFragment extends Fragment {
             try {
                 Bitmap bitmap = MediaStore.Images.Media.getBitmap(getActivity().getContentResolver(), profileImageUri);
                 profileImageView.setImageBitmap(bitmap);
-                uploadProfileImage();
+                uploadProfileImage(); // 上传图片
             } catch (IOException e) {
+                Log.e("OrganizerProfilePageFragment", "Error getting bitmap: " + e.getMessage());
                 e.printStackTrace();
             }
         }
@@ -253,10 +219,6 @@ public class OrganizerProfilePageFragment extends Fragment {
         }
     }
 
-    /**
-     * Uploads new profile image to Firebase Storage.
-     * Deletes old image if exists.
-     */
     private void uploadProfileImage() {
         if (profileImageUri != null) {
             DocumentReference docRef = firestore.collection("organizers").document(installationId);
@@ -324,27 +286,21 @@ public class OrganizerProfilePageFragment extends Fragment {
         });
     }
 
-    /**
-     * Saves organizer profile data to Firestore.
-     *
-     * @param installationId Unique identifier for the organizer
-     * @param profileImageUri URI of uploaded profile image
-     */
-    private void saveOrganizerDataToFirestore(String installationId, String profileImageUri) {
+    private void saveOrganizerDataToFirestore(String installationId, String profileImageUrl) {
         if (installationId == null) {
             Log.e("OrganizerProfilePageFragment", "installationId is null");
             return;
         }
-    
-        OrganizerProfile organizerProfile = new OrganizerProfile(organizerName, organizerEmail, organizerPhone, companyInfo, profileImageUri);
-        
+
+        OrganizerProfile organizerProfile = new OrganizerProfile(organizerName, organizerEmail, organizerPhone, companyInfo, profileImageUrl);
+
         firestore.collection("users").document(installationId)
-                .set(organizerProfile)  
+                .set(organizerProfile)
                 .addOnSuccessListener(aVoid ->
                         Log.d("OrganizerProfilePageFragment", "user profile updated successfully"))
                 .addOnFailureListener(e ->
                         Log.e("OrganizerProfilePageFragment", "user profile update failed: " + e.getMessage()));
-        
+
         firestore.collection("organizers")
                 .document(installationId)
                 .set(organizerProfile)
@@ -353,5 +309,4 @@ public class OrganizerProfilePageFragment extends Fragment {
                 .addOnFailureListener(e ->
                         Log.e("OrganizerProfilePageFragment", "organizer profile update failed: " + e.getMessage()));
     }
-    
 }

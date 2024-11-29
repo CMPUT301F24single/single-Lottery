@@ -166,6 +166,29 @@
                     android:inputType="textMultiLine"
                     android:layout_marginStart="8dp"/>
 
+
+                <!-- new Event facility -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Event Facitlity"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginStart="8dp"/>
+
+                <EditText
+                    android:id="@+id/editTextEventFacility"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Enter Event Facility"
+                    android:inputType="textMultiLine"
+                    android:layout_marginStart="8dp" />
+
+                <Switch
+                    android:id="@+id/locationRequirementSwitch"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Require Location Access"/>
+
                 <Button
                     android:id="@+id/buttonUpdateEvent"
                     android:layout_width="wrap_content"
