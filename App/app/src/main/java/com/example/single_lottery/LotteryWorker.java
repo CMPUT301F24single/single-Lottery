@@ -13,6 +13,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
@@ -117,25 +118,31 @@ public class LotteryWorker extends Worker {
                                     List<DocumentSnapshot> losers = registeredUsers.subList(winnersCount, registeredUsers.size());
 
                                     // Update Firestore: mark winners and losers
+                                    List<String> winnerIds = new ArrayList<>();
+                                    List<String> loserIds = new ArrayList<>();
+
                                     for (DocumentSnapshot winner : winners) {
                                         db.collection("registered_events").document(winner.getId()).update("status", "Winner");
-                                        // Send notification to winner with event name in title
-                                        sendNotification(getApplicationContext(),
-                                                eventName + " - Lottery Results",
-                                                "Congratulations, you are a winner!",
-                                                "winner");
+                                        winnerIds.add(winner.getId()); // Add user ID to winners list
                                     }
 
                                     for (DocumentSnapshot loser : losers) {
                                         db.collection("registered_events").document(loser.getId()).update("status", "Not Selected");
-                                        // Send notification to loser with event name in title
-                                        sendNotification(getApplicationContext(),
-                                                eventName + " - Lottery Results",
-                                                "Sorry, you were not selected.",
-                                                "loser");
+                                        loserIds.add(loser.getId()); // Add user ID to losers list
                                     }
 
-                                    // update event 'drawn' status to true
+                                    // Send notifications to winners and losers
+                                    sendNotification(getApplicationContext(),
+                                            eventName + " - Lottery Results",
+                                            "Congratulations, you are a winner!",
+                                            winnerIds); // Pass winner IDs
+
+                                    sendNotification(getApplicationContext(),
+                                            eventName + " - Lottery Results",
+                                            "Sorry, you were not selected.",
+                                            loserIds); // Pass loser IDs
+
+                                    // Update event 'drawn' status to true
                                     db.collection("events").document(eventId).update("drawnStatus", true);
 
                                     Log.d("LotteryWorker", "Lottery completed for event: " + eventId);
@@ -147,5 +154,6 @@ public class LotteryWorker extends Worker {
                 })
                 .addOnFailureListener(e -> Log.e("LotteryWorker", "Error retrieving event name", e));
     }
+
 
 }

@@ -21,6 +21,9 @@ import com.example.single_lottery.ui.notification.NotificationActivity;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Activity for viewing event details by organizers.
  * Provides comprehensive view of event information and management tools including:
@@ -189,9 +192,11 @@ public class OrganizerHomeViewEventActivity extends AppCompatActivity {
                                 .whereEqualTo("eventId", eventId)
                                 .get()
                                 .addOnSuccessListener(querySnapshot -> {
+                                    List<String> userIds = new ArrayList<>();
                                     StringBuilder waitingList = new StringBuilder();
                                     for (DocumentSnapshot document : querySnapshot.getDocuments()) {
                                         String userId = document.getString("userId");
+                                        userIds.add(userId); // Collect user IDs for the specific event
                                         waitingList.append(userId).append("\n");
                                     }
 
@@ -213,15 +218,19 @@ public class OrganizerHomeViewEventActivity extends AppCompatActivity {
                                                     String customMessage = input.getText().toString().trim();
 
                                                     if (!customMessage.isEmpty()) {
-                                                        // Send the notification to waiting list users with the event name in the title
-                                                        String notificationTitle = "Event Notification - " + eventName;  // Updated title
-                                                        NotificationActivity.sendNotification(
-                                                                OrganizerHomeViewEventActivity.this,
-                                                                notificationTitle,  // Use the dynamic event name in the title
-                                                                customMessage,
-                                                                "waiting"
-                                                        );
-                                                        Toast.makeText(this, "Notification sent to waiting list users.", Toast.LENGTH_SHORT).show();
+                                                        // Send the notification only to users in the waiting list for this event
+                                                        if (!userIds.isEmpty()) {
+                                                            String notificationTitle = "Event Notification - " + eventName; // Updated title
+                                                            NotificationActivity.sendNotification(
+                                                                    OrganizerHomeViewEventActivity.this,
+                                                                    notificationTitle,  // Use the dynamic event name in the title
+                                                                    customMessage,
+                                                                    userIds // Pass the list of user IDs
+                                                            );
+                                                            Toast.makeText(this, "Notification sent to waiting list users.", Toast.LENGTH_SHORT).show();
+                                                        } else {
+                                                            Toast.makeText(this, "No users in the waiting list for this event.", Toast.LENGTH_SHORT).show();
+                                                        }
                                                     } else {
                                                         Toast.makeText(this, "Message cannot be empty.", Toast.LENGTH_SHORT).show();
                                                     }
@@ -239,6 +248,7 @@ public class OrganizerHomeViewEventActivity extends AppCompatActivity {
                 })
                 .addOnFailureListener(e -> Toast.makeText(this, "Failed to load event name.", Toast.LENGTH_SHORT).show());
     }
+
 
 
 
@@ -264,10 +274,12 @@ public class OrganizerHomeViewEventActivity extends AppCompatActivity {
                             .whereEqualTo("status", "Winner")
                             .get()
                             .addOnSuccessListener(querySnapshot -> {
+                                List<String> winnerIds = new ArrayList<>();
                                 StringBuilder winnersList = new StringBuilder();
 
                                 for (DocumentSnapshot document : querySnapshot.getDocuments()) {
                                     String userId = document.getString("userId");
+                                    winnerIds.add(userId);  // Collect user IDs of winners
                                     winnersList.append(userId).append("\n");
                                 }
 
@@ -285,15 +297,19 @@ public class OrganizerHomeViewEventActivity extends AppCompatActivity {
                                             messageDialog.setPositiveButton("Send", (innerDialog, which1) -> {
                                                 String customMessage = input.getText().toString().trim();
                                                 if (!customMessage.isEmpty()) {
-                                                    // Send custom notification with event name in the title
-                                                    String notificationTitle = "Event Notification - " + eventName;
-                                                    NotificationActivity.sendNotification(
-                                                            OrganizerHomeViewEventActivity.this,
-                                                            notificationTitle,
-                                                            customMessage,
-                                                            "Winner"
-                                                    );
-                                                    Toast.makeText(this, "Notification sent to winners.", Toast.LENGTH_SHORT).show();
+                                                    // Send custom notification only to winners
+                                                    if (!winnerIds.isEmpty()) {
+                                                        String notificationTitle = "Event Notification - " + eventName; // Updated title
+                                                        NotificationActivity.sendNotification(
+                                                                OrganizerHomeViewEventActivity.this,
+                                                                notificationTitle,
+                                                                customMessage,
+                                                                winnerIds  // Pass the list of winner user IDs
+                                                        );
+                                                        Toast.makeText(this, "Notification sent to winners.", Toast.LENGTH_SHORT).show();
+                                                    } else {
+                                                        Toast.makeText(this, "No winners to notify.", Toast.LENGTH_SHORT).show();
+                                                    }
                                                 } else {
                                                     Toast.makeText(this, "Message cannot be empty.", Toast.LENGTH_SHORT).show();
                                                 }
@@ -307,6 +323,7 @@ public class OrganizerHomeViewEventActivity extends AppCompatActivity {
                 })
                 .addOnFailureListener(e -> Toast.makeText(this, "Failed to load event details.", Toast.LENGTH_SHORT).show());
     }
+
 
 
 
@@ -331,48 +348,48 @@ public class OrganizerHomeViewEventActivity extends AppCompatActivity {
                                 .whereEqualTo("status", "Not Selected")
                                 .get()
                                 .addOnSuccessListener(querySnapshot -> {
+                                    List<String> loserIds = new ArrayList<>();
                                     StringBuilder losersList = new StringBuilder();
+
                                     for (DocumentSnapshot document : querySnapshot.getDocuments()) {
                                         String userId = document.getString("userId");
+                                        loserIds.add(userId);  // Collect user IDs of losers
                                         losersList.append(userId).append("\n");
                                     }
 
-                                    // Show losers list in dialog with custom message input
+                                    // Show losers list in dialog with "Notify" button
                                     new AlertDialog.Builder(this)
                                             .setTitle("Losers List")
                                             .setMessage(losersList.toString())
                                             .setPositiveButton("OK", null)
                                             .setNegativeButton("Notify", (dialog, which) -> {
-                                                // Create an input dialog for custom message
-                                                AlertDialog.Builder inputDialog = new AlertDialog.Builder(this);
-                                                inputDialog.setTitle("Enter Custom Message");
-
-                                                // Set up the input field for custom message
+                                                // Show dialog to input custom message
+                                                AlertDialog.Builder messageDialog = new AlertDialog.Builder(this);
+                                                messageDialog.setTitle("Custom Message");
                                                 final EditText input = new EditText(this);
-                                                inputDialog.setView(input);
-
-                                                inputDialog.setPositiveButton("Send", (dialog1, which1) -> {
+                                                messageDialog.setView(input);
+                                                messageDialog.setPositiveButton("Send", (innerDialog, which1) -> {
                                                     String customMessage = input.getText().toString().trim();
-
                                                     if (!customMessage.isEmpty()) {
-                                                        // Send the notification to losers with the event name in the title
-                                                        String notificationTitle = "Event Notification - " + eventName;  // Updated title
-                                                        NotificationActivity.sendNotification(
-                                                                OrganizerHomeViewEventActivity.this,
-                                                                notificationTitle,  // Use the dynamic event name in the title
-                                                                customMessage,
-                                                                "Not Selected"
-                                                        );
-                                                        Toast.makeText(this, "Notification sent to losers.", Toast.LENGTH_SHORT).show();
+                                                        // Send custom notification only to losers
+                                                        if (!loserIds.isEmpty()) {
+                                                            String notificationTitle = "Event Notification - " + eventName; // Updated title
+                                                            NotificationActivity.sendNotification(
+                                                                    OrganizerHomeViewEventActivity.this,
+                                                                    notificationTitle,
+                                                                    customMessage,
+                                                                    loserIds  // Pass the list of loser user IDs
+                                                            );
+                                                            Toast.makeText(this, "Notification sent to losers.", Toast.LENGTH_SHORT).show();
+                                                        } else {
+                                                            Toast.makeText(this, "No losers to notify.", Toast.LENGTH_SHORT).show();
+                                                        }
                                                     } else {
                                                         Toast.makeText(this, "Message cannot be empty.", Toast.LENGTH_SHORT).show();
                                                     }
                                                 });
-
-                                                inputDialog.setNegativeButton("Cancel", null);
-
-                                                // Show the input dialog
-                                                inputDialog.show();
+                                                messageDialog.setNegativeButton("Cancel", null);
+                                                messageDialog.show();
                                             })
                                             .show();
                                 })
@@ -381,6 +398,7 @@ public class OrganizerHomeViewEventActivity extends AppCompatActivity {
                 })
                 .addOnFailureListener(e -> Toast.makeText(this, "Failed to load event name.", Toast.LENGTH_SHORT).show());
     }
+
 
 
 
@@ -405,48 +423,48 @@ public class OrganizerHomeViewEventActivity extends AppCompatActivity {
                                 .whereEqualTo("status", "Accepted")
                                 .get()
                                 .addOnSuccessListener(querySnapshot -> {
+                                    List<String> acceptedIds = new ArrayList<>();
                                     StringBuilder acceptedList = new StringBuilder();
+
                                     for (DocumentSnapshot document : querySnapshot.getDocuments()) {
                                         String userId = document.getString("userId");
+                                        acceptedIds.add(userId);  // Collect user IDs of accepted users
                                         acceptedList.append(userId).append("\n");
                                     }
 
-                                    // Show accepted users list in dialog with custom message input
+                                    // Show accepted users list in dialog with "Notify" button
                                     new AlertDialog.Builder(this)
                                             .setTitle("Accepted Users")
                                             .setMessage(acceptedList.toString())
                                             .setPositiveButton("OK", null)
                                             .setNegativeButton("Notify", (dialog, which) -> {
-                                                // Create an input dialog for custom message
-                                                AlertDialog.Builder inputDialog = new AlertDialog.Builder(this);
-                                                inputDialog.setTitle("Enter Custom Message");
-
-                                                // Set up the input field for custom message
+                                                // Show dialog to input custom message
+                                                AlertDialog.Builder messageDialog = new AlertDialog.Builder(this);
+                                                messageDialog.setTitle("Custom Message");
                                                 final EditText input = new EditText(this);
-                                                inputDialog.setView(input);
-
-                                                inputDialog.setPositiveButton("Send", (dialog1, which1) -> {
+                                                messageDialog.setView(input);
+                                                messageDialog.setPositiveButton("Send", (innerDialog, which1) -> {
                                                     String customMessage = input.getText().toString().trim();
-
                                                     if (!customMessage.isEmpty()) {
-                                                        // Send the notification to accepted users with the event name in the title
-                                                        String notificationTitle = "Event Notification - " + eventName;  // Updated title
-                                                        NotificationActivity.sendNotification(
-                                                                OrganizerHomeViewEventActivity.this,
-                                                                notificationTitle,  // Use the dynamic event name in the title
-                                                                customMessage,
-                                                                "Accepted"
-                                                        );
-                                                        Toast.makeText(this, "Notification sent to accepted users.", Toast.LENGTH_SHORT).show();
+                                                        // Send custom notification only to accepted users
+                                                        if (!acceptedIds.isEmpty()) {
+                                                            String notificationTitle = "Event Notification - " + eventName; // Updated title
+                                                            NotificationActivity.sendNotification(
+                                                                    OrganizerHomeViewEventActivity.this,
+                                                                    notificationTitle,
+                                                                    customMessage,
+                                                                    acceptedIds  // Pass the list of accepted user IDs
+                                                            );
+                                                            Toast.makeText(this, "Notification sent to accepted users.", Toast.LENGTH_SHORT).show();
+                                                        } else {
+                                                            Toast.makeText(this, "No accepted users to notify.", Toast.LENGTH_SHORT).show();
+                                                        }
                                                     } else {
                                                         Toast.makeText(this, "Message cannot be empty.", Toast.LENGTH_SHORT).show();
                                                     }
                                                 });
-
-                                                inputDialog.setNegativeButton("Cancel", null);
-
-                                                // Show the input dialog
-                                                inputDialog.show();
+                                                messageDialog.setNegativeButton("Cancel", null);
+                                                messageDialog.show();
                                             })
                                             .show();
                                 })
@@ -455,6 +473,7 @@ public class OrganizerHomeViewEventActivity extends AppCompatActivity {
                 })
                 .addOnFailureListener(e -> Toast.makeText(this, "Failed to load event name.", Toast.LENGTH_SHORT).show());
     }
+
 
 
 
@@ -479,48 +498,48 @@ public class OrganizerHomeViewEventActivity extends AppCompatActivity {
                                 .whereEqualTo("status", "Declined")
                                 .get()
                                 .addOnSuccessListener(querySnapshot -> {
+                                    List<String> cancelledIds = new ArrayList<>();
                                     StringBuilder cancelledList = new StringBuilder();
+
                                     for (DocumentSnapshot document : querySnapshot.getDocuments()) {
                                         String userId = document.getString("userId");
+                                        cancelledIds.add(userId);  // Collect user IDs of cancelled users
                                         cancelledList.append(userId).append("\n");
                                     }
 
-                                    // Show cancelled users list in dialog with custom message input
+                                    // Show cancelled users list in dialog with "Notify" button
                                     new AlertDialog.Builder(this)
                                             .setTitle("Cancelled Users")
                                             .setMessage(cancelledList.toString())
                                             .setPositiveButton("OK", null)
                                             .setNegativeButton("Notify", (dialog, which) -> {
-                                                // Create an input dialog for custom message
-                                                AlertDialog.Builder inputDialog = new AlertDialog.Builder(this);
-                                                inputDialog.setTitle("Enter Custom Message");
-
-                                                // Set up the input field for custom message
+                                                // Show dialog to input custom message
+                                                AlertDialog.Builder messageDialog = new AlertDialog.Builder(this);
+                                                messageDialog.setTitle("Custom Message");
                                                 final EditText input = new EditText(this);
-                                                inputDialog.setView(input);
-
-                                                inputDialog.setPositiveButton("Send", (dialog1, which1) -> {
+                                                messageDialog.setView(input);
+                                                messageDialog.setPositiveButton("Send", (innerDialog, which1) -> {
                                                     String customMessage = input.getText().toString().trim();
-
                                                     if (!customMessage.isEmpty()) {
-                                                        // Send the notification to cancelled users with the event name in the title
-                                                        String notificationTitle = "Event Cancellation - " + eventName;  // Updated title
-                                                        NotificationActivity.sendNotification(
-                                                                OrganizerHomeViewEventActivity.this,
-                                                                notificationTitle,  // Use the dynamic event name in the title
-                                                                customMessage,
-                                                                "Declined"
-                                                        );
-                                                        Toast.makeText(this, "Notification sent to cancelled users.", Toast.LENGTH_SHORT).show();
+                                                        // Send custom notification only to cancelled users
+                                                        if (!cancelledIds.isEmpty()) {
+                                                            String notificationTitle = "Event Cancellation - " + eventName; // Updated title
+                                                            NotificationActivity.sendNotification(
+                                                                    OrganizerHomeViewEventActivity.this,
+                                                                    notificationTitle,
+                                                                    customMessage,
+                                                                    cancelledIds  // Pass the list of cancelled user IDs
+                                                            );
+                                                            Toast.makeText(this, "Notification sent to cancelled users.", Toast.LENGTH_SHORT).show();
+                                                        } else {
+                                                            Toast.makeText(this, "No cancelled users to notify.", Toast.LENGTH_SHORT).show();
+                                                        }
                                                     } else {
                                                         Toast.makeText(this, "Message cannot be empty.", Toast.LENGTH_SHORT).show();
                                                     }
                                                 });
-
-                                                inputDialog.setNegativeButton("Cancel", null);
-
-                                                // Show the input dialog
-                                                inputDialog.show();
+                                                messageDialog.setNegativeButton("Cancel", null);
+                                                messageDialog.show();
                                             })
                                             .show();
                                 })
@@ -529,5 +548,6 @@ public class OrganizerHomeViewEventActivity extends AppCompatActivity {
                 })
                 .addOnFailureListener(e -> Toast.makeText(this, "Failed to load event name.", Toast.LENGTH_SHORT).show());
     }
+
 
 }

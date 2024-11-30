@@ -6,28 +6,67 @@
     android:orientation="vertical"
     android:padding="16dp">
 
-    <!-- 用户头像 -->
+    <!-- Back Button Fixed at the Top -->
+    <ImageButton
+        android:id="@+id/adminUserBackButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_back"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:contentDescription="Back Button"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentStart="true"
+        android:layout_marginBottom="8dp"
+         />
+
+
+    <!-- User Avatar Section with Blue Background -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/rounded_corners_blue"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:padding="16dp"
+        android:elevation="4dp">
+
     <ImageView
         android:id="@+id/userProfileImage"
         android:layout_width="150dp"
         android:layout_height="150dp"
-        android:layout_gravity="center"
         android:scaleType="centerCrop"
         android:src="@drawable/ic_profile" />
 
-    <!-- 用户名称 -->
-    <TextView
-        android:id="@+id/userName"
+    <Button
+        android:id="@+id/btnDeleteAvatar"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
+        android:text="Delete Avatar" />
+    </LinearLayout>
+
+    <!-- User Info Section with Grey Background -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/rounded_corners_grey"
+        android:orientation="vertical"
+        android:padding="16dp"
+        android:layout_marginTop="16dp"
+        android:elevation="4dp">
+
+        <!-- User Name -->
+        <TextView
+        android:id="@+id/userName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:text="User Name"
         android:textSize="20sp"
         android:textStyle="bold" />
 
-    <!-- 用户邮箱 -->
-    <TextView
+            <!-- User Email -->
+        <TextView
         android:id="@+id/userEmail"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -36,8 +75,8 @@
         android:text="Email: example@example.com"
         android:textSize="16sp" />
 
-    <!-- 用户电话 -->
-    <TextView
+            <!-- User Phone -->
+        <TextView
         android:id="@+id/userPhone"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -46,20 +85,14 @@
         android:text="Phone: 1234567890"
         android:textSize="16sp" />
 
-    <Button
-        android:id="@+id/btnDeleteAvatar"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:layout_marginTop="16dp"
-        android:text="Delete Avatar" />
-
-    <Button
+            <!-- Delete User Button -->
+        <Button
         android:id="@+id/btnDeleteProfile"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:layout_marginTop="16dp"
         android:text="Delete User" />
+    </LinearLayout>
 
 </LinearLayout>

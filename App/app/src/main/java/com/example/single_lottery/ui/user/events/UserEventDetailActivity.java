@@ -50,7 +50,7 @@ public class UserEventDetailActivity extends AppCompatActivity {
         setContentView(R.layout.user_event_viewdetail);
 
         // Bind views
-        Button backButton = findViewById(R.id.backButton);
+        ImageView backButton = findViewById(R.id.backButton);
         backButton.setOnClickListener(v -> finish());
 
         eventPosterImageView = findViewById(R.id.imageViewPoster);
@@ -113,8 +113,13 @@ public class UserEventDetailActivity extends AppCompatActivity {
                         eventFacilityTextView.setText(eventFacility);
 
                         String posterUrl = documentSnapshot.getString("posterUrl");
+
+                        // Check if there is a poster URL, if not use a default poster image
                         if (posterUrl != null && !posterUrl.isEmpty()) {
                             Glide.with(this).load(posterUrl).into(eventPosterImageView);
+                        } else {
+                            // Load a default image if posterUrl is empty or null
+                            Glide.with(this).load(R.drawable.defaultbackground).into(eventPosterImageView);
                         }
 
                         updateEventStatus();
@@ -124,6 +129,7 @@ public class UserEventDetailActivity extends AppCompatActivity {
                 })
                 .addOnFailureListener(e -> Log.e("UserEventDetailActivity", "Error loading event details", e));
     }
+
 
     /**
      * Updates event status display based on current time and deadlines.
