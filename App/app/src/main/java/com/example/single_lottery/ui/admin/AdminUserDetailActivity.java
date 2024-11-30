@@ -26,6 +26,7 @@ public class AdminUserDetailActivity extends AppCompatActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.admin_user_detail);
+        setTitle("User Details");
 
         // 获取传递的用户数据
         EventModel user = (EventModel) getIntent().getSerializableExtra(EXTRA_USER);
@@ -37,6 +38,7 @@ public class AdminUserDetailActivity extends AppCompatActivity {
         TextView userPhone = findViewById(R.id.userPhone);
         Button btnDeleteAvatar = findViewById(R.id.btnDeleteAvatar);
         Button btnDeleteProfile = findViewById(R.id.btnDeleteProfile);
+        ImageView backButton = findViewById(R.id.adminUserBackButton);  // Back button reference
 
         if (user != null) {
             userName.setText(user.getName());
@@ -55,7 +57,17 @@ public class AdminUserDetailActivity extends AppCompatActivity {
             // 删除用户按钮逻辑
             btnDeleteProfile.setOnClickListener(v -> deleteProfile(user));
         }
+
+        // Set click listener for the back button
+        backButton.setOnClickListener(v -> {
+            // Navigate back to the user list activity (replace AdminUserListActivity.class with the correct class)
+            Intent intent = new Intent(AdminUserDetailActivity.this, AdminUserFragment.class);
+            startActivity(intent);
+            overridePendingTransition(0, 0);  // Skip transition animation
+            finish();
+        });
     }
+
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         if (item.getItemId() == android.R.id.home) { // 返回按钮的 ID
@@ -93,7 +105,6 @@ public class AdminUserDetailActivity extends AppCompatActivity {
                 .show();
     }
 
-
     // 删除头像逻辑
     private void deleteAvatar(EventModel user) {
         // 检查 eventId 是否为 null
@@ -115,5 +126,4 @@ public class AdminUserDetailActivity extends AppCompatActivity {
                     Toast.makeText(this, "Failed to delete avatar: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                 });
     }
-
 }

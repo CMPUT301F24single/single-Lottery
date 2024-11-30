@@ -66,13 +66,6 @@ public class HomeFragment extends Fragment {
         recyclerViewEvents = view.findViewById(R.id.recyclerViewEvents);
         recyclerViewEvents.setLayoutManager(new LinearLayoutManager(getContext()));
 
-        // Add DividerItemDecoration (for dividing list of events)
-        DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(
-                recyclerViewEvents.getContext(),
-                LinearLayoutManager.VERTICAL
-        );
-        recyclerViewEvents.addItemDecoration(dividerItemDecoration);
-
         eventList = new ArrayList<>();
         userHomeAdapter = new UserHomeAdapter(getContext(), eventList);
         recyclerViewEvents.setAdapter(userHomeAdapter);

@@ -14,7 +14,8 @@
         android:gravity="center"
         android:layout_marginLeft="8dp"
         android:layout_marginRight="8dp"
-        android:layout_marginTop="8dp">
+        android:layout_marginTop="8dp"
+        android:elevation="4dp">
 
         <!-- Profile Image Centered in Blue Section -->
         <ImageView
@@ -24,7 +25,8 @@
             android:layout_centerHorizontal="true"
             android:layout_marginTop="16dp"
             android:padding="8dp"
-            android:src="@drawable/org" />
+            android:src="@drawable/org"
+            android:elevation="4dp"/>
 
         <!-- Upload and Remove Buttons Below Profile Image -->
         <LinearLayout
@@ -60,7 +62,8 @@
         android:layout_marginLeft="8dp"
         android:layout_marginRight="8dp"
         android:layout_marginTop="8dp"
-        android:layout_marginBottom="8dp">
+        android:layout_marginBottom="8dp"
+        android:elevation="4dp">
 
         <!-- Profile Information Fields -->
         <LinearLayout

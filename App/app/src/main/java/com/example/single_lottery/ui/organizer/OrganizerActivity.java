@@ -63,12 +63,16 @@ public class OrganizerActivity extends AppCompatActivity {
             Fragment selectedFragment = null;
             if (item.getItemId() == R.id.navigation_home) {
                 selectedFragment = new OrganizerHomeFragment();
+                // Set action bar title for Home
+                getSupportActionBar().setTitle("My Events");
             } else if (item.getItemId() == R.id.navigation_new) {
                 Intent intent = new Intent(OrganizerActivity.this, OrganizerEventCreateActivity.class);
                 startActivity(intent);
                 return true;
             } else if (item.getItemId() == R.id.navigation_profile) {
                 selectedFragment = new OrganizerProfilePageFragment();
+                // Set action bar title for Profile
+                getSupportActionBar().setTitle("Profile");
             }
 
             if (selectedFragment != null) {
@@ -84,6 +88,8 @@ public class OrganizerActivity extends AppCompatActivity {
                 .replace(R.id.nav_host_fragment_organizer, new OrganizerHomeFragment())
                 .commit();
         navView.setSelectedItemId(R.id.navigation_home);  // Make sure "Home" is selected initially
+        // Set action bar title for Home on startup
+        getSupportActionBar().setTitle("Event Management");
     }
 
     @Override
