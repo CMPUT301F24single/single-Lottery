@@ -59,13 +59,7 @@ public class AdminUserDetailActivity extends AppCompatActivity {
         }
 
         // Set click listener for the back button
-        backButton.setOnClickListener(v -> {
-            // Navigate back to the user list activity (replace AdminUserListActivity.class with the correct class)
-            Intent intent = new Intent(AdminUserDetailActivity.this, AdminUserFragment.class);
-            startActivity(intent);
-            overridePendingTransition(0, 0);  // Skip transition animation
-            finish();
-        });
+        backButton.setOnClickListener(v -> finish());
     }
 
     @Override
