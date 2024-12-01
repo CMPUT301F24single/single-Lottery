@@ -61,7 +61,7 @@ public class OrganizerEventAdapter extends RecyclerView.Adapter<OrganizerEventAd
     @Override
     public void onBindViewHolder(@NonNull OrganizerEventViewHolder holder, int position) {
         EventModel event = eventList.get(position);
-        holder.eventNameTextView.setText(event.getName());  // 假设有 `getName()` 方法
+        holder.eventNameTextView.setText(event.getName());  // Assume there is a `getName()` method
 
         // View button click listener
         holder.viewButton.setOnClickListener(v -> {

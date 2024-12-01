@@ -13,6 +13,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.Toolbar;
@@ -72,6 +73,9 @@ public class OrganizerEventCreateActivity extends AppCompatActivity {
     private EditText eventNameEditText, eventDescriptionEditText, waitingListCountEditText, lotteryCountEditText;
     private TextView eventTimeTextView, registrationDeadlineTextView, lotteryTimeTextView, selectedEventTimeTextView, selectedRegistrationDeadlineTextView, selectedLotteryTimeTextView;  // 改为 TextView
     private Uri posterUri;
+    private EditText eventFacilityEditText; // New
+    private Switch locationRequirementSwitch;
+
 
     private FirebaseFirestore db;
     private StorageReference storageRef;
@@ -93,6 +97,7 @@ public class OrganizerEventCreateActivity extends AppCompatActivity {
         eventPosterImageView = findViewById(R.id.eventPosterImageView);
         eventNameEditText = findViewById(R.id.eventNameEditText);
         eventDescriptionEditText = findViewById(R.id.eventDescriptionEditText);
+        eventFacilityEditText = findViewById(R.id.eventFacilityEditText); // new
         eventTimeTextView = findViewById(R.id.eventTimeTextView);  // 改为 TextView
         registrationDeadlineTextView = findViewById(R.id.registrationDeadlineTextView);  // 改为 TextView
         waitingListCountEditText = findViewById(R.id.waitingListCountEditText);
@@ -101,6 +106,7 @@ public class OrganizerEventCreateActivity extends AppCompatActivity {
         selectedEventTimeTextView = findViewById(R.id.selectedEventTimeTextView);  // 改为 TextView
         selectedRegistrationDeadlineTextView = findViewById(R.id.selectedRegistrationDeadlineTextView);  // 改为 TextView
         selectedLotteryTimeTextView = findViewById(R.id.selectedLotteryTimeTextView);  // 改为 TextView
+        locationRequirementSwitch = findViewById(R.id.locationRequirementSwitch);
 
         Button uploadPosterButton = findViewById(R.id.uploadPosterButton);
         Button createEventButton = findViewById(R.id.createEventButton);
@@ -155,6 +161,8 @@ public class OrganizerEventCreateActivity extends AppCompatActivity {
         String registrationDeadline = selectedRegistrationDeadlineTextView.getText().toString().trim();
         String lotteryTime = selectedLotteryTimeTextView.getText().toString().trim();
         String eventDescription = eventDescriptionEditText.getText().toString().trim();
+        String facility = eventFacilityEditText.getText().toString().trim();//new
+        boolean requiresLocation = locationRequirementSwitch.isChecked();
 
         // Get device code
         String organizerDeviceID = Settings.Secure.getString(getContentResolver(), Settings.Secure.ANDROID_ID);
@@ -163,6 +171,13 @@ public class OrganizerEventCreateActivity extends AppCompatActivity {
         if (eventName.isEmpty() || eventTime.isEmpty() || registrationDeadline.isEmpty() || lotteryTime.isEmpty()) {
             Toast.makeText(this, "Please fill in all required fields", Toast.LENGTH_SHORT).show();
             Log.d("OrganizerEventCreateActivity", "Required fields are missing");
+            return;
+        }
+
+        // new
+        if (facility.isEmpty()) {
+            Toast.makeText(this, "Please fill in the event facility", Toast.LENGTH_SHORT).show();
+            Log.d("OrganizerEventCreateActivity", "Facility field is missing");
             return;
         }
 
@@ -195,7 +210,7 @@ public class OrganizerEventCreateActivity extends AppCompatActivity {
             posterRef.putFile(posterUri).addOnSuccessListener(taskSnapshot ->
                     posterRef.getDownloadUrl().addOnSuccessListener(uri -> {
                         Log.d("OrganizerEventCreateActivity", "Poster uploaded, URL: " + uri.toString());
-                        saveEventData(uri.toString(), eventName, eventTime, registrationDeadline, lotteryTime, waitingListCount, lotteryCount, organizerDeviceID, eventDescription);
+                        saveEventData(uri.toString(), eventName, eventTime, registrationDeadline, lotteryTime, waitingListCount, lotteryCount, organizerDeviceID, eventDescription, facility, requiresLocation);
                     })
             ).addOnFailureListener(e -> {
                 Toast.makeText(this, "Failed to upload poster", Toast.LENGTH_SHORT).show();
@@ -203,13 +218,13 @@ public class OrganizerEventCreateActivity extends AppCompatActivity {
             });
         } else {
             Log.d("OrganizerEventCreateActivity", "No poster, saving event data directly");
-            saveEventData(null, eventName, eventTime, registrationDeadline, lotteryTime, waitingListCount, lotteryCount, organizerDeviceID, eventDescription);
+            saveEventData(null, eventName, eventTime, registrationDeadline, lotteryTime, waitingListCount, lotteryCount, organizerDeviceID, eventDescription, facility, requiresLocation);
         }
     }
 
     private void saveEventData(String posterUrl, String eventName, String eventTime,
                                String registrationDeadline, String lotteryTime,
-                               int waitingListCount, int lotteryCount, String organizerDeviceID, String eventDescription) {
+                               int waitingListCount, int lotteryCount, String organizerDeviceID, String eventDescription, String facility, boolean requiresLocation) {
         Map<String, Object> event = new HashMap<>();
         event.put("name", eventName);
         event.put("time", eventTime);
@@ -220,11 +235,18 @@ public class OrganizerEventCreateActivity extends AppCompatActivity {
         event.put("posterUrl", posterUrl);
         event.put("organizerDeviceID", organizerDeviceID);
         event.put("description", eventDescription);
+        event.put("facility", facility); //new
+        event.put("drawnStatus", false);
+        event.put("requiresLocation", requiresLocation);
 
         db.collection("events").add(event).addOnSuccessListener(documentReference -> {
             Toast.makeText(this, "Event created successfully", Toast.LENGTH_SHORT).show();
+            Intent intent = new Intent(OrganizerEventCreateActivity.this, OrganizerActivity.class);
+            startActivity(intent);
+            finish(); // Optionally close this activity after redirecting
         }).addOnFailureListener(e -> {
             Toast.makeText(this, "Failed to create event", Toast.LENGTH_SHORT).show();
         });
+
     }
 }

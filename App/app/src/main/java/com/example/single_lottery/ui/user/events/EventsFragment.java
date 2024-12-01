@@ -45,7 +45,7 @@ public class EventsFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_events, container, false);
 
         recyclerView = view.findViewById(R.id.recyclerViewRegisteredEvents);
-        noEventsTextView = view.findViewById(R.id.noEventsTextView); // 初始化 noEventsTextView
+        noEventsTextView = view.findViewById(R.id.noEventsTextView);
 
         eventList = new ArrayList<>();
         eventAdapter = new UserEventAdapter(getContext(), eventList);
@@ -88,7 +88,7 @@ public class EventsFragment extends Fragment {
                         for (DocumentSnapshot document : queryDocumentSnapshots.getDocuments()) {
                             String eventId = document.getString("eventId");
 
-                            // 查找 events 集合中的详细信息
+                            // Find detailed information in the events collection
                             db.collection("events").document(eventId)
                                     .get()
                                     .addOnSuccessListener(eventSnapshot -> {

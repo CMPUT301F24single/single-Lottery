@@ -66,6 +66,24 @@
             android:textSize="17sp"
             android:paddingTop="4dp" />
 
+        <!-- Event Facility -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Event Facility"
+            android:textStyle="bold"
+            android:textSize="17sp"
+            android:paddingTop="8dp" />
+
+        <TextView
+            android:id="@+id/eventFacilityTextView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Facility"
+            android:textSize="17sp"
+            android:paddingTop="4dp" />
+
+
         <!-- Event Time -->
         <LinearLayout
             android:layout_width="match_parent"
@@ -199,6 +217,31 @@
                 android:paddingStart="8dp" />
         </LinearLayout>
 
+        <!-- Accept and Decline Buttons (Side by side, same size) -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="8dp">
+
+            <Button
+                android:id="@+id/acceptButton"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:text="Accept Invite"
+                android:layout_marginEnd="8dp"
+                android:visibility="gone"
+                android:layout_weight="1" />
+
+            <Button
+                android:id="@+id/declineButton"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:text="Decline Invite"
+                android:visibility="gone"
+                android:layout_weight="1" />
+        </LinearLayout>
+
         <!-- Cancel Registration Button -->
         <Button
             android:id="@+id/cancelRegistrationButton"
@@ -206,23 +249,7 @@
             android:layout_height="wrap_content"
             android:text="Cancel Registration"
             android:layout_gravity="center"
-            android:layout_marginTop="16dp"/>
+            android:layout_marginTop="4dp"/>
 
-        <!-- Accept and Decline Buttons -->
-        <Button
-            android:id="@+id/acceptButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Accept"
-            android:visibility="gone"
-            android:layout_marginTop="8dp"/>
-
-        <Button
-            android:id="@+id/declineButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Decline"
-            android:visibility="gone"
-            android:layout_marginTop="8dp"/>
     </LinearLayout>
 </ScrollView>

@@ -1,13 +1,14 @@
-
 package com.example.single_lottery.ui.organizer;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuItem;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 
-
+import com.example.single_lottery.MainActivity;
 import com.example.single_lottery.R;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
@@ -31,7 +32,6 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
  * @see OrganizerEventAdapter
  * @since 1.0
  */
-
 public class OrganizerActivity extends AppCompatActivity {
 
     /**
@@ -52,7 +52,6 @@ public class OrganizerActivity extends AppCompatActivity {
      * @see OrganizerEventCreateActivity
      * @see OrganizerProfilePageFragment
      */
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -62,12 +61,15 @@ public class OrganizerActivity extends AppCompatActivity {
 
         navView.setOnItemSelectedListener(item -> {
             Fragment selectedFragment = null;
+            // Navigate to organizer's home screen
             if (item.getItemId() == R.id.navigation_home) {
                 selectedFragment = new OrganizerHomeFragment();
+                // Navigate to event creation screen
             } else if (item.getItemId() == R.id.navigation_new) {
                 Intent intent = new Intent(OrganizerActivity.this, OrganizerEventCreateActivity.class);
                 startActivity(intent);
                 return true;
+                // Navigate to organizer's profile screen
             } else if (item.getItemId() == R.id.navigation_profile) {
                 selectedFragment = new OrganizerProfilePageFragment();
             }
@@ -80,9 +82,43 @@ public class OrganizerActivity extends AppCompatActivity {
             return true;
         });
 
-
+        // Initialize with the default fragment (OrganizerHomeFragment)
         getSupportFragmentManager().beginTransaction()
                 .replace(R.id.nav_host_fragment_organizer, new OrganizerHomeFragment())
                 .commit();
+        navView.setSelectedItemId(R.id.navigation_home);  // Make sure "Home" is selected initially
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        // When coming back from the event creation activity, ensure the correct tab is selected
+        BottomNavigationView navView = findViewById(R.id.nav_view_organizer);
+        navView.setSelectedItemId(R.id.navigation_home);  // Set Home tab selected when returning
+    }
+
+    // Inflate the menu in the action bar
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_actionbar, menu);
+        return true;
+    }
+
+    // Handle the item selection in the action bar
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+
+        if (id == R.id.action_return) {
+            // Return to homepage when the icon is clicked
+            Intent intent = new Intent(OrganizerActivity.this, MainActivity.class);
+            intent.putExtra("showLandingScreen", true); // Ensure you have the landing screen logic in MainActivity
+            startActivity(intent);
+            finish();  // Optionally finish the current activity
+            return true;
+        }
+
+        return super.onOptionsItemSelected(item);
     }
 }

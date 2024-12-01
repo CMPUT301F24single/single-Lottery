@@ -7,6 +7,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.Switch;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -47,6 +48,9 @@ public class OrganizerHomeEditEventActivity extends AppCompatActivity {
     private ImageView imageViewPoster;
     private Button buttonUpdate;
     private String eventId;
+    private EditText editTextEventFacility; // new
+    private Switch locationRequirementSwitch;
+
 
     /**
      * Initializes the event editing interface and loads existing event data.
@@ -70,6 +74,7 @@ public class OrganizerHomeEditEventActivity extends AppCompatActivity {
         // Initializing the View
         editTextEventName = findViewById(R.id.editTextEventName);
         editTextEventDescription = findViewById(R.id.editTextEventDescription);
+        editTextEventFacility = findViewById(R.id.editTextEventFacility); // new
         editTextEventTime = findViewById(R.id.editTextEventTime);
         editTextRegistrationDeadline = findViewById(R.id.editTextRegistrationDeadline);
         editTextLotteryTime = findViewById(R.id.editTextLotteryTime);
@@ -77,6 +82,7 @@ public class OrganizerHomeEditEventActivity extends AppCompatActivity {
         editTextLotteryCount = findViewById(R.id.editTextLotteryCount);
         imageViewPoster = findViewById(R.id.imageViewPoster);
         buttonUpdate = findViewById(R.id.buttonUpdateEvent);
+        locationRequirementSwitch = findViewById(R.id.locationRequirementSwitch);
 
         Button buttonChangePoster = findViewById(R.id.buttonChangePoster); // Change Poster Button
         buttonChangePoster.setOnClickListener(v -> openImagePicker()); // 设置点击事件
@@ -188,6 +194,12 @@ public class OrganizerHomeEditEventActivity extends AppCompatActivity {
                             editTextWaitingListCount.setText(String.valueOf(event.getWaitingListCount()));
                             editTextLotteryCount.setText(String.valueOf(event.getLotteryCount()));
 
+                            if (event.getFacility() != null) {
+                                editTextEventFacility.setText(event.getFacility());
+                            }
+
+                            locationRequirementSwitch.setChecked(event.isRequiresLocation());
+
                             if (event.getPosterUrl() != null) {
                                 Glide.with(this).load(event.getPosterUrl()).into(imageViewPoster);
                             }
@@ -220,7 +232,9 @@ public class OrganizerHomeEditEventActivity extends AppCompatActivity {
                 "lotteryTime", editTextLotteryTime.getText().toString(),
                 "waitingListCount", Integer.parseInt(editTextWaitingListCount.getText().toString()),
                 "lotteryCount", Integer.parseInt(editTextLotteryCount.getText().toString()),
-                "description", editTextEventDescription.getText().toString()
+                "description", editTextEventDescription.getText().toString(),
+                "facility", editTextEventFacility.getText().toString(), // new
+                "requiresLocation", locationRequirementSwitch.isChecked()
 
         ).addOnSuccessListener(aVoid -> {
             // Update successful prompt
