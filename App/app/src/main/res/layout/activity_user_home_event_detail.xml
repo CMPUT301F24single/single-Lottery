@@ -68,29 +68,27 @@
             android:textSize="17sp"
             android:paddingTop="4dp" />
 
-        <TextView
-            android:id="@+id/textViewLocationRequirement"
-            android:layout_width="wrap_content"
+        <!-- Facility -->
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Location is required: No"
-            android:textSize="16sp"
-            android:layout_marginTop="16dp"/>
-
-        <!-- Event Description -->
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Facility:"
-            android:textStyle="bold"
-            android:textSize="17sp"
-            android:paddingTop="8dp" />
-        <TextView
-            android:id="@+id/textViewEventFacility"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Event Facility"
-            android:textSize="17sp"
-            android:paddingTop="4dp" />
+            android:orientation="horizontal"
+            android:layout_marginTop="8dp">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Facility:"
+                android:textStyle="bold"
+                android:textSize="17sp" />
+            <TextView
+                android:id="@+id/textViewEventFacility"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Event Facility"
+                android:textSize="17sp"
+                android:paddingStart="8dp" />
+        </LinearLayout>
 
         <!-- Event Time -->
         <LinearLayout
@@ -201,6 +199,31 @@
                 android:textSize="17sp"
                 android:paddingStart="8dp" />
         </LinearLayout>
+
+        <!-- Geolocation -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="8dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Geolocation:"
+                android:textStyle="bold"
+                android:textSize="17sp" />
+
+            <TextView
+                android:id="@+id/textViewLocationRequirement"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Yes/No"
+                android:textSize="17sp"
+                android:paddingStart="8dp" />
+        </LinearLayout>
+
 
         <!-- Sign Up Button -->
         <Button
