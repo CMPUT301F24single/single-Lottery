@@ -125,46 +125,40 @@ public class OfflineWorker extends Worker {
                                     List<DocumentSnapshot> winners = registeredUsers.subList(0, winnersCount);
                                     List<DocumentSnapshot> losers = registeredUsers.subList(winnersCount, registeredUsers.size());
 
-                                    // Prepare batch for notifications
-                                    WriteBatch batch = db.batch();
-
-                                    // Mark winners and losers and prepare notification documents
+                                    // Update winners
                                     for (DocumentSnapshot winner : winners) {
+                                        // Update winner status
                                         db.collection("registered_events").document(winner.getId()).update("status", "Winner");
 
-                                        // Upload notification for the winner to Firebase
+                                        // Add notification for winner
                                         Notification winnerNotification = new Notification(
                                                 eventName + " - Lottery Results",
                                                 "Congratulations, you are a winner!",
                                                 winner.getId()
                                         );
-                                        DocumentReference winnerNotificationRef = db.collection("notifications").document();
-                                        batch.set(winnerNotificationRef, winnerNotification);
+                                        db.collection("notifications").document(winner.getId()).set(winnerNotification);
                                     }
 
+                                    // Update losers
                                     for (DocumentSnapshot loser : losers) {
-                                        // Upload notification for the loser to Firebase
+                                        // Add notification for loser
                                         Notification loserNotification = new Notification(
                                                 eventName + " - Lottery Results",
                                                 "Sorry, you were not selected.",
                                                 loser.getId()
                                         );
-                                        DocumentReference loserNotificationRef = db.collection("notifications").document();
-                                        batch.set(loserNotificationRef, loserNotification);
+                                        db.collection("notifications").document(loser.getId()).set(loserNotification);
                                     }
 
-                                    // Commit the batch to upload the notifications
-                                    batch.commit()
+                                    // Update event 'drawn' status to true
+                                    db.collection("events").document(eventId).update("drawnStatus", true)
                                             .addOnSuccessListener(aVoid -> {
-                                                // Update event 'drawn' status to true
-                                                db.collection("events").document(eventId).update("drawnStatus", true);
-
                                                 Log.d("LotteryWorker", "Lottery completed for event: " + eventId);
                                                 Toast.makeText(getApplicationContext(), "Lottery and notifications completed.", Toast.LENGTH_SHORT).show();
                                             })
                                             .addOnFailureListener(e -> {
-                                                Log.e("LotteryWorker", "Error uploading notifications", e);
-                                                Toast.makeText(getApplicationContext(), "Failed to save notifications.", Toast.LENGTH_SHORT).show();
+                                                Log.e("LotteryWorker", "Error updating event drawn status", e);
+                                                Toast.makeText(getApplicationContext(), "Failed to update event status.", Toast.LENGTH_SHORT).show();
                                             });
                                 })
                                 .addOnFailureListener(e -> {
@@ -178,6 +172,7 @@ public class OfflineWorker extends Worker {
                     Toast.makeText(getApplicationContext(), "Failed to load event name.", Toast.LENGTH_SHORT).show();
                 });
     }
+
 
 
 
