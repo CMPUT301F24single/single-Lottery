@@ -238,13 +238,6 @@
                 android:layout_height="wrap_content"
                 android:text="Lottery WINNERS" />
 
-            <!-- View Losers Button -->
-            <Button
-                android:id="@+id/buttonViewLosers"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="lottery LOSERS" />
-
             <!-- View Cancelled Users Button -->
             <Button
                 android:id="@+id/buttonViewCancelledUsers"

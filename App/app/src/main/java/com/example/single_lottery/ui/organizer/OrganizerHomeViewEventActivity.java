@@ -101,7 +101,6 @@ public class OrganizerHomeViewEventActivity extends AppCompatActivity {
         imageViewPoster = findViewById(R.id.imageViewPoster);
         buttonViewWaitingList = findViewById(R.id.buttonViewWaitingList);
         buttonViewAcceptedUsers = findViewById(R.id.buttonViewAcceptedUsers);
-        buttonViewLosers = findViewById(R.id.buttonViewLosers);
         buttonViewWinners = findViewById(R.id.buttonViewWinners);
         buttonViewCancelledUsers = findViewById(R.id.buttonViewCancelledUsers);
 
@@ -122,7 +121,6 @@ public class OrganizerHomeViewEventActivity extends AppCompatActivity {
 
         // Set the click event of the user button to view the selected and unselected
         buttonViewWinners.setOnClickListener(v -> viewWinners(eventId));
-        buttonViewLosers.setOnClickListener(v -> viewLosers(eventId));
 
         // Set the click event of the View Accepted User Button
         buttonViewAcceptedUsers.setOnClickListener(v -> viewAcceptedUsers(eventId));
@@ -191,16 +189,17 @@ public class OrganizerHomeViewEventActivity extends AppCompatActivity {
                     if (eventDocumentSnapshot.exists()) {
                         String eventName = eventDocumentSnapshot.getString("name"); // Extract event name
 
-                        // Fetch the registered users for this event's waiting list
+                        // Fetch the registered users for this event's waiting list with "Waiting" status
                         db.collection("registered_events")
                                 .whereEqualTo("eventId", eventId)
+                                .whereEqualTo("status", "Waiting") // Add this filter for users with status "Waiting"
                                 .get()
                                 .addOnSuccessListener(querySnapshot -> {
                                     List<String> userIds = new ArrayList<>();
                                     StringBuilder waitingList = new StringBuilder();
                                     for (DocumentSnapshot document : querySnapshot.getDocuments()) {
                                         String userId = document.getString("userId");
-                                        userIds.add(userId); // Collect user IDs for the specific event
+                                        userIds.add(userId); // Collect user IDs for users with status "Waiting"
                                         waitingList.append(userId).append("\n");
                                     }
 
@@ -264,6 +263,7 @@ public class OrganizerHomeViewEventActivity extends AppCompatActivity {
                 })
                 .addOnFailureListener(e -> Toast.makeText(this, "Failed to load event name.", Toast.LENGTH_SHORT).show());
     }
+
 
 
 
@@ -356,99 +356,6 @@ public class OrganizerHomeViewEventActivity extends AppCompatActivity {
                 })
                 .addOnFailureListener(e -> Toast.makeText(this, "Failed to load event details.", Toast.LENGTH_SHORT).show());
     }
-
-
-
-
-
-    /**
-     * Displays list of losers for the event.
-     * Shows losers list in an AlertDialog.
-     *
-     * @param eventId ID of the event to view losers for
-     */
-    private void viewLosers(String eventId) {
-        FirebaseFirestore db = FirebaseFirestore.getInstance();
-
-        // First, get the event name by querying the events collection
-        db.collection("events").document(eventId).get()
-                .addOnSuccessListener(eventDocumentSnapshot -> {
-                    if (eventDocumentSnapshot.exists()) {
-                        String eventName = eventDocumentSnapshot.getString("name"); // Extract event name
-
-                        // Now fetch the registered users for this event's losers
-                        db.collection("registered_events")
-                                .whereEqualTo("eventId", eventId)
-                                .whereEqualTo("status", "Not Selected")
-                                .get()
-                                .addOnSuccessListener(querySnapshot -> {
-                                    List<String> loserIds = new ArrayList<>();
-                                    StringBuilder losersList = new StringBuilder();
-
-                                    for (DocumentSnapshot document : querySnapshot.getDocuments()) {
-                                        String userId = document.getString("userId");
-                                        loserIds.add(userId);  // Collect user IDs of losers
-                                        losersList.append(userId).append("\n");
-                                    }
-
-                                    // Show losers list in dialog with "Notify" button
-                                    new AlertDialog.Builder(this)
-                                            .setTitle("Losers List")
-                                            .setMessage(losersList.toString())
-                                            .setPositiveButton("OK", null)
-                                            .setNegativeButton("Notify", (dialog, which) -> {
-                                                // Show dialog to input custom message
-                                                AlertDialog.Builder messageDialog = new AlertDialog.Builder(this);
-                                                messageDialog.setTitle("Custom Message");
-                                                final EditText input = new EditText(this);
-                                                messageDialog.setView(input);
-                                                messageDialog.setPositiveButton("Send", (innerDialog, which1) -> {
-                                                    String customMessage = input.getText().toString().trim();
-                                                    if (!customMessage.isEmpty()) {
-                                                        if (!loserIds.isEmpty()) {
-                                                            String notificationTitle = "Event Notification - " + eventName;
-
-                                                            // Batch write notifications to Firestore
-                                                            WriteBatch batch = db.batch();
-                                                            for (String userId : loserIds) {
-                                                                DocumentReference notificationRef = db.collection("notifications").document();
-                                                                Notification notification = new Notification(
-                                                                        notificationTitle,
-                                                                        customMessage,
-                                                                        userId
-                                                                );
-                                                                batch.set(notificationRef, notification);
-                                                            }
-
-                                                            // Commit batch and send notifications
-                                                            batch.commit()
-                                                                    .addOnSuccessListener(aVoid -> {
-                                                                        Toast.makeText(this, "Notification sent to losers.", Toast.LENGTH_SHORT).show();
-                                                                    })
-                                                                    .addOnFailureListener(e -> {
-                                                                        Toast.makeText(this, "Failed to save notifications.", Toast.LENGTH_SHORT).show();
-                                                                    });
-                                                        } else {
-                                                            Toast.makeText(this, "No losers to notify.", Toast.LENGTH_SHORT).show();
-                                                        }
-                                                    } else {
-                                                        Toast.makeText(this, "Message cannot be empty.", Toast.LENGTH_SHORT).show();
-                                                    }
-                                                });
-                                                messageDialog.setNegativeButton("Cancel", null);
-                                                messageDialog.show();
-                                            })
-                                            .show();
-                                })
-                                .addOnFailureListener(e -> Toast.makeText(this, "Failed to load losers.", Toast.LENGTH_SHORT).show());
-                    }
-                })
-                .addOnFailureListener(e -> Toast.makeText(this, "Failed to load event name.", Toast.LENGTH_SHORT).show());
-    }
-
-
-
-
 
     /**
      * Displays list of accepted users for the event.

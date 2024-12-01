@@ -125,17 +125,12 @@ public class OfflineWorker extends Worker {
                                     List<DocumentSnapshot> winners = registeredUsers.subList(0, winnersCount);
                                     List<DocumentSnapshot> losers = registeredUsers.subList(winnersCount, registeredUsers.size());
 
-                                    // Mark winners and losers in Firestore
-                                    List<String> winnerIds = new ArrayList<>();
-                                    List<String> loserIds = new ArrayList<>();
-
                                     // Prepare batch for notifications
                                     WriteBatch batch = db.batch();
 
                                     // Mark winners and losers and prepare notification documents
                                     for (DocumentSnapshot winner : winners) {
                                         db.collection("registered_events").document(winner.getId()).update("status", "Winner");
-                                        winnerIds.add(winner.getId()); // Add user ID to winners list
 
                                         // Upload notification for the winner to Firebase
                                         Notification winnerNotification = new Notification(
@@ -148,9 +143,6 @@ public class OfflineWorker extends Worker {
                                     }
 
                                     for (DocumentSnapshot loser : losers) {
-                                        db.collection("registered_events").document(loser.getId()).update("status", "Not Selected");
-                                        loserIds.add(loser.getId()); // Add user ID to losers list
-
                                         // Upload notification for the loser to Firebase
                                         Notification loserNotification = new Notification(
                                                 eventName + " - Lottery Results",
@@ -186,6 +178,7 @@ public class OfflineWorker extends Worker {
                     Toast.makeText(getApplicationContext(), "Failed to load event name.", Toast.LENGTH_SHORT).show();
                 });
     }
+
 
 
     /**

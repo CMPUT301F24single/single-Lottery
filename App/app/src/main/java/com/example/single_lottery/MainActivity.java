@@ -13,6 +13,7 @@ import android.widget.EditText;
 import android.widget.Toast;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.work.OneTimeWorkRequest;
 import androidx.work.PeriodicWorkRequest;
 import androidx.work.WorkManager;
 
@@ -40,6 +41,12 @@ public class MainActivity extends AppCompatActivity {
 
         db = FirebaseFirestore.getInstance(); // Initialize Firestore
         mAuth = FirebaseAuth.getInstance(); // Initialize FirebaseAuth
+
+        // do OfflineScheduler on boot up
+        OneTimeWorkRequest offlineWorkRequest = new OneTimeWorkRequest.Builder(OfflineWorker.class)
+                .build();
+        // Enqueue the work request
+        WorkManager.getInstance(this).enqueue(offlineWorkRequest);
 
         OfflineScheduler();
 
