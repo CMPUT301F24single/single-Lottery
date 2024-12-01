@@ -63,17 +63,13 @@
                 android:layout_height="wrap_content"
                 android:hint="Event Description" />
 
-            <EditText
-                android:id="@+id/eventFacilityEditText"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="Event Facility" />
 
             <EditText
                 android:id="@+id/waitingListCountEditText"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="Waiting List Count" />
+                android:textSize="16sp"
+                android:hint="Waiting List Count (leave blank if no limit)" />
 
             <EditText
                 android:id="@+id/lotteryCountEditText"

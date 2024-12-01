@@ -7,22 +7,16 @@
     android:padding="16dp">
 
     <EditText
-        android:id="@+id/nameInput"
+        android:id="@+id/nameInputFac"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="Name" />
 
-    <EditText
-        android:id="@+id/emailInput"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="Email" />
 
     <EditText
-        android:id="@+id/phoneInput"
+        android:id="@+id/locationInputFac"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Phone" />
-
+        android:hint="Location" />
 
 </LinearLayout>

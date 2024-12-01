@@ -89,59 +89,7 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="2"
-                    android:text="Ex. John Doe"
-                    android:textSize="18sp"
-                    android:textColor="#000000" />
-            </LinearLayout>
-
-            <!-- Email Layout -->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:padding="8dp"
-                android:id="@+id/emailLayout">
-
-                <TextView
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="Email"
-                    android:textColor="#000000"
-                    android:textSize="18sp" />
-
-                <TextView
-                    android:id="@+id/emailTextView"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="2"
-                    android:text="Ex. john.doe@example.com"
-                    android:textSize="18sp"
-                    android:textColor="#000000" />
-            </LinearLayout>
-
-            <!-- Phone Layout -->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:padding="8dp"
-                android:id="@+id/phoneLayout">
-
-                <TextView
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="Phone"
-                    android:textColor="#000000"
-                    android:textSize="18sp" />
-
-                <TextView
-                    android:id="@+id/phoneTextView"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="2"
-                    android:text="Ex. +1-123-456-7890"
+                    android:text="-"
                     android:textSize="18sp"
                     android:textColor="#000000" />
             </LinearLayout>
@@ -167,8 +115,8 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="2"
-                    android:text="E. location"
-                    android:textSize="16sp"
+                    android:text="-"
+                    android:textSize="18sp"
                     android:textColor="#000000" />
             </LinearLayout>
 
