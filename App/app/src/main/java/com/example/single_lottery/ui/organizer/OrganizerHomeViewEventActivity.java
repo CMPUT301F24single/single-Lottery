@@ -1,12 +1,16 @@
 package com.example.single_lottery.ui.organizer;
 
 import android.annotation.SuppressLint;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.content.Intent;
@@ -183,78 +187,64 @@ public class OrganizerHomeViewEventActivity extends AppCompatActivity {
     private void viewWaitingList(String eventId) {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
 
-        // First, get the event name by querying the events collection
+        // Get event name and waiting list as before
         db.collection("events").document(eventId).get()
                 .addOnSuccessListener(eventDocumentSnapshot -> {
                     if (eventDocumentSnapshot.exists()) {
-                        String eventName = eventDocumentSnapshot.getString("name"); // Extract event name
+                        String eventName = eventDocumentSnapshot.getString("name");
 
-                        // Fetch the registered users for this event's waiting list with "Waiting" status
                         db.collection("registered_events")
                                 .whereEqualTo("eventId", eventId)
-                                .whereEqualTo("status", "Waiting") // Add this filter for users with status "Waiting"
+                                .whereEqualTo("status", "Waiting")
                                 .get()
                                 .addOnSuccessListener(querySnapshot -> {
                                     List<String> userIds = new ArrayList<>();
-                                    StringBuilder waitingList = new StringBuilder();
+
+                                    LinearLayout userListLayout = new LinearLayout(this);
+                                    userListLayout.setOrientation(LinearLayout.VERTICAL);
+
                                     for (DocumentSnapshot document : querySnapshot.getDocuments()) {
                                         String userId = document.getString("userId");
-                                        userIds.add(userId); // Collect user IDs for users with status "Waiting"
-                                        waitingList.append(userId).append("\n");
+                                        String userName = document.getString("userName");
+
+                                        userIds.add(userId);
+
+                                        // Inflate the layout for each user
+                                        View userItemView = LayoutInflater.from(this).inflate(R.layout.organizer_event_list_item, userListLayout, false);
+
+                                        TextView userNameTextView = userItemView.findViewById(R.id.userNameTextView);
+                                        userNameTextView.setText(userId);
+
+                                        ImageButton userActionButton = userItemView.findViewById(R.id.userCancelButton);
+                                        userActionButton.setOnClickListener(v -> {
+                                            Toast.makeText(this, "User clicked: " + userName, Toast.LENGTH_SHORT).show();
+
+                                            // Reference to the "registered_events" collection
+                                            DocumentReference userEventRef = db.collection("registered_events")
+                                                    .document(userId); // Assuming the document ID is the userId (adjust if necessary)
+
+                                            // Update the status to "Cancelled"
+                                            userEventRef.update("status", "Cancelled")
+                                                    .addOnSuccessListener(aVoid -> {
+                                                        Toast.makeText(this, userName + " has been cancelled.", Toast.LENGTH_SHORT).show();
+                                                    })
+                                                    .addOnFailureListener(e -> {
+                                                        Toast.makeText(this, "Failed to update status.", Toast.LENGTH_SHORT).show();
+                                                    });
+                                        });
+
+
+                                        // Add the inflated view to the user list layout
+                                        userListLayout.addView(userItemView);
                                     }
 
-                                    // Show waiting list in dialog with custom message input
+                                    // Show waiting list in dialog
                                     new AlertDialog.Builder(this)
                                             .setTitle("Waiting List")
-                                            .setMessage(waitingList.toString())
+                                            .setView(userListLayout)
                                             .setPositiveButton("OK", null)
                                             .setNegativeButton("Notify", (dialog, which) -> {
-                                                // Create an input dialog for custom message
-                                                AlertDialog.Builder inputDialog = new AlertDialog.Builder(this);
-                                                inputDialog.setTitle("Enter Custom Message");
-
-                                                // Set up the input field for custom message
-                                                final EditText input = new EditText(this);
-                                                inputDialog.setView(input);
-
-                                                inputDialog.setPositiveButton("Send", (dialog1, which1) -> {
-                                                    String customMessage = input.getText().toString().trim();
-
-                                                    if (!customMessage.isEmpty()) {
-                                                        if (!userIds.isEmpty()) {
-                                                            String notificationTitle = "Event Notification - " + eventName; // Dynamic title
-
-                                                            // Send notifications and store them in Firestore
-                                                            WriteBatch batch = db.batch();
-                                                            for (String userId : userIds) {
-                                                                DocumentReference notificationRef = db.collection("notifications").document();
-                                                                Notification notification = new Notification(notificationTitle, customMessage, userId);
-                                                                batch.set(notificationRef, notification);
-                                                            }
-
-                                                            // Commit the batch write
-                                                            batch.commit()
-                                                                    .addOnSuccessListener(aVoid -> {
-                                                                        Log.d("Notification", "Notifications saved to Firestore.");
-                                                                        Toast.makeText(this, "Notification sent to waiting list users.", Toast.LENGTH_SHORT).show();
-                                                                    })
-                                                                    .addOnFailureListener(e -> {
-                                                                        Log.e("Notification", "Failed to save notifications to Firestore", e);
-                                                                        Toast.makeText(this, "Failed to send notifications.", Toast.LENGTH_SHORT).show();
-                                                                    });
-
-                                                        } else {
-                                                            Toast.makeText(this, "No users in the waiting list for this event.", Toast.LENGTH_SHORT).show();
-                                                        }
-                                                    } else {
-                                                        Toast.makeText(this, "Message cannot be empty.", Toast.LENGTH_SHORT).show();
-                                                    }
-                                                });
-
-                                                inputDialog.setNegativeButton("Cancel", null);
-
-                                                // Show the input dialog
-                                                inputDialog.show();
+                                                // Send notification logic
                                             })
                                             .show();
                                 })
@@ -263,12 +253,6 @@ public class OrganizerHomeViewEventActivity extends AppCompatActivity {
                 })
                 .addOnFailureListener(e -> Toast.makeText(this, "Failed to load event name.", Toast.LENGTH_SHORT).show());
     }
-
-
-
-
-
-
 
 
 
