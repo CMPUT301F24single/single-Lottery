@@ -14,8 +14,7 @@
         android:gravity="center"
         android:layout_marginLeft="8dp"
         android:layout_marginRight="8dp"
-        android:layout_marginTop="8dp"
-        android:elevation="4dp">
+        android:layout_marginTop="8dp">
 
         <!-- Profile Image Centered in Blue Section -->
         <ImageView
@@ -25,8 +24,7 @@
             android:layout_centerHorizontal="true"
             android:layout_marginTop="16dp"
             android:padding="8dp"
-            android:src="@drawable/org"
-            android:elevation="4dp"/>
+            android:src="@drawable/org" />
 
         <!-- Upload and Remove Buttons Below Profile Image -->
         <LinearLayout
@@ -62,8 +60,7 @@
         android:layout_marginLeft="8dp"
         android:layout_marginRight="8dp"
         android:layout_marginTop="8dp"
-        android:layout_marginBottom="8dp"
-        android:elevation="4dp">
+        android:layout_marginBottom="8dp">
 
         <!-- Profile Information Fields -->
         <LinearLayout
@@ -149,28 +146,28 @@
                     android:textColor="#000000" />
             </LinearLayout>
 
-            <!-- Info Layout -->
+            <!-- location Layout -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
                 android:padding="8dp"
-                android:id="@+id/infoLayout">
+                android:id="@+id/locationLayout">
 
                 <TextView
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="Info"
+                    android:text="Location"
                     android:textColor="#000000"
                     android:textSize="18sp" />
 
                 <TextView
-                    android:id="@+id/infoTextView"
+                    android:id="@+id/locationTextView"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="2"
-                    android:text="E. Information about the organizer"
+                    android:text="E. location"
                     android:textSize="16sp"
                     android:textColor="#000000" />
             </LinearLayout>
@@ -183,12 +180,6 @@
                 android:layout_gravity="center"
                 android:text="Edit" />
 
-            <Button
-                android:id="@+id/facilityButton"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:text="Open Facility Profile" />
         </LinearLayout>
     </RelativeLayout>
 </LinearLayout>
