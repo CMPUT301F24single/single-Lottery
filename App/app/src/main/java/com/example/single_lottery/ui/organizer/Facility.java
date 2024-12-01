@@ -1,25 +1,16 @@
 package com.example.single_lottery.ui.organizer;
 public class Facility {
     public String name;
-    public String email;
-    public String phone;
     public String location;
     public String profileImageUrl;
-    public Facility(String name, String email, String phone, String location, String profileImageUrl) {
+    public String facility;
+    public Facility(String name, String location, String profileImageUrl) {
         this.name = name;
-        this.email = email;
-        this.phone = phone;
         this.location = location;
         this.profileImageUrl = profileImageUrl;
     }
     public String getName() {
         return name;
-    }
-    public String getEmail() {
-        return email;
-    }
-    public String getPhone() {
-        return phone;
     }
     public String getLocation() {
         return location;
@@ -29,12 +20,6 @@ public class Facility {
     }
     public void setName(String name) {
         this.name = name;
-    }
-    public void setEmail(String email) {
-        this.email = email;
-    }
-    public void setPhone(String phone) {
-        this.phone = phone;
     }
     public void setLocation(String location) {
         this.location = location;

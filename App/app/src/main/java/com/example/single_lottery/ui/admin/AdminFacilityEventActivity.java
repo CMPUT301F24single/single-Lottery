@@ -6,8 +6,8 @@ import androidx.fragment.app.FragmentTransaction;
 public class AdminFacilityEventActivity extends AppCompatActivity {
 
     public static final String facility_name = "facility_name";
-    @Override
 
+    @Override
     protected void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
 

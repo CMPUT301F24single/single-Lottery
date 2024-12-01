@@ -80,7 +80,11 @@ public class OrganizerProfilePageFragment extends Fragment {
         editButton.setOnClickListener(v -> showEditDialog());
         uploadButton.setOnClickListener(v -> selectImage());
         removeImageButton.setOnClickListener(v -> removeProfileImage());
-        facilityButton.setOnClickListener(v -> openFacilityProfile());
+        //facilityButton.setOnClickListener(v -> openFacilityProfile());
+        facilityButton.setOnClickListener(v -> {
+            Intent intent = new Intent(getContext(), FacilityProfile.class);
+            getContext().startActivity(intent);
+        });
 
         return view;
     }
