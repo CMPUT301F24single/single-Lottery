@@ -61,12 +61,15 @@ public class OrganizerActivity extends AppCompatActivity {
 
         navView.setOnItemSelectedListener(item -> {
             Fragment selectedFragment = null;
+            // Navigate to organizer's home screen
             if (item.getItemId() == R.id.navigation_home) {
                 selectedFragment = new OrganizerHomeFragment();
+                // Navigate to event creation screen
             } else if (item.getItemId() == R.id.navigation_new) {
                 Intent intent = new Intent(OrganizerActivity.this, OrganizerEventCreateActivity.class);
                 startActivity(intent);
                 return true;
+                // Navigate to organizer's profile screen
             } else if (item.getItemId() == R.id.navigation_profile) {
                 selectedFragment = new OrganizerProfilePageFragment();
             }

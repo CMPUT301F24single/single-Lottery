@@ -16,19 +16,30 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.annotations.Nullable;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
-
+/**
+ * Activity for admin login authentication.
+ * Handles admin credentials verification and login process using Firestore.
+ *
+ * @author Jingyao Gu
+ * @version 1.0
+ */
 public class AdminLoginActivity extends AppCompatActivity {
 
     private EditText emailInput, passwordInput;
     private Button loginButton;
     private FirebaseFirestore db;
-
+    /**
+     * Initializes the activity, sets up UI components and click listeners.
+     * Configures admin login form and back navigation.
+     *
+     * @param savedInstanceState Saved instance state bundle
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.admin_login);
 
-        // 初始化 Firestore 和 UI 组件
+        // Initialize Firestore and UI components
         db = FirebaseFirestore.getInstance();
         emailInput = findViewById(R.id.emailInput);
         passwordInput = findViewById(R.id.passwordInput);
@@ -45,7 +56,7 @@ public class AdminLoginActivity extends AppCompatActivity {
         });
 
 
-        // 登录按钮点击事件
+        // Login button click event
         loginButton.setOnClickListener(v -> {
             String email = emailInput.getText().toString().trim();
             String password = passwordInput.getText().toString().trim();
@@ -59,7 +70,12 @@ public class AdminLoginActivity extends AppCompatActivity {
     }
 
     /**
-     * 使用 Firestore 验证管理员登录
+     * Authenticates admin login credentials against Firestore.
+     * Verifies email and password match stored admin records.
+     * Navigates to admin main screen on successful login.
+     *
+     * @param email Admin's email address
+     * @param password Admin's password
      */
     private void performFirestoreLogin(String email, String password) {
         db.collection("admin")
@@ -67,14 +83,14 @@ public class AdminLoginActivity extends AppCompatActivity {
                 .get()
                 .addOnSuccessListener(queryDocumentSnapshots -> {
                     if (!queryDocumentSnapshots.isEmpty()) {
-                        // 获取第一个匹配的文档
+                        // Get the first matching document
                         DocumentSnapshot document = queryDocumentSnapshots.getDocuments().get(0);
                         String storedPassword = document.getString("password");
 
-                        // 验证密码是否匹配
+                        // Verify that the passwords match
                         if (storedPassword != null && storedPassword.equals(password)) {
                             Toast.makeText(this, "Login successful!", Toast.LENGTH_SHORT).show();
-                            // 跳转到管理员主页面
+                            // Jump to the administrator's main page
                             Intent intent = new Intent(AdminLoginActivity.this, AdminActivity.class);
                             startActivity(intent);
                             finish();

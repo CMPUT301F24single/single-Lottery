@@ -143,7 +143,7 @@ public class UserEventDetailActivity extends AppCompatActivity {
             SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault());
             Date deadlineDate = dateFormat.parse(registrationDeadline);
             Date lotteryDate = dateFormat.parse(lotteryTime);
-            Date eventEndDate = dateFormat.parse(eventTime); // 活动的结束时间
+            Date eventEndDate = dateFormat.parse(eventTime); // End time of the event
             Date currentDate = new Date();
 
             if (currentDate.before(deadlineDate)) {

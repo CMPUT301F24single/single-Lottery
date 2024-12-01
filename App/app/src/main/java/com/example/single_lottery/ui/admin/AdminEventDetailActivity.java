@@ -23,6 +23,14 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
+/**
+ * Activity for displaying and managing event details in admin view.
+ * Provides functionality to view event information, delete posters, delete QR codes,
+ * and delete entire events.
+ *
+ * @author Jingyao Gu
+ * @version 1.0
+ */
 public class AdminEventDetailActivity extends AppCompatActivity {
 
     private TextView textViewName;
@@ -37,6 +45,12 @@ public class AdminEventDetailActivity extends AppCompatActivity {
     private Button buttonDeleteEvent;
     private ProgressDialog progressDialog;
 
+    /**
+     * Initializes the activity, sets up the UI components and button listeners.
+     * Loads event details if valid event ID is provided.
+     *
+     * @param savedInstanceState Saved instance state bundle
+     */
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -82,6 +96,12 @@ public class AdminEventDetailActivity extends AppCompatActivity {
         });
     }
 
+    /**
+     * Handles action bar button clicks, specifically the back button.
+     *
+     * @param item The menu item that was clicked
+     * @return True if the event was handled, false otherwise
+     */
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         if (item.getItemId() == android.R.id.home) { // The ID of the back button
@@ -91,6 +111,9 @@ public class AdminEventDetailActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
+    /**
+     * Initializes all view references from the layout.
+     */
     private void initViews() {
         textViewName = findViewById(R.id.textViewEventName);
         textViewDescription = findViewById(R.id.textViewEventDescription);
@@ -104,6 +127,13 @@ public class AdminEventDetailActivity extends AppCompatActivity {
         buttonDeleteEvent = findViewById(R.id.buttonDeleteEvent);
     }
 
+    /**
+     * Loads event details from Firestore database.
+     * Updates UI with event information including name, description, times,
+     * and poster image if available.
+     *
+     * @param eventId ID of the event to load
+     */
     private void loadEventDetails(String eventId) {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
 
@@ -129,11 +159,17 @@ public class AdminEventDetailActivity extends AppCompatActivity {
                 .addOnFailureListener(e -> Log.e("AdminEventDetail", "Error loading event details", e));
     }
 
+    /**
+     * Deletes the event poster from storage and removes poster URL from database.
+     * Shows progress dialog during deletion process.
+     *
+     * @param eventId ID of the event whose poster should be deleted
+     */
     private void deletePoster(String eventId) {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         FirebaseStorage storage = FirebaseStorage.getInstance();
 
-        // 显示加载对话框
+        // Show loading dialog
         progressDialog.setMessage("Deleting poster...");
         progressDialog.show();
 
@@ -181,6 +217,13 @@ public class AdminEventDetailActivity extends AppCompatActivity {
                 });
     }
 
+    /**
+     * Deletes an event and its associated data from the database.
+     * Includes deletion of poster if it exists.
+     * Shows confirmation dialog before deletion.
+     *
+     * @param eventId ID of the event to delete
+     */
     private void deleteEvent(String eventId) {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         FirebaseStorage storage = FirebaseStorage.getInstance();
@@ -222,6 +265,12 @@ public class AdminEventDetailActivity extends AppCompatActivity {
                 });
     }
 
+    /**
+     * Deletes the QR code associated with an event.
+     * Removes QR code hash from the event document in database.
+     *
+     * @param eventId ID of the event whose QR code should be deleted
+     */
     private void deleteQRCode(String eventId) {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
 
