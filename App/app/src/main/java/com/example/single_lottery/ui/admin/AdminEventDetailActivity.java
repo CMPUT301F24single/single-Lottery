@@ -46,14 +46,14 @@ public class AdminEventDetailActivity extends AppCompatActivity {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         }
 
-        // 初始化视图
+        // Initializing the View
         initViews();
 
-        // 初始化加载对话框
+        // Initialize loading dialog box
         progressDialog = new ProgressDialog(this);
         progressDialog.setCancelable(false);
 
-        // 获取从Intent传递的eventId
+        // Get the eventId passed from the Intent
         String eventId = getIntent().getStringExtra("eventId");
         if (eventId != null) {
             loadEventDetails(eventId);
@@ -61,12 +61,12 @@ public class AdminEventDetailActivity extends AppCompatActivity {
             Log.e("AdminEventDetail", "Event ID is missing in intent.");
         }
 
-        // 绑定删除海报按钮
+        // Bind delete poster button
         buttonDeletePoster.setOnClickListener(v -> {
             deletePoster(eventId);
         });
 
-        // 绑定删除活动按钮
+        // Bind delete activity button
         buttonDeleteEvent.setOnClickListener(v -> {
             new AlertDialog.Builder(this)
                     .setTitle("Delete Event")
@@ -84,8 +84,8 @@ public class AdminEventDetailActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        if (item.getItemId() == android.R.id.home) { // 返回按钮的 ID
-            onBackPressed(); // 返回上一页
+        if (item.getItemId() == android.R.id.home) { // The ID of the back button
+            onBackPressed(); // Return to previous page
             return true;
         }
         return super.onOptionsItemSelected(item);
@@ -110,7 +110,7 @@ public class AdminEventDetailActivity extends AppCompatActivity {
         db.collection("events").document(eventId).get()
                 .addOnSuccessListener(doc -> {
                     if (doc.exists()) {
-                        // 设置活动信息
+                        // Set event information
                         textViewName.setText(doc.getString("name"));
                         textViewDescription.setText(doc.getString("description"));
                         textViewTime.setText(doc.getString("time"));
@@ -119,7 +119,7 @@ public class AdminEventDetailActivity extends AppCompatActivity {
                         textViewWaitingListCount.setText(doc.getLong("waitingListCount") + "/100");
                         textViewLotteryCount.setText(String.valueOf(doc.getLong("lotteryCount")));
 
-                        // 加载海报图片
+                        // Loading poster image
                         String posterUrl = doc.getString("posterUrl");
                         if (posterUrl != null && !posterUrl.isEmpty()) {
                             Glide.with(this).load(posterUrl).into(imageViewPoster);
@@ -144,12 +144,12 @@ public class AdminEventDetailActivity extends AppCompatActivity {
                     Log.d("DeletePoster", "Poster URL: " + posterUrl);
 
                     if (posterUrl != null && !posterUrl.isEmpty()) {
-                        // 删除存储中的海报文件
+                        // Delete poster files in storage
                         StorageReference posterRef = storage.getReferenceFromUrl(posterUrl);
                         posterRef.delete()
                                 .addOnSuccessListener(aVoid -> {
                                     Log.d("DeletePoster", "Poster deleted successfully from storage");
-                                    // 更新数据库，移除海报 URL
+                                    // Update database to remove poster URL
                                     db.collection("events").document(eventId)
                                             .update("posterUrl", null)
                                             .addOnSuccessListener(unused -> {
@@ -185,14 +185,14 @@ public class AdminEventDetailActivity extends AppCompatActivity {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         FirebaseStorage storage = FirebaseStorage.getInstance();
 
-        // 显示加载对话框
+        // Show loading dialog
         progressDialog.setMessage("Deleting event...");
         progressDialog.show();
 
         db.collection("events").document(eventId)
                 .get()
                 .addOnSuccessListener(documentSnapshot -> {
-                    // 删除关联的海报
+                    // Delete associated poster
                     String posterUrl = documentSnapshot.getString("posterUrl");
                     if (posterUrl != null && !posterUrl.isEmpty()) {
                         StorageReference posterRef = storage.getReferenceFromUrl(posterUrl);
@@ -201,7 +201,7 @@ public class AdminEventDetailActivity extends AppCompatActivity {
                                 .addOnFailureListener(e -> Log.e("DeleteEvent", "Failed to delete poster from storage", e));
                     }
 
-                    // 删除活动文档
+                    // Delete the active document
                     db.collection("events").document(eventId)
                             .delete()
                             .addOnSuccessListener(aVoid -> {
@@ -225,7 +225,7 @@ public class AdminEventDetailActivity extends AppCompatActivity {
     private void deleteQRCode(String eventId) {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
 
-        // 显示加载进度对话框
+        // Show loading progress dialog
         ProgressDialog progressDialog = new ProgressDialog(this);
         progressDialog.setMessage("Deleting QR Code...");
         progressDialog.setCancelable(false);
@@ -235,10 +235,10 @@ public class AdminEventDetailActivity extends AppCompatActivity {
                 .get()
                 .addOnSuccessListener(documentSnapshot -> {
                     if (documentSnapshot.exists()) {
-                        // 检查是否存在 QR Code
+                        // Check if a QR Code exists
                         String qrCodeHash = documentSnapshot.getString("qrCodeHash");
                         if (qrCodeHash != null && !qrCodeHash.isEmpty()) {
-                            // 删除 QR Code 字段
+                            // Delete the QR Code field
                             db.collection("events").document(eventId)
                                     .update("qrCodeHash", null)
                                     .addOnSuccessListener(unused -> {
