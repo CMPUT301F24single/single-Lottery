@@ -46,7 +46,9 @@
         <activity
             android:name=".ui.organizer.OrganizerActivity"
             android:exported="true" />
-
+        <activity
+            android:name=".ui.organizer.FacilityProfile"
+            android:exported="true" />
         <activity
             android:name=".ui.user.UserActivity"
             android:exported="true" />
