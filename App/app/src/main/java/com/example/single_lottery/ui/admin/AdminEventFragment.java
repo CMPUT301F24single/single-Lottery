@@ -49,13 +49,6 @@ public class AdminEventFragment extends Fragment {
         eventAdapter = new AdminEventAdapter(getContext(), eventList);
         recyclerView.setAdapter(eventAdapter);
 
-        // Add DividerItemDecoration (for dividing list of events)
-        DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(
-                recyclerView.getContext(),
-                LinearLayoutManager.VERTICAL
-        );
-        recyclerView.addItemDecoration(dividerItemDecoration);
-
         loadEventData();
 
         return view;
