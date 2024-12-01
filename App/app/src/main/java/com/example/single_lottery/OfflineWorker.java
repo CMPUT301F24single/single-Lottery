@@ -1,12 +1,15 @@
 package com.example.single_lottery;
 
 import android.content.Context;
+import android.provider.Settings;
 import android.util.Log;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.work.Worker;
 import androidx.work.WorkerParameters;
+import android.content.ContentResolver;
+
 
 import com.example.single_lottery.ui.notification.Notification;
 import com.example.single_lottery.ui.notification.NotificationActivity;
@@ -192,12 +195,16 @@ public class OfflineWorker extends Worker {
     private void sendNotifications() {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
 
-        // Query the notifications collection
+        // Get the current user's ID (ANDROID_ID)
+        String currentUserId = Settings.Secure.getString(getApplicationContext().getContentResolver(), Settings.Secure.ANDROID_ID);
+
+        // Query the notifications collection for notifications relevant to the current user
         db.collection("notifications")
+                .whereEqualTo("userId", currentUserId) // Filter notifications based on userId
                 .get()
                 .addOnSuccessListener(querySnapshot -> {
                     if (!querySnapshot.isEmpty()) {
-                        // Loop through all notifications
+                        // Loop through all notifications for the current user
                         for (DocumentSnapshot notificationDoc : querySnapshot.getDocuments()) {
                             // Extract the fields from the document
                             String title = notificationDoc.getString("title");
@@ -209,7 +216,7 @@ public class OfflineWorker extends Worker {
                                 // Send notification
                                 NotificationActivity.sendNotification(getApplicationContext(), title, message, userId);
 
-                                // Delete the notification document from the Firestore
+                                // Delete the notification document from Firestore after sending
                                 db.collection("notifications").document(notificationDoc.getId())
                                         .delete()
                                         .addOnSuccessListener(aVoid -> {
@@ -230,5 +237,4 @@ public class OfflineWorker extends Worker {
                     Log.e("Notification", "Error retrieving notifications", e);
                 });
     }
-
 }
