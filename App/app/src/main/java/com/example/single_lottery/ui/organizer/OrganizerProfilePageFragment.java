@@ -133,16 +133,18 @@ public class OrganizerProfilePageFragment extends Fragment {
 
 
     private void generateLetterAvatar(String name) {
-        String[] nameParts = name.split("\\s+");
         String initials = "";
-        if(name.isEmpty()){
+        if(name == null || name.isEmpty()){
             initials += '-';
         }
-        else if (nameParts.length > 0) {
-            initials += nameParts[0].charAt(0);
-        }
-        if (nameParts.length > 1) {
-            initials += nameParts[1].charAt(0);
+        else {
+            String[] nameParts = name.split("\\s+");
+            if (nameParts.length > 0) {
+                initials += nameParts[0].charAt(0); // First letter of first name
+            }
+            if (nameParts.length > 1) {
+                initials += nameParts[1].charAt(0); // First letter of last name
+            }
         }
 
         Bitmap bitmap = Bitmap.createBitmap(100, 100, Bitmap.Config.ARGB_8888);
