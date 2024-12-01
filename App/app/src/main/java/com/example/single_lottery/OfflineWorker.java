@@ -1,6 +1,8 @@
 package com.example.single_lottery;
 
 import android.content.Context;
+import android.os.Handler;
+import android.os.Looper;
 import android.provider.Settings;
 import android.util.Log;
 import android.widget.Toast;
@@ -17,6 +19,8 @@ import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.WriteBatch;
+
+import org.w3c.dom.Document;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -35,8 +39,10 @@ public class OfflineWorker extends Worker {
     @NonNull
     @Override
     public Result doWork() {
-        performLotteryCheck(); // Call your lottery check logic
-        sendNotifications();
+        performLotteryCheck();
+
+        new Handler(Looper.getMainLooper()).postDelayed(this::sendNotifications, 2000); // delay the execution of sendNotifications() by 2 seconds
+
         return Result.success();
     }
 
@@ -125,10 +131,13 @@ public class OfflineWorker extends Worker {
                                     List<DocumentSnapshot> winners = registeredUsers.subList(0, winnersCount);
                                     List<DocumentSnapshot> losers = registeredUsers.subList(winnersCount, registeredUsers.size());
 
+                                    // Prepare WriteBatch for notifications
+                                    WriteBatch batch = db.batch();
+
                                     // Update winners
                                     for (DocumentSnapshot winner : winners) {
                                         // Update winner status
-                                        db.collection("registered_events").document(winner.getId()).update("status", "Winner");
+                                        batch.update(db.collection("registered_events").document(winner.getId()), "status", "Winner");
 
                                         // Add notification for winner
                                         Notification winnerNotification = new Notification(
@@ -136,7 +145,8 @@ public class OfflineWorker extends Worker {
                                                 "Congratulations, you are a winner!",
                                                 winner.getId()
                                         );
-                                        db.collection("notifications").document(winner.getId()).set(winnerNotification);
+                                        DocumentReference winnerNotificationRef = db.collection("notifications").document();
+                                        batch.set(winnerNotificationRef, winnerNotification);
                                     }
 
                                     // Update losers
@@ -147,18 +157,27 @@ public class OfflineWorker extends Worker {
                                                 "Sorry, you were not selected.",
                                                 loser.getId()
                                         );
-                                        db.collection("notifications").document(loser.getId()).set(loserNotification);
+                                        DocumentReference loserNotificationRef = db.collection("notifications").document();
+                                        batch.set(loserNotificationRef, loserNotification);
                                     }
 
-                                    // Update event 'drawn' status to true
-                                    db.collection("events").document(eventId).update("drawnStatus", true)
+                                    // Commit the batch to upload all changes
+                                    batch.commit()
                                             .addOnSuccessListener(aVoid -> {
-                                                Log.d("LotteryWorker", "Lottery completed for event: " + eventId);
-                                                Toast.makeText(getApplicationContext(), "Lottery and notifications completed.", Toast.LENGTH_SHORT).show();
+                                                // Update event 'drawn' status to true
+                                                db.collection("events").document(eventId).update("drawnStatus", true)
+                                                        .addOnSuccessListener(unused -> {
+                                                            Log.d("LotteryWorker", "Lottery completed for event: " + eventId);
+                                                            Toast.makeText(getApplicationContext(), "Lottery and notifications completed.", Toast.LENGTH_SHORT).show();
+                                                        })
+                                                        .addOnFailureListener(e -> {
+                                                            Log.e("LotteryWorker", "Error updating event drawn status", e);
+                                                            Toast.makeText(getApplicationContext(), "Failed to update event status.", Toast.LENGTH_SHORT).show();
+                                                        });
                                             })
                                             .addOnFailureListener(e -> {
-                                                Log.e("LotteryWorker", "Error updating event drawn status", e);
-                                                Toast.makeText(getApplicationContext(), "Failed to update event status.", Toast.LENGTH_SHORT).show();
+                                                Log.e("LotteryWorker", "Error committing batch", e);
+                                                Toast.makeText(getApplicationContext(), "Failed to save notifications.", Toast.LENGTH_SHORT).show();
                                             });
                                 })
                                 .addOnFailureListener(e -> {
@@ -172,6 +191,7 @@ public class OfflineWorker extends Worker {
                     Toast.makeText(getApplicationContext(), "Failed to load event name.", Toast.LENGTH_SHORT).show();
                 });
     }
+
 
 
 
