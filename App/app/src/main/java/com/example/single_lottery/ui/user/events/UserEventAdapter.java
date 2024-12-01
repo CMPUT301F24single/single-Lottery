@@ -68,7 +68,6 @@ public class UserEventAdapter extends RecyclerView.Adapter<UserEventAdapter.User
         TextView facilityTextView = holder.itemView.findViewById(R.id.eventFacilityTextView);
         TextView timeTextView = holder.itemView.findViewById(R.id.eventTimeTextView);
         TextView statusTextView = holder.itemView.findViewById(R.id.eventStatusTextView);
-
         String eventId = event.getEventId();
         String userId = Settings.Secure.getString(contentResolver, Settings.Secure.ANDROID_ID);
         setUserStatus(userId, eventId, statusTextView);

@@ -1,32 +1,115 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="horizontal"
-    android:padding="8dp">
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:padding="16dp"
+    android:background="@drawable/rounded_corners_grey"
+    android:layout_marginBottom="4dp">
 
-    <TextView
-        android:id="@+id/eventNameTextView"
+    <!-- Container for Event Details (Name, Facility, Time) -->
+    <LinearLayout
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:text="Event Name"
-        android:textSize="16sp"
-        android:textColor="#000000"
-        android:gravity="center_vertical" /> <!-- Aligns the text vertically -->
+        android:orientation="vertical"
+        android:layout_weight="1">
 
-    <Button
-        android:id="@+id/viewButton"
+        <!-- Event Name TextView -->
+        <TextView
+            android:id="@+id/eventNameTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Event Name"
+            android:textSize="17sp"
+            android:textStyle="bold" />
+
+        <!-- Facility TextView with Location Icon -->
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp">
+
+            <ImageView
+                android:src="@drawable/baseline_location_pin_24"
+                android:layout_width="20dp"
+                android:layout_height="20dp"/>
+
+            <TextView
+                android:id="@+id/organizerFacilityTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Facility: "
+                android:textSize="14sp"
+                android:layout_marginLeft="4dp"/>
+        </LinearLayout>
+
+        <!-- Time TextView with Event Date Icon -->
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp">
+
+            <ImageView
+                android:src="@drawable/baseline_access_time_24"
+                android:layout_width="20dp"
+                android:layout_height="20dp" />
+
+            <TextView
+                android:id="@+id/organizerTimeTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Time: "
+                android:textSize="14sp"
+                android:layout_marginLeft="4dp"/>
+        </LinearLayout>
+
+        <!-- Lottery Date TextView with Lottery Icon -->
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp">
+
+            <ImageView
+                android:src="@drawable/baseline_how_to_vote_24"
+                android:layout_width="20dp"
+                android:layout_height="20dp" />
+
+            <TextView
+                android:id="@+id/organizerLotteryDate"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Lottery Date: "
+                android:textSize="14sp"
+                android:layout_marginLeft="4dp"/>
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <!-- Container for View and Edit buttons (stacked vertically) -->
+    <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="View"
-        android:layout_marginStart="8dp" /> <!-- Adds margin to the start of the button -->
+        android:orientation="vertical"
+        android:layout_alignParentEnd="true"
+        android:layout_gravity="end|center_vertical">
 
-    <Button
-        android:id="@+id/editButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Edit"
-        android:layout_marginStart="8dp" /> <!-- Adds margin to the start of the button -->
+        <!-- View Button -->
+        <Button
+            android:id="@+id/viewButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="View" />
+
+        <!-- Edit Button -->
+        <Button
+            android:id="@+id/editButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Edit" /> <!-- Adds margin between buttons -->
+    </LinearLayout>
 
 </LinearLayout>

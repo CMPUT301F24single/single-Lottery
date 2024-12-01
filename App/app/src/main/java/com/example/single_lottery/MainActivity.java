@@ -1,62 +1,54 @@
-
 package com.example.single_lottery;
 
+import android.content.ContentResolver;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.os.Build;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.text.TextUtils;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.EditText;
 import android.widget.Toast;
-import android.Manifest;
 import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.work.PeriodicWorkRequest;
+import androidx.work.WorkManager;
 
 import com.example.single_lottery.ui.admin.AdminActivity;
 import com.example.single_lottery.ui.organizer.OrganizerActivity;
-
 import com.example.single_lottery.ui.user.UserActivity;
-import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.installations.FirebaseInstallations;
 
-
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-
-import androidx.work.PeriodicWorkRequest;
-import androidx.work.WorkManager;
-import androidx.work.OneTimeWorkRequest;
-
+import java.util.Collections;
 import java.util.concurrent.TimeUnit;
 
-/**
- * Main entry point activity for Single Lottery application.
- * Handles role selection and automatic lottery execution for events.
- *
- * @author [Haorui Gao]
- * @version 1.0
- */
 public class MainActivity extends AppCompatActivity {
 
     private boolean showLandingScreen;
     private static final int REQUEST_CODE = 100;
     private FirebaseFirestore db;
+    private FirebaseAuth mAuth;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         db = FirebaseFirestore.getInstance(); // Initialize Firestore
+        mAuth = FirebaseAuth.getInstance(); // Initialize FirebaseAuth
+
         scheduleLotteryWorker();
 
         showLandingScreen = getIntent().getBooleanExtra("showLandingScreen", true);
 
         if (showLandingScreen) {
             setContentView(R.layout.activity_landing);
-
+            saveUID();  // Save UID
             Button buttonUser = findViewById(R.id.button_user);
             Button buttonOrganizer = findViewById(R.id.button_organizer);
             Button buttonAdmin = findViewById(R.id.button_admin);
@@ -77,13 +69,64 @@ public class MainActivity extends AppCompatActivity {
             buttonOrganizer.setOnClickListener(listener);
             buttonAdmin.setOnClickListener(listener);
         }
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            if (checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
-                requestPermissions(new String[]{Manifest.permission.POST_NOTIFICATIONS}, REQUEST_CODE);
-            }
-        }
     }
+
+    private void saveUID() {
+        // Step 1: Get the Firebase Installation ID
+        FirebaseInstallations.getInstance().getId()
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        String installationId = task.getResult();  // Get Installation ID
+                        Log.d("Installation ID", "Installation ID: " + installationId);
+
+                        // Step 2: Get the current Firebase user UID (Android ID)
+                        String uid = Settings.Secure.getString(getContentResolver(), Settings.Secure.ANDROID_ID);
+
+                        if (uid != null) {
+                            // Step 3: Check if the UID field exists
+                            db.collection("users")
+                                    .document(installationId)
+                                    .get()
+                                    .addOnSuccessListener(documentSnapshot -> {
+                                        if (documentSnapshot.exists()) {
+                                            // Check if 'uid' is already set (using lowercase 'uid')
+                                            if (!documentSnapshot.contains("uid")) {
+                                                // If 'uid' is not set, update the 'uid' field
+                                                db.collection("users")
+                                                        .document(installationId)
+                                                        .update("uid", uid)  // Use lowercase 'uid'
+                                                        .addOnSuccessListener(aVoid ->
+                                                                Log.d("Firestore", "UID stored successfully"))
+                                                        .addOnFailureListener(e ->
+                                                                Log.d("Firestore", "Error storing UID: " + e.getMessage()));
+                                            } else {
+                                                Log.d("Firestore", "UID already exists.");
+                                            }
+                                        } else {
+                                            // Document does not exist, create it and set 'uid'
+                                            db.collection("users")
+                                                    .document(installationId)
+                                                    .set(Collections.singletonMap("uid", uid))  // Use lowercase 'uid'
+                                                    .addOnSuccessListener(aVoid ->
+                                                            Log.d("Firestore", "Document created and UID stored successfully"))
+                                                    .addOnFailureListener(e ->
+                                                            Log.d("Firestore", "Error storing UID: " + e.getMessage()));
+                                        }
+                                    })
+                                    .addOnFailureListener(e ->
+                                            Log.d("Firestore", "Error checking document existence: " + e.getMessage()));
+                        } else {
+                            Log.d("Firestore", "Android ID is null. Cannot store UID.");
+                        }
+                    } else {
+                        Log.d("Installation ID", "Failed to get Installation ID.");
+                    }
+                });
+    }
+
+
+
+
 
     private void showAdminLoginPopup() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -127,9 +170,6 @@ public class MainActivity extends AppCompatActivity {
         dialog.show();
     }
 
-
-
-
     private void performFirestoreLogin(String email, String password, AlertDialog dialog) {
         db.collection("admin")
                 .whereEqualTo("email", email)
@@ -157,10 +197,8 @@ public class MainActivity extends AppCompatActivity {
                 });
     }
 
-
-
     @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         if (requestCode == REQUEST_CODE) {
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
@@ -171,6 +209,7 @@ public class MainActivity extends AppCompatActivity {
             }
         }
     }
+
     private void scheduleLotteryWorker() {
         PeriodicWorkRequest lotteryWorkRequest = new PeriodicWorkRequest.Builder(LotteryWorker.class,
                 15, TimeUnit.MINUTES // Check every 15 mins
@@ -178,4 +217,3 @@ public class MainActivity extends AppCompatActivity {
         WorkManager.getInstance(this).enqueue(lotteryWorkRequest);
     }
 }
-

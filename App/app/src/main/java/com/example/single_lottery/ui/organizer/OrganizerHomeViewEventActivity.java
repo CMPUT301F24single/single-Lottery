@@ -66,6 +66,7 @@ public class OrganizerHomeViewEventActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.organizer_home_view_event);
+        setTitle("Event Details");
 
         ImageButton backButton = findViewById(R.id.backButton);
         buttonGenerateQRCode = findViewById(R.id.buttonGenerateQRCode);
@@ -158,7 +159,7 @@ public class OrganizerHomeViewEventActivity extends AppCompatActivity {
                             textViewLotteryTime.setText(event.getLotteryTime());
                             textViewWaitingListCount.setText(String.valueOf(event.getWaitingListCount()));
                             textViewLotteryCount.setText(String.valueOf(event.getLotteryCount()));
-                            textViewLocationRequirement.setText("Geolocation: " + (event.isRequiresLocation() ? "Yes" : "No"));
+                            textViewLocationRequirement.setText(event.isRequiresLocation() ? "Yes" : "No");
 
 
                             // Use Glide to display event posters

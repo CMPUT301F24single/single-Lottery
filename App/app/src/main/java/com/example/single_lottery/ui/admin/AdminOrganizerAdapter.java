@@ -13,6 +13,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.single_lottery.EventModel;
 import com.example.single_lottery.R;
+import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.List;
 
@@ -61,24 +62,40 @@ public class AdminOrganizerAdapter extends RecyclerView.Adapter<AdminOrganizerAd
         public OrganizerViewHolder(@NonNull View itemView) {
             super(itemView);
             // Bind views from the layout
-            textViewOrganizerName = itemView.findViewById(R.id.textViewOrganizerName);
-            textViewOrganizerID = itemView.findViewById(R.id.textViewOrganizerID);
-            buttonViewDetails = itemView.findViewById(R.id.admin_organizer_button_view); // Bind the "View Details" button
+            textViewOrganizerName = itemView.findViewById(R.id.adminOrganizerName);
+            textViewOrganizerID = itemView.findViewById(R.id.adminOrganizerIdTextView);
+            buttonViewDetails = itemView.findViewById(R.id.adminEventsViewButton); // Bind the "View Details" button
         }
 
         public void bind(EventModel organizer, OnItemClickListener listener) {
-            // Set the organizer name and ID
+            // Set organizer name and ID
             textViewOrganizerName.setText(organizer.getName() != null ? organizer.getName() : "No Name");
             textViewOrganizerID.setText(organizer.getOrganizerDeviceID() != null ? organizer.getOrganizerDeviceID() : "No ID");
 
+            // Firebase Firestore reference
+            FirebaseFirestore db = FirebaseFirestore.getInstance();
+            TextView textViewEventCount = itemView.findViewById(R.id.adminEventCount);
+
+            // Query the events collection to count matching events
+            db.collection("events")
+                    .whereEqualTo("organizerId", organizer.getOrganizerDeviceID())
+                    .get()
+                    .addOnSuccessListener(queryDocumentSnapshots -> {
+                        int eventCount = queryDocumentSnapshots.size(); // Count matching events
+                        textViewEventCount.setText(String.format("%d Events", eventCount));
+                    })
+                    .addOnFailureListener(e -> {
+                        textViewEventCount.setText("Error"); // Handle query failure
+                    });
 
             // Set the click listener for the "View Details" button
             buttonViewDetails.setOnClickListener(v -> {
-                // Open the organizer's detail activity
                 Intent intent = new Intent(v.getContext(), AdminOrganizerDetailActivity.class);
-                intent.putExtra("organizerId", organizer.getOrganizerDeviceID()); // Pass the organizer's ID to the detail activity
+                intent.putExtra("organizerId", organizer.getOrganizerDeviceID());
                 v.getContext().startActivity(intent);
             });
         }
+
+
     }
 }

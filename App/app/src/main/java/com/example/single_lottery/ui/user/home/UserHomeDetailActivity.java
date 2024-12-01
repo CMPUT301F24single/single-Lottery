@@ -109,7 +109,7 @@ public class UserHomeDetailActivity extends AppCompatActivity {
                             textViewRegistrationDeadline.setText(event.getRegistrationDeadline());
                             textViewLotteryTime.setText(event.getLotteryTime());
                             textViewLotteryCount.setText(String.valueOf(event.getLotteryCount()));
-                            textViewLocationRequirement.setText("Geolocation: " + (event.isRequiresLocation() ? "Yes" : "No"));
+                            textViewLocationRequirement.setText(event.isRequiresLocation() ? "Yes" : "No");
 
                             registrationDeadline = event.getRegistrationDeadline();
                             boolean requiresLocation = event.isRequiresLocation();

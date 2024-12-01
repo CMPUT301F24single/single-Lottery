@@ -78,6 +78,7 @@ public class OrganizerHomeEditEventActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.organizer_home_edit_event);
+        setTitle("Edit Event Details");
 
         ImageButton backButton = findViewById(R.id.backButton);
         backButton.setOnClickListener(v -> finish());
@@ -167,10 +168,11 @@ public class OrganizerHomeEditEventActivity extends AppCompatActivity {
             Uri posterUri = data.getData();
             imageViewPoster.setImageURI(posterUri); // Update ImageView to display the new image
 
-            //Upload the image to Firebase or update it to the activity data
+            // Upload the image to Firebase or update it to the activity data
             uploadPosterToFirebase(posterUri, eventId);
         }
     }
+
 
     /**
      * Uploads new event poster to Firebase Storage and updates event data.
@@ -242,18 +244,22 @@ public class OrganizerHomeEditEventActivity extends AppCompatActivity {
 
                             locationRequirementSwitch.setChecked(event.isRequiresLocation());
 
-                            if (event.getPosterUrl() != null) {
+                            // Check if a poster URL exists
+                            if (event.getPosterUrl() != null && !event.getPosterUrl().isEmpty()) {
                                 Glide.with(this).load(event.getPosterUrl()).into(imageViewPoster);
+                            } else {
+                                // If no poster URL, load default image
+                                Glide.with(this).load(R.drawable.defaultbackground).into(imageViewPoster);
                             }
                         }
                     }
-
                 })
-
                 .addOnFailureListener(e -> {
                     // Error handling
+                    Log.e("OrganizerHomeEditEvent", "Failed to load event data", e);
                 });
     }
+
 
     /**
      * Updates event data in Firestore with current form values.
