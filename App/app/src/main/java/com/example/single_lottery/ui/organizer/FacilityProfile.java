@@ -27,12 +27,13 @@ import com.google.firebase.storage.StorageReference;
 import java.io.IOException;
 import java.util.UUID;
 public class FacilityProfile extends AppCompatActivity {
-    private TextView nameTextView, emailTextView, phoneTextView;
+    private TextView nameTextView, emailTextView, phoneTextView, locationTextView;
     private Button editButton, uploadButton, removeImageButton;
     private ImageView profileImageView;
     private String facilityName;
     private String facilityEmail;
     private String facilityPhone;
+    private String facilityLocation;
     private String installationId;
     private Uri profileImageUri;
     private FirebaseFirestore firestore;
@@ -46,6 +47,7 @@ public class FacilityProfile extends AppCompatActivity {
         nameTextView = findViewById(R.id.nameTextView);
         emailTextView = findViewById(R.id.emailTextView);
         phoneTextView = findViewById(R.id.phoneTextView);
+        locationTextView = findViewById(R.id.locationTextView);
         editButton = findViewById(R.id.editButton);
         uploadButton = findViewById(R.id.uploadButton);
         removeImageButton = findViewById(R.id.removeImageButton);
@@ -73,6 +75,7 @@ public class FacilityProfile extends AppCompatActivity {
                 facilityName = task.getResult().getString("name");
                 facilityEmail = task.getResult().getString("email");
                 facilityPhone = task.getResult().getString("phone");
+                facilityLocation = task.getResult().getString("location");
                 String profileImageUrl = task.getResult().getString("profileImageUrl");
                 updateFacilityDetails(profileImageUrl);
             }
@@ -84,6 +87,7 @@ public class FacilityProfile extends AppCompatActivity {
         nameTextView.setText(facilityName);
         emailTextView.setText(facilityEmail);
         phoneTextView.setText(facilityPhone);
+        locationTextView.setText(facilityLocation);
         if (profileImageUrl != null) {
             Glide.with(this)
                     .load(profileImageUrl)
@@ -124,14 +128,17 @@ public class FacilityProfile extends AppCompatActivity {
         final EditText nameInput = dialogView.findViewById(R.id.nameInput);
         final EditText emailInput = dialogView.findViewById(R.id.emailInput);
         final EditText phoneInput = dialogView.findViewById(R.id.phoneInput);
+        final EditText locationInput = dialogView.findViewById(R.id.locationInput);
         setEditTextValue(nameInput, facilityName, "Enter facility name");
         setEditTextValue(emailInput, facilityEmail, "Enter facility email");
         setEditTextValue(phoneInput, facilityPhone, "Enter facility phone number");
+        setEditTextValue(locationInput, facilityLocation, "Enter facility location");
         builder.setView(dialogView)
                 .setPositiveButton("save", (dialog, which) -> {
                     facilityName = nameInput.getText().toString().trim();
                     facilityEmail = emailInput.getText().toString().trim();
                     facilityPhone = phoneInput.getText().toString().trim();
+                    facilityLocation = locationInput.getText().toString().trim();
                     updateFacilityDetails(null);
                     saveFacilityDataToFirestore(installationId, null);
                 })
@@ -234,7 +241,7 @@ public class FacilityProfile extends AppCompatActivity {
             Log.e("ProfileFragment", "installationId is null");
             return;
         }
-        Facility facility = new Facility(facilityName, facilityEmail, facilityPhone, profileImageUrl);
+        Facility facility = new Facility(facilityName, facilityEmail, facilityPhone, facilityLocation, profileImageUrl);
         firestore.collection("facilities")
                 .document(installationId)
                 .set(facility)
