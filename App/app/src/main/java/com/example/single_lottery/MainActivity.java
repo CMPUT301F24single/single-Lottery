@@ -1,6 +1,5 @@
 package com.example.single_lottery;
 
-import android.content.ContentResolver;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
@@ -42,7 +41,7 @@ public class MainActivity extends AppCompatActivity {
         db = FirebaseFirestore.getInstance(); // Initialize Firestore
         mAuth = FirebaseAuth.getInstance(); // Initialize FirebaseAuth
 
-        scheduleLotteryWorker();
+        OfflineScheduler();
 
         showLandingScreen = getIntent().getBooleanExtra("showLandingScreen", true);
 
@@ -210,8 +209,8 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private void scheduleLotteryWorker() {
-        PeriodicWorkRequest lotteryWorkRequest = new PeriodicWorkRequest.Builder(LotteryWorker.class,
+    private void OfflineScheduler() {
+        PeriodicWorkRequest lotteryWorkRequest = new PeriodicWorkRequest.Builder(OfflineWorker.class,
                 15, TimeUnit.MINUTES // Check every 15 mins
         ).build();
         WorkManager.getInstance(this).enqueue(lotteryWorkRequest);

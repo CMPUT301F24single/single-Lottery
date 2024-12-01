@@ -17,9 +17,12 @@ import com.example.single_lottery.MapsActivity;
 import com.bumptech.glide.Glide;
 import com.example.single_lottery.R;
 import com.example.single_lottery.EventModel;
+import com.example.single_lottery.ui.notification.Notification;
 import com.example.single_lottery.ui.notification.NotificationActivity;
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.WriteBatch;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -188,7 +191,7 @@ public class OrganizerHomeViewEventActivity extends AppCompatActivity {
                     if (eventDocumentSnapshot.exists()) {
                         String eventName = eventDocumentSnapshot.getString("name"); // Extract event name
 
-                        // Now fetch the registered users for this event's waiting list
+                        // Fetch the registered users for this event's waiting list
                         db.collection("registered_events")
                                 .whereEqualTo("eventId", eventId)
                                 .get()
@@ -219,16 +222,28 @@ public class OrganizerHomeViewEventActivity extends AppCompatActivity {
                                                     String customMessage = input.getText().toString().trim();
 
                                                     if (!customMessage.isEmpty()) {
-                                                        // Send the notification only to users in the waiting list for this event
                                                         if (!userIds.isEmpty()) {
-                                                            String notificationTitle = "Event Notification - " + eventName; // Updated title
-                                                            NotificationActivity.sendNotification(
-                                                                    OrganizerHomeViewEventActivity.this,
-                                                                    notificationTitle,  // Use the dynamic event name in the title
-                                                                    customMessage,
-                                                                    userIds // Pass the list of user IDs
-                                                            );
-                                                            Toast.makeText(this, "Notification sent to waiting list users.", Toast.LENGTH_SHORT).show();
+                                                            String notificationTitle = "Event Notification - " + eventName; // Dynamic title
+
+                                                            // Send notifications and store them in Firestore
+                                                            WriteBatch batch = db.batch();
+                                                            for (String userId : userIds) {
+                                                                DocumentReference notificationRef = db.collection("notifications").document();
+                                                                Notification notification = new Notification(notificationTitle, customMessage, userId);
+                                                                batch.set(notificationRef, notification);
+                                                            }
+
+                                                            // Commit the batch write
+                                                            batch.commit()
+                                                                    .addOnSuccessListener(aVoid -> {
+                                                                        Log.d("Notification", "Notifications saved to Firestore.");
+                                                                        Toast.makeText(this, "Notification sent to waiting list users.", Toast.LENGTH_SHORT).show();
+                                                                    })
+                                                                    .addOnFailureListener(e -> {
+                                                                        Log.e("Notification", "Failed to save notifications to Firestore", e);
+                                                                        Toast.makeText(this, "Failed to send notifications.", Toast.LENGTH_SHORT).show();
+                                                                    });
+
                                                         } else {
                                                             Toast.makeText(this, "No users in the waiting list for this event.", Toast.LENGTH_SHORT).show();
                                                         }
@@ -249,6 +264,10 @@ public class OrganizerHomeViewEventActivity extends AppCompatActivity {
                 })
                 .addOnFailureListener(e -> Toast.makeText(this, "Failed to load event name.", Toast.LENGTH_SHORT).show());
     }
+
+
+
+
 
 
 
@@ -298,16 +317,29 @@ public class OrganizerHomeViewEventActivity extends AppCompatActivity {
                                             messageDialog.setPositiveButton("Send", (innerDialog, which1) -> {
                                                 String customMessage = input.getText().toString().trim();
                                                 if (!customMessage.isEmpty()) {
-                                                    // Send custom notification only to winners
                                                     if (!winnerIds.isEmpty()) {
-                                                        String notificationTitle = "Event Notification - " + eventName; // Updated title
-                                                        NotificationActivity.sendNotification(
-                                                                OrganizerHomeViewEventActivity.this,
-                                                                notificationTitle,
-                                                                customMessage,
-                                                                winnerIds  // Pass the list of winner user IDs
-                                                        );
-                                                        Toast.makeText(this, "Notification sent to winners.", Toast.LENGTH_SHORT).show();
+                                                        String notificationTitle = "Event Notification - " + eventName;
+
+                                                        // Batch write notifications to Firestore
+                                                        WriteBatch batch = db.batch();
+                                                        for (String userId : winnerIds) {
+                                                            DocumentReference notificationRef = db.collection("notifications").document();
+                                                            Notification notification = new Notification(
+                                                                    notificationTitle,
+                                                                    customMessage,
+                                                                    userId
+                                                            );
+                                                            batch.set(notificationRef, notification);
+                                                        }
+
+                                                        // Commit batch and send notifications
+                                                        batch.commit()
+                                                                .addOnSuccessListener(aVoid -> {
+                                                                    Toast.makeText(this, "Notification sent to winners.", Toast.LENGTH_SHORT).show();
+                                                                })
+                                                                .addOnFailureListener(e -> {
+                                                                    Toast.makeText(this, "Failed to save notifications.", Toast.LENGTH_SHORT).show();
+                                                                });
                                                     } else {
                                                         Toast.makeText(this, "No winners to notify.", Toast.LENGTH_SHORT).show();
                                                     }
@@ -324,6 +356,7 @@ public class OrganizerHomeViewEventActivity extends AppCompatActivity {
                 })
                 .addOnFailureListener(e -> Toast.makeText(this, "Failed to load event details.", Toast.LENGTH_SHORT).show());
     }
+
 
 
 
@@ -372,16 +405,29 @@ public class OrganizerHomeViewEventActivity extends AppCompatActivity {
                                                 messageDialog.setPositiveButton("Send", (innerDialog, which1) -> {
                                                     String customMessage = input.getText().toString().trim();
                                                     if (!customMessage.isEmpty()) {
-                                                        // Send custom notification only to losers
                                                         if (!loserIds.isEmpty()) {
-                                                            String notificationTitle = "Event Notification - " + eventName; // Updated title
-                                                            NotificationActivity.sendNotification(
-                                                                    OrganizerHomeViewEventActivity.this,
-                                                                    notificationTitle,
-                                                                    customMessage,
-                                                                    loserIds  // Pass the list of loser user IDs
-                                                            );
-                                                            Toast.makeText(this, "Notification sent to losers.", Toast.LENGTH_SHORT).show();
+                                                            String notificationTitle = "Event Notification - " + eventName;
+
+                                                            // Batch write notifications to Firestore
+                                                            WriteBatch batch = db.batch();
+                                                            for (String userId : loserIds) {
+                                                                DocumentReference notificationRef = db.collection("notifications").document();
+                                                                Notification notification = new Notification(
+                                                                        notificationTitle,
+                                                                        customMessage,
+                                                                        userId
+                                                                );
+                                                                batch.set(notificationRef, notification);
+                                                            }
+
+                                                            // Commit batch and send notifications
+                                                            batch.commit()
+                                                                    .addOnSuccessListener(aVoid -> {
+                                                                        Toast.makeText(this, "Notification sent to losers.", Toast.LENGTH_SHORT).show();
+                                                                    })
+                                                                    .addOnFailureListener(e -> {
+                                                                        Toast.makeText(this, "Failed to save notifications.", Toast.LENGTH_SHORT).show();
+                                                                    });
                                                         } else {
                                                             Toast.makeText(this, "No losers to notify.", Toast.LENGTH_SHORT).show();
                                                         }
@@ -399,6 +445,7 @@ public class OrganizerHomeViewEventActivity extends AppCompatActivity {
                 })
                 .addOnFailureListener(e -> Toast.makeText(this, "Failed to load event name.", Toast.LENGTH_SHORT).show());
     }
+
 
 
 
@@ -447,16 +494,25 @@ public class OrganizerHomeViewEventActivity extends AppCompatActivity {
                                                 messageDialog.setPositiveButton("Send", (innerDialog, which1) -> {
                                                     String customMessage = input.getText().toString().trim();
                                                     if (!customMessage.isEmpty()) {
-                                                        // Send custom notification only to accepted users
                                                         if (!acceptedIds.isEmpty()) {
-                                                            String notificationTitle = "Event Notification - " + eventName; // Updated title
-                                                            NotificationActivity.sendNotification(
-                                                                    OrganizerHomeViewEventActivity.this,
-                                                                    notificationTitle,
-                                                                    customMessage,
-                                                                    acceptedIds  // Pass the list of accepted user IDs
-                                                            );
-                                                            Toast.makeText(this, "Notification sent to accepted users.", Toast.LENGTH_SHORT).show();
+                                                            String notificationTitle = "Event Notification - " + eventName;
+
+                                                            // Batch write notifications to Firestore
+                                                            WriteBatch batch = db.batch();
+                                                            for (String userId : acceptedIds) {
+                                                                DocumentReference notificationRef = db.collection("notifications").document();
+                                                                Notification notification = new Notification(notificationTitle, customMessage, userId);
+                                                                batch.set(notificationRef, notification);
+                                                            }
+
+                                                            // Commit batch and send notifications
+                                                            batch.commit()
+                                                                    .addOnSuccessListener(aVoid -> {
+                                                                        Toast.makeText(this, "Notifications sent to accepted users.", Toast.LENGTH_SHORT).show();
+                                                                    })
+                                                                    .addOnFailureListener(e -> {
+                                                                        Toast.makeText(this, "Failed to save notifications.", Toast.LENGTH_SHORT).show();
+                                                                    });
                                                         } else {
                                                             Toast.makeText(this, "No accepted users to notify.", Toast.LENGTH_SHORT).show();
                                                         }
@@ -474,6 +530,7 @@ public class OrganizerHomeViewEventActivity extends AppCompatActivity {
                 })
                 .addOnFailureListener(e -> Toast.makeText(this, "Failed to load event name.", Toast.LENGTH_SHORT).show());
     }
+
 
 
 
@@ -522,16 +579,29 @@ public class OrganizerHomeViewEventActivity extends AppCompatActivity {
                                                 messageDialog.setPositiveButton("Send", (innerDialog, which1) -> {
                                                     String customMessage = input.getText().toString().trim();
                                                     if (!customMessage.isEmpty()) {
-                                                        // Send custom notification only to cancelled users
                                                         if (!cancelledIds.isEmpty()) {
-                                                            String notificationTitle = "Event Cancellation - " + eventName; // Updated title
-                                                            NotificationActivity.sendNotification(
-                                                                    OrganizerHomeViewEventActivity.this,
-                                                                    notificationTitle,
-                                                                    customMessage,
-                                                                    cancelledIds  // Pass the list of cancelled user IDs
-                                                            );
-                                                            Toast.makeText(this, "Notification sent to cancelled users.", Toast.LENGTH_SHORT).show();
+                                                            String notificationTitle = "Event Cancellation - " + eventName;
+
+                                                            // Batch write notifications to Firestore
+                                                            WriteBatch batch = db.batch();
+                                                            for (String userId : cancelledIds) {
+                                                                DocumentReference notificationRef = db.collection("notifications").document();
+                                                                Notification notification = new Notification(
+                                                                        notificationTitle,
+                                                                        customMessage,
+                                                                        userId
+                                                                );
+                                                                batch.set(notificationRef, notification);
+                                                            }
+
+                                                            // Commit batch and send notifications
+                                                            batch.commit()
+                                                                    .addOnSuccessListener(aVoid -> {
+                                                                        Toast.makeText(this, "Notifications sent to cancelled users.", Toast.LENGTH_SHORT).show();
+                                                                    })
+                                                                    .addOnFailureListener(e -> {
+                                                                        Toast.makeText(this, "Failed to save notifications.", Toast.LENGTH_SHORT).show();
+                                                                    });
                                                         } else {
                                                             Toast.makeText(this, "No cancelled users to notify.", Toast.LENGTH_SHORT).show();
                                                         }
@@ -549,6 +619,7 @@ public class OrganizerHomeViewEventActivity extends AppCompatActivity {
                 })
                 .addOnFailureListener(e -> Toast.makeText(this, "Failed to load event name.", Toast.LENGTH_SHORT).show());
     }
+
 
 
 }
