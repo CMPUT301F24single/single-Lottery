@@ -44,7 +44,12 @@ public class AdminUserAdapter extends RecyclerView.Adapter<AdminUserAdapter.User
         EventModel user = userList.get(position);
 
         // Set the user name in the TextView
-        holder.userNameTextView.setText(user.getName());
+        if(user.getName() == null || user.getName().isEmpty()){
+            holder.userNameTextView.setText("(no name)");
+        }
+        else {
+            holder.userNameTextView.setText(user.getName());
+        }
 
         // Get the profile image URL from the user model (Firestore data)
         String profileImageUrl = user.getProfileImageUrl();  // Assuming Firestore data is being passed correctly here
@@ -81,18 +86,18 @@ public class AdminUserAdapter extends RecyclerView.Adapter<AdminUserAdapter.User
      * @param name User's display name for initial generation
      */
     private void generateLetterAvatar(String name, ImageView profileImageView) {
-        String[] nameParts = name.split("\\s+");
         String initials = "";
-
-        // Handle case if the name is empty
-        if (name.isEmpty()) {
+        if(name == null || name.isEmpty()){
             initials += '-';
-        } else if (nameParts.length > 0) {
-            initials += nameParts[0].charAt(0); // First letter of first name
         }
-
-        if (nameParts.length > 1) {
-            initials += nameParts[1].charAt(0); // First letter of last name
+        else {
+            String[] nameParts = name.split("\\s+");
+            if (nameParts.length > 0) {
+                initials += nameParts[0].charAt(0); // First letter of first name
+            }
+            if (nameParts.length > 1) {
+                initials += nameParts[1].charAt(0); // First letter of last name
+            }
         }
 
         // Create a Bitmap with 100x100 size (for circular avatar)
