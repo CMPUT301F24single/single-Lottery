@@ -122,7 +122,7 @@
                     android:textSize="18sp"
                     android:textColor="#000000" />
             </LinearLayout>
-            
+
             <!-- Phone Layout -->
             <LinearLayout
                 android:layout_width="match_parent"
@@ -175,7 +175,7 @@
                     android:textColor="#000000" />
             </LinearLayout>
 
-            <!-- Edit Button -->
+            <!-- Edit and Facility Buttons -->
             <Button
                 android:id="@+id/editButton"
                 android:layout_width="wrap_content"
@@ -183,6 +183,12 @@
                 android:layout_gravity="center"
                 android:text="Edit" />
 
+            <Button
+                android:id="@+id/facilityButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:text="Open Facility Profile" />
         </LinearLayout>
     </RelativeLayout>
 </LinearLayout>
