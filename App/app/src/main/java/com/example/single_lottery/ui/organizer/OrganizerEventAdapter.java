@@ -1,17 +1,23 @@
 package com.example.single_lottery.ui.organizer;
 
+import static java.security.AccessController.getContext;
+
 import android.content.Intent;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.single_lottery.R;
 import com.example.single_lottery.EventModel;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.installations.FirebaseInstallations;
 
 import java.util.List;
 
@@ -30,6 +36,8 @@ import java.util.List;
 
 public class OrganizerEventAdapter extends RecyclerView.Adapter<OrganizerEventAdapter.OrganizerEventViewHolder> {
     private List<EventModel> eventList;
+    private String installationId;
+    private String facilityName = "None";
 
     /**
      * Constructs an OrganizerEventAdapter with a list of events.
@@ -60,8 +68,16 @@ public class OrganizerEventAdapter extends RecyclerView.Adapter<OrganizerEventAd
 
     @Override
     public void onBindViewHolder(@NonNull OrganizerEventViewHolder holder, int position) {
+        TextView facilityTextView = holder.itemView.findViewById(R.id.organizerFacilityTextView);
+        TextView timeTextView = holder.itemView.findViewById(R.id.organizerTimeTextView);
+        TextView lotteryDateTextView = holder.itemView.findViewById(R.id.organizerLotteryDate);
+
         EventModel event = eventList.get(position);
         holder.eventNameTextView.setText(event.getName());  // 假设有 `getName()` 方法
+
+        facilityTextView.setText(event.getFacility()); // Ensure getFacility() returns the facility
+        timeTextView.setText(event.getTime()); // Ensure getTime() returns the time
+        lotteryDateTextView.setText(event.getLotteryTime()); // Ensure getLotteryDate() returns the date
 
         // View button click listener
         holder.viewButton.setOnClickListener(v -> {

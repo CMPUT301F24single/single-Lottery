@@ -1,12 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="horizontal"
-    android:padding="8dp">
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:padding="16dp"
+    android:background="@drawable/rounded_corners_grey"
+    android:layout_marginTop="2dp"
+    android:layout_marginStart="8dp"
+    android:layout_marginEnd="8dp"
+    android:layout_marginBottom="2dp">
 
-    <!-- Container for Event Name and Lottery Date -->
+    <!-- Container for Event Details (Name, Facility, Time, Status) -->
     <LinearLayout
         android:layout_width="0dp"
         android:layout_height="wrap_content"
@@ -18,35 +23,102 @@
             android:id="@+id/eventNameTextView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/event_name"
+            android:text="Event Name"
             android:textSize="17sp"
             android:textStyle="bold" />
 
-        <!-- Lottery Date -->
-        <TextView
-            android:id="@+id/lotteryDate"
+        <!-- Facility TextView with Location Icon -->
+        <LinearLayout
+            android:orientation="horizontal"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/lottery_date"
-            android:textSize="12sp"
-            android:layout_marginTop="4dp" />
+            android:layout_marginTop="4dp">
+
+            <ImageView
+                android:src="@drawable/baseline_location_pin_24"
+                android:layout_width="20dp"
+                android:layout_height="20dp"/>
+
+            <TextView
+                android:id="@+id/eventFacilityTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Facility: "
+                android:textSize="14sp"
+                android:layout_marginLeft="4dp"/>
+        </LinearLayout>
+
+        <!-- Time TextView with Event Date Icon -->
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp">
+
+            <ImageView
+                android:src="@drawable/baseline_access_time_24"
+                android:layout_width="20dp"
+                android:layout_height="20dp" />
+
+            <TextView
+                android:id="@+id/eventTimeTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Time: "
+                android:textSize="14sp"
+                android:layout_marginLeft="4dp"/>
+        </LinearLayout>
+
+        <!-- Lottery Date TextView with Lottery Icon -->
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp">
+
+            <ImageView
+                android:src="@drawable/baseline_how_to_vote_24"
+                android:layout_width="20dp"
+                android:layout_height="20dp" />
+
+            <TextView
+                android:id="@+id/eventLotteryDate"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Lottery Date: "
+                android:textSize="14sp"
+                android:layout_marginLeft="4dp"/>
+        </LinearLayout>
+
+        <!-- Status TextView with Status Icon -->
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp">
+
+            <ImageView
+                android:src="@drawable/baseline_face_retouching_natural_24"
+                android:layout_width="20dp"
+                android:layout_height="20dp" />
+
+            <TextView
+                android:id="@+id/eventStatusTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Status"
+                android:textSize="14sp"
+                android:layout_marginLeft="4dp" />
+        </LinearLayout>
 
     </LinearLayout>
 
-    <ImageView
-        android:id="@+id/event_alert"
-        android:layout_width="20dp"
-        android:layout_height="20dp"
-        android:layout_marginEnd="8dp"
-        android:layout_gravity="center_vertical"
-        android:src="@drawable/event_alert"
-        android:visibility="gone" />
-
-    <!-- View Details Button -->
+    <!-- View Button -->
     <Button
         android:id="@+id/viewButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/view_details" />
+        android:text="View"
+        android:layout_gravity="center"/>
 
 </LinearLayout>

@@ -38,6 +38,9 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity android:name=".ui.admin.AdminFacilityEventActivity">
+        </activity>
+
         <activity
             android:name=".MapsActivity"
             android:exported="true"
@@ -45,9 +48,6 @@
         </activity>
         <activity
             android:name=".ui.organizer.OrganizerActivity"
-            android:exported="true" />
-        <activity
-            android:name=".ui.organizer.FacilityProfile"
             android:exported="true" />
         <activity
             android:name=".ui.user.UserActivity"
@@ -81,6 +81,8 @@
         <activity android:name=".ui.admin.AdminOrganizerDetailActivity" />
 
         <activity android:name=".ui.admin.AdminUserDetailActivity" />
+
+        <activity android:name=".ui.organizer.FacilityProfile" />
 
         <meta-data
             android:name="com.google.firebase.messaging.default_notification_channel_id"

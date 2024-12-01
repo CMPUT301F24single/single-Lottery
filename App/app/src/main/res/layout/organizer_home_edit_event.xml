@@ -12,7 +12,8 @@
         android:contentDescription="Back Button"
         android:layout_alignParentTop="true"
         android:layout_alignParentStart="true"
-        android:layout_margin="16dp" />
+        android:layout_marginLeft="16dp"
+        android:layout_marginTop="16dp"/>
 
     <ScrollView
         android:layout_width="match_parent"
@@ -29,173 +30,220 @@
                 android:id="@+id/imageViewPoster"
                 android:layout_width="match_parent"
                 android:layout_height="200dp"
-                android:scaleType="centerCrop"
-                android:contentDescription="Event Poster"/>
+                android:contentDescription="Event Poster"
+                android:scaleType="centerCrop" />
 
             <!-- 上传新海报按钮 -->
             <Button
                 android:id="@+id/buttonChangePoster"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Change Poster"
+                android:layout_gravity="center"
                 android:layout_marginTop="8dp"
-                android:layout_gravity="center"/>
+                android:text="Change Poster" />
 
             <!-- Event Details Section -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
                 android:layout_marginTop="16dp"
-                android:background="@drawable/rounded_corners_grey">
+                android:background="@drawable/rounded_corners_grey"
+                android:orientation="vertical"
+                android:elevation="4dp">
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:paddingTop="8dp"
                     android:text="Event Details"
                     android:textSize="18sp"
-                    android:textStyle="bold"
-                    android:layout_marginStart="8dp"/>
+                    android:textStyle="bold" />
 
                 <!-- Event Name -->
+
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Event Name"
+                    android:layout_marginStart="8dp"
                     android:layout_marginTop="8dp"
-                    android:layout_marginStart="8dp"/>
+                    android:text="Event Name" />
+
                 <EditText
                     android:id="@+id/editTextEventName"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
                     android:hint="Enter event name"
-                    android:inputType="text"
-                    android:layout_marginStart="8dp"/>
-
-                <!-- Event Time -->
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Event Time"
-                    android:layout_marginTop="8dp"
-                    android:layout_marginStart="8dp"/>
-                <EditText
-                    android:id="@+id/editTextEventTime"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:hint="Enter event time"
-                    android:inputType="datetime"
-                    android:layout_marginStart="8dp"/>
-
-                <!-- Registration Deadline -->
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Registration Deadline"
-                    android:layout_marginTop="8dp"
-                    android:layout_marginStart="8dp"/>
-                <EditText
-                    android:id="@+id/editTextRegistrationDeadline"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:hint="Enter registration deadline"
-                    android:inputType="datetime"
-                    android:layout_marginStart="8dp"/>
-
-                <!-- Lottery Time -->
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Lottery Time"
-                    android:layout_marginTop="8dp"
-                    android:layout_marginStart="8dp" />
-
-                <EditText
-                    android:id="@+id/editTextLotteryTime"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:hint="Enter lottery time"
-                    android:inputType="datetime"
-                    android:layout_marginStart="8dp"/>
+                    android:inputType="text" />
 
                 <!-- Waiting List Count -->
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Waiting List Count"
+                    android:layout_marginStart="8dp"
                     android:layout_marginTop="8dp"
-                    android:layout_marginStart="8dp"/>
+                    android:text="Waiting List Count" />
 
                 <EditText
                     android:id="@+id/editTextWaitingListCount"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
                     android:hint="Enter waiting list count"
-                    android:inputType="number"
-                    android:layout_marginStart="8dp"/>
+                    android:inputType="number" />
 
                 <!-- Lottery Count -->
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Lottery Count"
+                    android:layout_marginStart="8dp"
                     android:layout_marginTop="8dp"
-                    android:layout_marginStart="8dp"/>
+                    android:text="Lottery Count" />
 
                 <EditText
                     android:id="@+id/editTextLotteryCount"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
                     android:hint="Enter lottery count"
-                    android:inputType="number"
-                    android:layout_marginStart="8dp"/>
+                    android:inputType="number" />
 
                 <!-- Event Description -->
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Event Description"
+                    android:layout_marginStart="8dp"
                     android:layout_marginTop="8dp"
-                    android:layout_marginStart="8dp"/>
+                    android:text="Event Description" />
 
                 <EditText
                     android:id="@+id/editTextEventDescription"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
                     android:hint="Enter event description"
-                    android:inputType="textMultiLine"
-                    android:layout_marginStart="8dp"/>
+                    android:inputType="textMultiLine" />
 
 
                 <!-- new Event facility -->
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Event Facitlity"
+                    android:layout_marginStart="8dp"
                     android:layout_marginTop="8dp"
-                    android:layout_marginStart="8dp"/>
+                    android:text="Event Facitlity" />
 
                 <EditText
                     android:id="@+id/editTextEventFacility"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
                     android:hint="Enter Event Facility"
-                    android:inputType="textMultiLine"
-                    android:layout_marginStart="8dp" />
+                    android:inputType="textMultiLine" />
+
+                <!-- Event Time -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:id="@+id/editEventTime"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:background="?attr/selectableItemBackground"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:padding="8dp"
+                        android:text="Select Event Time"
+                        android:textColor="@android:color/holo_blue_dark"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/editedEventTime"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="end"
+                        android:padding="8dp"
+                        android:text=""
+                        android:textColor="@android:color/black" />
+                </LinearLayout>
+
+                <!-- Select Registration Deadline -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:id="@+id/editRegistrationTime"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:background="?attr/selectableItemBackground"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:padding="8dp"
+                        android:text="Select Registration Deadline"
+                        android:textColor="@android:color/holo_blue_dark"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/editedRegistrationTime"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="end"
+                        android:padding="8dp"
+                        android:text=""
+                        android:textColor="@android:color/black" />
+                </LinearLayout>
+
+                <!-- Select Lottery Time -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:id="@+id/editLotteryTime"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:background="?attr/selectableItemBackground"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:padding="8dp"
+                        android:text="Select Lottery Time"
+                        android:textColor="@android:color/holo_blue_dark"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/editedLotteryTime"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="end"
+                        android:padding="8dp"
+                        android:text=""
+                        android:textColor="@android:color/black" />
+                </LinearLayout>
 
                 <Switch
                     android:id="@+id/locationRequirementSwitch"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Require Location Access"/>
+                    android:padding="8dp"
+                    android:text="Require Location Access" />
 
                 <Button
                     android:id="@+id/buttonUpdateEvent"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Update Event"
+                    android:layout_gravity="center"
                     android:layout_marginTop="16dp"
-                    android:layout_gravity="center"/>
+                    android:layout_marginBottom="4dp"
+                    android:text="Update Event" />
 
             </LinearLayout>
 

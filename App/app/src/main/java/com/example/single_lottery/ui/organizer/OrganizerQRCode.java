@@ -5,6 +5,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.Toast;
 
@@ -43,7 +44,7 @@ public class OrganizerQRCode extends AppCompatActivity {
 
         Log.d("OrganizerQRCode", "event_id: " + eventId);
 
-        Button buttonback = findViewById(R.id.buttonback);
+        ImageButton buttonback = findViewById(R.id.backButton);
         buttonback.setOnClickListener(v -> {
             finish();
         });

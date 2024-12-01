@@ -1,17 +1,19 @@
 package com.example.single_lottery.ui.admin;
 
+import static android.app.PendingIntent.getActivity;
+
+import android.app.AlertDialog;
+import android.content.Context;
+import android.content.Intent;
+import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
-
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
-
 import com.example.single_lottery.R;
-
-import org.checkerframework.checker.units.qual.A;
 
 import java.util.List;
 import java.util.Map;
@@ -20,10 +22,12 @@ public class AdminFacilityAdapter extends RecyclerView.Adapter<AdminFacilityAdap
 
     private List<Map<String, String>> facilitiesWithEvents;
     private OnFacilityDeleteListener deleteListener;
+    private Context context;
 
-    public AdminFacilityAdapter(List<Map<String, String>> facilitiesWithEvents, OnFacilityDeleteListener deleteListener) {
+    public AdminFacilityAdapter(List<Map<String, String>> facilitiesWithEvents, OnFacilityDeleteListener deleteListener, Context context) {
         this.facilitiesWithEvents = facilitiesWithEvents;
         this.deleteListener = deleteListener;
+        this.context = context;
     }
 
     @NonNull
@@ -38,15 +42,29 @@ public class AdminFacilityAdapter extends RecyclerView.Adapter<AdminFacilityAdap
     public void onBindViewHolder(@NonNull FacilityViewHolder holder, int position) {
         Map<String, String> facilityEvent = facilitiesWithEvents.get(position);
         String facility = facilityEvent.get("facility");
-        String eventName = facilityEvent.get("eventName");
 
         holder.facilityTextView.setText(facility);
-        holder.eventNameTextView.setText("Event: " + eventName);
 
-        // 设置删除按钮点击事件
+        holder.eventsButton.setOnClickListener(v -> {
+            Intent intent = new Intent(context, AdminFacilityEventActivity.class);
+            intent.putExtra(AdminFacilityEventActivity.facility_name, facility);
+            context.startActivity(intent);
+        });
+
         holder.deleteButton.setOnClickListener(v -> {
             if (deleteListener != null) {
-                deleteListener.onFacilityDelete(facility);
+                new AlertDialog.Builder(holder.itemView.getContext())
+                        .setMessage("Are you sure you want to delete this facility? You will delete every event at this facility.")
+                        .setCancelable(false)  // Disable cancel by tapping outside the dialog
+                        .setPositiveButton("Yes", (dialog, which) -> {
+                            if (deleteListener != null) {
+                                deleteListener.onFacilityDelete(facility);
+                            }
+                        })
+                        .setNegativeButton("No", (dialog, which) -> {
+                            dialog.dismiss();
+                        })
+                        .show();
             }
         });
     }
@@ -59,13 +77,13 @@ public class AdminFacilityAdapter extends RecyclerView.Adapter<AdminFacilityAdap
     public static class FacilityViewHolder extends RecyclerView.ViewHolder {
 
         TextView facilityTextView;
-        TextView eventNameTextView;
         Button deleteButton;
+        Button eventsButton;
 
         public FacilityViewHolder(@NonNull View itemView) {
             super(itemView);
             facilityTextView = itemView.findViewById(R.id.facilityTextView);
-            eventNameTextView = itemView.findViewById(R.id.eventNameTextView);
+            eventsButton = itemView.findViewById(R.id.viewEventsButton);
             deleteButton = itemView.findViewById(R.id.deleteButton);
         }
     }
@@ -73,4 +91,5 @@ public class AdminFacilityAdapter extends RecyclerView.Adapter<AdminFacilityAdap
     public interface OnFacilityDeleteListener {
         void onFacilityDelete(String facility);
     }
+
 }

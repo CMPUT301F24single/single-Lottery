@@ -1,7 +1,6 @@
 package com.example.single_lottery.ui.admin;
 
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,12 +20,10 @@ import com.google.firebase.firestore.WriteBatch;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
-public class AdminFacilityFragment extends Fragment {
+public class AdminFacilityFragment extends Fragment{
 
     private RecyclerView recyclerView;
     private AdminFacilityAdapter facilityAdapter;
@@ -40,7 +37,7 @@ public class AdminFacilityFragment extends Fragment {
         recyclerView = view.findViewById(R.id.facilityRecyclerView);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
-        facilityAdapter = new AdminFacilityAdapter(facilitiesWithEvents, this::deleteEventsByFacility);
+        facilityAdapter = new AdminFacilityAdapter(facilitiesWithEvents, this::deleteEventsByFacility, getContext());
         recyclerView.setAdapter(facilityAdapter);
 
         // Add DividerItemDecoration (for dividing list of events)
@@ -69,11 +66,19 @@ public class AdminFacilityFragment extends Fragment {
                         if (facility != null && !facility.isEmpty() && eventName != null && !eventName.isEmpty()) {
                             Map<String, String> facilityEvent = new HashMap<>();
                             facilityEvent.put("facility", facility);
-                            facilityEvent.put("eventName", eventName);
-                            facilitiesWithEvents.add(facilityEvent); // 添加到列表
+                            boolean alreadyExists = false;
+                            for (Map<String, String> existingEvent : facilitiesWithEvents) {
+                                if (facility.equals(existingEvent.get("facility"))) {
+                                    alreadyExists = true;
+                                    break;
+                                }
+                            }
+
+                            if (!alreadyExists) {
+                                facilitiesWithEvents.add(facilityEvent);
+                            }
                         }
                     }
-
                     facilityAdapter.notifyDataSetChanged(); // 更新 RecyclerView
                 })
                 .addOnFailureListener(e -> {

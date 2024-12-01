@@ -1,36 +1,100 @@
+<?xml version="1.0" encoding="utf-8"?>
 <LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="horizontal"
-    android:padding="16dp">
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:padding="16dp"
+    android:background="@drawable/rounded_corners_grey"
+    android:layout_marginBottom="4dp">
 
+    <!-- Container for Event Details (Name, Facility, Time) -->
     <LinearLayout
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:layout_weight="1">
 
+        <!-- Event Name TextView -->
         <TextView
-            android:id="@+id/text_event_name"
-            android:layout_width="match_parent"
+            android:id="@+id/adminEventName"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Event Name"
-            android:textSize="18sp"
+            android:textSize="17sp"
             android:textStyle="bold" />
 
-        <TextView
-            android:id="@+id/text_organizer_name"
-            android:layout_width="match_parent"
+        <!-- Facility TextView with Location Icon -->
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Organizer Name"
-            android:textSize="16sp"
-            android:textStyle="italic" />
+            android:layout_marginTop="4dp">
+
+            <ImageView
+                android:src="@drawable/baseline_person_24"
+                android:layout_width="20dp"
+                android:layout_height="20dp"/>
+
+            <TextView
+                android:id="@+id/adminOrganizerTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Organizer"
+                android:textSize="14sp"
+                android:layout_marginLeft="4dp"/>
+        </LinearLayout>
+
+        <!-- Lottery Date TextView with location-->
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp">
+
+            <ImageView
+                android:src="@drawable/baseline_location_pin_24"
+                android:layout_width="20dp"
+                android:layout_height="20dp" />
+
+            <TextView
+                android:id="@+id/adminLocationTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Location "
+                android:textSize="14sp"
+                android:layout_marginLeft="4dp"/>
+        </LinearLayout>
+
+        <!-- Time TextView with Event Date Icon -->
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp">
+
+            <ImageView
+                android:src="@drawable/baseline_access_time_24"
+                android:layout_width="20dp"
+                android:layout_height="20dp" />
+
+            <TextView
+                android:id="@+id/adminTimeTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Time: "
+                android:textSize="14sp"
+                android:layout_marginLeft="4dp"/>
+        </LinearLayout>
+
     </LinearLayout>
 
+    <!-- View Button -->
     <Button
-        android:id="@+id/admin_event_button_view"
+        android:id="@+id/adminEventsViewButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="View" />
+        android:text="View"
+        android:layout_gravity="center"/>
+
 </LinearLayout>

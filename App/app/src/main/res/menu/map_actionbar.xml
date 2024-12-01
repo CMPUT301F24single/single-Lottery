@@ -1,0 +1,9 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/action_return"
+        android:icon="@drawable/baseline_keyboard_return_24"
+        android:orderInCategory="100"
+        android:title="Return to details"
+        app:showAsAction="ifRoom" />
+</menu>

@@ -2,15 +2,22 @@ package com.example.single_lottery.ui.admin;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;  // For loading images (make sure to add Glide dependency)
 import com.example.single_lottery.EventModel;
+import com.example.single_lottery.R;
 
 import java.util.List;
 
@@ -26,23 +33,45 @@ public class AdminUserAdapter extends RecyclerView.Adapter<AdminUserAdapter.User
     @NonNull
     @Override
     public UserViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        // Inflate your custom layout for each item
         View view = LayoutInflater.from(parent.getContext())
-                .inflate(android.R.layout.simple_list_item_1, parent, false);
+                .inflate(R.layout.admin_item_user, parent, false); // Inflate item_user.xml
         return new UserViewHolder(view);
     }
 
     @Override
     public void onBindViewHolder(@NonNull UserViewHolder holder, int position) {
         EventModel user = userList.get(position);
-        holder.textView.setText(user.getName());
 
-        // 设置点击事件
+        // Set the user name in the TextView
+        if(user.getName() == null || user.getName().isEmpty()){
+            holder.userNameTextView.setText("(no name)");
+        }
+        else {
+            holder.userNameTextView.setText(user.getName());
+        }
+
+        // Get the profile image URL from the user model (Firestore data)
+        String profileImageUrl = user.getProfileImageUrl();  // Assuming Firestore data is being passed correctly here
+
+        // Check if the profile image URL is valid
+        if (profileImageUrl == null || profileImageUrl.isEmpty()) {
+            // If profile image URL is null or empty, generate the letter avatar
+            generateLetterAvatar(user.getName(), holder.userImageView);
+        } else {
+            // If profile image URL is available, load it using Glide
+            Glide.with(context)
+                    .load(profileImageUrl)
+                    .placeholder(R.drawable.ic_profile)  // Placeholder image while loading
+                    .into(holder.userImageView);
+        }
+
+        // Set the click listener to open the detailed user activity
         holder.itemView.setOnClickListener(v -> {
             Intent intent = new Intent(context, AdminUserDetailActivity.class);
-            intent.putExtra(AdminUserDetailActivity.EXTRA_USER, user); // 传递 Serializable 对象
+            intent.putExtra(AdminUserDetailActivity.EXTRA_USER, user); // Passing user data to the next activity
             context.startActivity(intent);
         });
-
     }
 
     @Override
@@ -50,12 +79,55 @@ public class AdminUserAdapter extends RecyclerView.Adapter<AdminUserAdapter.User
         return userList.size();
     }
 
+    /**
+     * Generates a letter avatar when no profile image is set.
+     * Creates circular avatar with user initials.
+     *
+     * @param name User's display name for initial generation
+     */
+    private void generateLetterAvatar(String name, ImageView profileImageView) {
+        String initials = "";
+        if(name == null || name.isEmpty()){
+            initials += '-';
+        }
+        else {
+            String[] nameParts = name.split("\\s+");
+            if (nameParts.length > 0) {
+                initials += nameParts[0].charAt(0); // First letter of first name
+            }
+            if (nameParts.length > 1) {
+                initials += nameParts[1].charAt(0); // First letter of last name
+            }
+        }
+
+        // Create a Bitmap with 100x100 size (for circular avatar)
+        Bitmap bitmap = Bitmap.createBitmap(100, 100, Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(bitmap);
+
+        // Draw a circular background
+        Paint paint = new Paint();
+        paint.setColor(Color.GRAY); // Background color
+        canvas.drawCircle(50, 50, 50, paint); // Circle at center (50, 50) with radius 50
+
+        // Draw initials in the center of the circle
+        paint.setColor(Color.WHITE); // Text color
+        paint.setTextSize(40);
+        paint.setTextAlign(Paint.Align.CENTER); // Center-align text
+        canvas.drawText(initials, 50, 65, paint); // Draw the initials at position (50, 65)
+
+        // Set the generated bitmap as the profile image
+        profileImageView.setImageBitmap(bitmap);
+    }
+
     public static class UserViewHolder extends RecyclerView.ViewHolder {
-        TextView textView;
+        ImageView userImageView;
+        TextView userNameTextView;
 
         public UserViewHolder(@NonNull View itemView) {
             super(itemView);
-            textView = itemView.findViewById(android.R.id.text1);
+            // Bind the ImageView and TextView
+            userImageView = itemView.findViewById(R.id.userImage);  // ImageView in item_user.xml
+            userNameTextView = itemView.findViewById(R.id.userName); // TextView in item_user.xml
         }
     }
 }

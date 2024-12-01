@@ -27,6 +27,15 @@ public class AdminEventFragment extends Fragment {
     private RecyclerView recyclerView;
     private AdminEventAdapter eventAdapter;
     private List<EventModel> eventList;
+    private String facilityName;
+
+    @Override
+    public void onCreate(Bundle savedInstanceState){
+        super.onCreate(savedInstanceState);
+        if(getArguments() != null){
+            facilityName = getArguments().getString("facility_name");
+        }
+    }
 
     @Nullable
     @Override
@@ -40,13 +49,6 @@ public class AdminEventFragment extends Fragment {
         eventAdapter = new AdminEventAdapter(getContext(), eventList);
         recyclerView.setAdapter(eventAdapter);
 
-        // Add DividerItemDecoration (for dividing list of events)
-        DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(
-                recyclerView.getContext(),
-                LinearLayoutManager.VERTICAL
-        );
-        recyclerView.addItemDecoration(dividerItemDecoration);
-
         loadEventData();
 
         return view;
@@ -57,10 +59,21 @@ public class AdminEventFragment extends Fragment {
 
         db.collection("events").get().addOnSuccessListener(queryDocumentSnapshots -> {
             eventList.clear();
-            for (DocumentSnapshot doc : queryDocumentSnapshots.getDocuments()) {
-                EventModel event = doc.toObject(EventModel.class);
-                event.setEventId(doc.getId()); // 将文档ID设置为eventId
-                eventList.add(event);
+            if (facilityName == null) {
+                for (DocumentSnapshot doc : queryDocumentSnapshots.getDocuments()) {
+                    EventModel event = doc.toObject(EventModel.class);
+                    event.setEventId(doc.getId()); // 将文档ID设置为eventId
+                    eventList.add(event);
+                }
+            }
+            else {
+                for (DocumentSnapshot doc : queryDocumentSnapshots.getDocuments()) {
+                    EventModel event = doc.toObject(EventModel.class);
+                    event.setEventId(doc.getId());
+                    if(event.getFacility() != null && event.getFacility().equals(facilityName)) {
+                        eventList.add(event);
+                    }
+                }
             }
             eventAdapter.notifyDataSetChanged();
         }).addOnFailureListener(e -> {

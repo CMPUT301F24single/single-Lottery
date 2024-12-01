@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -41,19 +42,21 @@ public class AdminEventDetailActivity extends AppCompatActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.admin_event_detail);
+        setTitle("Event Details");
 
+        // Remove the default back button in the ActionBar
         if (getSupportActionBar() != null) {
-            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            getSupportActionBar().setDisplayHomeAsUpEnabled(false); // Disable the default back button
         }
 
-        // 初始化视图
+        // Initialize views
         initViews();
 
-        // 初始化加载对话框
+        // Initialize the loading dialog
         progressDialog = new ProgressDialog(this);
         progressDialog.setCancelable(false);
 
-        // 获取从Intent传递的eventId
+        // Get the eventId passed from the previous activity
         String eventId = getIntent().getStringExtra("eventId");
         if (eventId != null) {
             loadEventDetails(eventId);
@@ -61,12 +64,19 @@ public class AdminEventDetailActivity extends AppCompatActivity {
             Log.e("AdminEventDetail", "Event ID is missing in intent.");
         }
 
-        // 绑定删除海报按钮
+        // Set up the custom back button's click listener
+        ImageButton backButton = findViewById(R.id.backButton);
+        backButton.setOnClickListener(v -> {
+            // Finish the activity and go back to the previous screen
+            onBackPressed();
+        });
+
+        // Set up the delete poster button click listener
         buttonDeletePoster.setOnClickListener(v -> {
             deletePoster(eventId);
         });
 
-        // 绑定删除活动按钮
+        // Set up the delete event button click listener
         buttonDeleteEvent.setOnClickListener(v -> {
             new AlertDialog.Builder(this)
                     .setTitle("Delete Event")
@@ -76,20 +86,14 @@ public class AdminEventDetailActivity extends AppCompatActivity {
                     .show();
         });
 
+        // Set up the delete QR code button click listener
         Button buttonDeleteQRCode = findViewById(R.id.buttonDeleteQRCode);
         buttonDeleteQRCode.setOnClickListener(v -> {
             deleteQRCode(eventId);
         });
     }
 
-    @Override
-    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        if (item.getItemId() == android.R.id.home) { // 返回按钮的 ID
-            onBackPressed(); // 返回上一页
-            return true;
-        }
-        return super.onOptionsItemSelected(item);
-    }
+
 
     private void initViews() {
         textViewName = findViewById(R.id.textViewEventName);

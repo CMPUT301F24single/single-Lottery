@@ -52,7 +52,11 @@ public class UserHomeAdapter extends RecyclerView.Adapter<UserHomeAdapter.UserHo
         holder.eventNameTextView.setText(event.getName());
 
         TextView lotteryDateTextView = holder.itemView.findViewById(R.id.lotteryDate);
-        lotteryDateTextView.setText("Lottery Date: " + event.getLotteryTime()); // Ensure getLotteryDate() returns the date
+        TextView facilityTextView = holder.itemView.findViewById(R.id.facilityTextView);
+        TextView timeTextView = holder.itemView.findViewById(R.id.timeTextView);
+        facilityTextView.setText(event.getFacility()); // Ensure getFacility() returns the facility
+        timeTextView.setText(event.getTime()); // Ensure getTime() returns the time
+        lotteryDateTextView.setText(event.getLotteryTime()); // Ensure getLotteryDate() returns the date
 
         holder.viewButton.setOnClickListener(v -> {
             Intent intent = new Intent(context, UserHomeDetailActivity.class);

@@ -12,6 +12,8 @@ import androidx.core.app.NotificationCompat;
 
 import com.example.single_lottery.R;
 
+import java.util.List;
+
 public class NotificationActivity extends AppCompatActivity {
     private static final String CHANNEL_ID = "notifications";
     private static final String TAG = "NotificationActivity";
@@ -22,59 +24,30 @@ public class NotificationActivity extends AppCompatActivity {
         setContentView(R.layout.activity_notification);
     }
 
-    public static void sendNotification(Context context, String title, String message, String userGroup) {
-        Log.d(TAG, "User group: " + userGroup);
-        if (userGroup == null || userGroup.isEmpty()) {
-            Log.d(TAG, "Notification not sent. User group is not specified.");
+    public static void sendNotification(Context context, String title, String message, List<String> userIds) {
+        if (userIds == null || userIds.isEmpty()) {
+            Log.d("NotificationActivity", "No users to notify.");
             return;
         }
 
         NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
 
-        // Create notification channel
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            NotificationChannel channel = new NotificationChannel(CHANNEL_ID, "Notification", NotificationManager.IMPORTANCE_HIGH);
+            NotificationChannel channel = new NotificationChannel("notifications", "Event Notifications", NotificationManager.IMPORTANCE_HIGH);
             notificationManager.createNotificationChannel(channel);
         }
 
-        // Build notification
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(context, CHANNEL_ID)
-                .setSmallIcon(R.drawable.ic_notification)
-                .setContentTitle(title)
-                .setContentText(message)
-                .setPriority(NotificationCompat.PRIORITY_HIGH)
-                .setAutoCancel(true);
+        for (String userId : userIds) {
+            NotificationCompat.Builder builder = new NotificationCompat.Builder(context, "notifications")
+                    .setSmallIcon(R.drawable.ic_notification)
+                    .setContentTitle(title)
+                    .setContentText(message)
+                    .setPriority(NotificationCompat.PRIORITY_HIGH)
+                    .setAutoCancel(true);
 
-        // Determine notification ID based on user group
-        int notificationId;
-        switch (userGroup.toLowerCase()) {
-            case "winner":
-                notificationId = 1;
-                break;
-            case "waiting":
-                notificationId = 2;
-                break;
-            case "loser":
-                notificationId = 3;
-                break;
-            case "accepted":
-                notificationId = 4;
-                break;
-            case "cancelled":
-                notificationId = 5;
-                break;
-            default:
-                notificationId = 0;
-                break;
+            int notificationId = userId.hashCode(); // Unique ID per user
+            notificationManager.notify(notificationId, builder.build());
         }
-
-        if (notificationId == 0) {
-            Log.d(TAG, "Notification not sent. Unknown user group.");
-            return;
-        }
-
-        // Show notification
-        notificationManager.notify(notificationId, builder.build());
-        Log.d(TAG, "Notification sent to " + userGroup + " group.");
     }
+
 }

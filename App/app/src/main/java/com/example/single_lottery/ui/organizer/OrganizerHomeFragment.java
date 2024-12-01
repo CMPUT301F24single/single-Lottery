@@ -74,13 +74,6 @@ public class OrganizerHomeFragment extends Fragment {
         eventAdapter = new OrganizerEventAdapter(eventList);
         recyclerView.setAdapter(eventAdapter);
 
-        // Add DividerItemDecoration (for dividing list of events)
-        DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(
-                recyclerView.getContext(),
-                LinearLayoutManager.VERTICAL
-        );
-        recyclerView.addItemDecoration(dividerItemDecoration);
-
         loadEvents();
 
         return view;
