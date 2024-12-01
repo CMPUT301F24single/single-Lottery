@@ -24,4 +24,10 @@
         android:layout_height="wrap_content"
         android:hint="Phone" />
 
+    <EditText
+        android:id="@+id/locationInput"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Location" />
+
 </LinearLayout>
