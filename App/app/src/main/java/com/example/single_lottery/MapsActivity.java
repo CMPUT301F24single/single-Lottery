@@ -27,12 +27,24 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.ArrayList;
-
+/**
+ * Activity for displaying user locations on Google Maps.
+ * Shows locations of registered users for a specific event.
+ * Handles map initialization and location marker management.
+ *
+ * @author [Haorui Gao]
+ * @version 1.0
+ */
 public class MapsActivity extends AppCompatActivity implements OnMapReadyCallback {
 
     private GoogleMap mMap;
     private com.example.single_lottery.databinding.ActivityMapsBinding binding;
-
+    /**
+     * Initializes the activity and sets up the map fragment.
+     * Loads user locations for specified event.
+     *
+     * @param savedInstanceState Bundle containing the activity's previously saved state
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -50,7 +62,12 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 .findFragmentById(R.id.map_fragment);
         mapFragment.getMapAsync(this);
     }
-
+    /**
+     * Loads user location data from Firestore.
+     * Retrieves latitude and longitude for all users registered to the event.
+     *
+     * @param eventId ID of event to load locations for
+     */
     private void loadLocations(String eventId) {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         Log.d("MapsActivity", "Event ID:" + eventId);
@@ -82,6 +99,12 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 });
     }
 
+    /**
+     * Adds location markers to the map.
+     * Places markers for each user location and centers map on first location.
+     *
+     * @param locations List of LatLng coordinates to mark on map
+     */
     private void addMarkersToMap(ArrayList<LatLng> locations) {
         if (locations != null && !locations.isEmpty()) {
             for (LatLng location : locations) {
@@ -92,7 +115,12 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             Toast.makeText(this, "No locations found", Toast.LENGTH_SHORT).show();
         }
     }
-
+    /**
+     * Called when the map is ready to be used.
+     * Triggers location loading once map is initialized.
+     *
+     * @param googleMap The ready-to-use Google Map
+     */
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
@@ -112,7 +140,13 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         getMenuInflater().inflate(R.menu.map_actionbar, menu);
         return true;
     }
-
+    /**
+     * Handles action bar item selections.
+     * Manages back navigation and map-specific actions.
+     *
+     * @param item The selected menu item
+     * @return true if the event was handled, false otherwise
+     */
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();

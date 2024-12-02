@@ -21,13 +21,30 @@ import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
 import java.util.List;
-
+/**
+ * Fragment for managing users in admin view.
+ * Displays list of users and handles loading user data from Firestore.
+ * Manages loading and displaying user data in a RecyclerView.
+ *
+ * @author [Jingyao Gu]
+ * @author [Aaron kim]
+ * @version 1.0
+ */
 public class AdminUserFragment extends Fragment {
     private RecyclerView recyclerView;
     private AdminUserAdapter userAdapter;
     private List<EventModel> userList;
     private FirebaseFirestore db;
 
+    /**
+     * Creates and initializes the fragment's user interface.
+     * Sets up RecyclerView with adapter and loads user data.
+     *
+     * @param inflater The layout inflater
+     * @param container The parent view container
+     * @param savedInstanceState Bundle containing the fragment's previously saved state
+     * @return The created fragment view
+     */
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -45,7 +62,12 @@ public class AdminUserFragment extends Fragment {
 
         return view;
     }
-
+    /**
+     * Loads user data from Firestore database.
+     * Retrieves user information and updates adapter with fresh data.
+     * Clears existing list before adding new user data.
+     * Handles errors during data loading with user feedback.
+     */
     private void loadUsers() {
         CollectionReference usersRef = db.collection("users");
         usersRef.get().addOnCompleteListener(task -> {

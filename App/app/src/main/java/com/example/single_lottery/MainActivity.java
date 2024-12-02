@@ -32,14 +32,29 @@ import com.google.firebase.installations.FirebaseInstallations;
 
 import java.util.Collections;
 import java.util.concurrent.TimeUnit;
-
+/**
+ * Main entry point activity for Single Lottery application.
+ * Handles user role selection, admin authentication, notification preferences,
+ * and offline lottery processing setup.
+ *
+ * @author [Aaron kim]
+ * @author [Gabriel Bautista]
+ * @author [Haorui Gao]
+ * @author [Jingyao Gu]
+ * @version 1.0
+ */
 public class MainActivity extends AppCompatActivity {
 
     private boolean showLandingScreen;
     private static final int REQUEST_CODE = 100;
     private FirebaseFirestore db;
     private FirebaseAuth mAuth;
-
+    /**
+     * Initializes the activity, sets up Firebase instances, and configures landing screen.
+     * Initializes notification preferences and schedules offline lottery processing.
+     *
+     * @param savedInstanceState Bundle containing the activity's previously saved state
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -179,7 +194,10 @@ public class MainActivity extends AppCompatActivity {
 
         }
     }
-
+    /**
+     * Initializes notification preferences in Firestore.
+     * Creates or updates user document with default notification settings.
+     */
     private void initializeNotificationPreferences() {
         FirebaseInstallations.getInstance().getId()
                 .addOnCompleteListener(task -> {
@@ -223,7 +241,10 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-
+    /**
+     * Saves user's unique identifier (UID) to Firestore.
+     * Uses device's Android ID as unique identifier.
+     */
     private void saveUID() {
         // Step 1: Get the Firebase Installation ID
         FirebaseInstallations.getInstance().getId()
@@ -280,7 +301,10 @@ public class MainActivity extends AppCompatActivity {
 
 
 
-
+    /**
+     * Displays admin login dialog with email and password fields.
+     * Validates input and performs login through Firestore.
+     */
     private void showAdminLoginPopup() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Admin Login");
@@ -322,7 +346,14 @@ public class MainActivity extends AppCompatActivity {
 
         dialog.show();
     }
-
+    /**
+     * Verifies admin credentials against Firestore database.
+     * Navigates to admin interface on successful authentication.
+     *
+     * @param email Admin's email address
+     * @param password Admin's password
+     * @param dialog Reference to login dialog for dismissal
+     */
     private void performFirestoreLogin(String email, String password, AlertDialog dialog) {
         db.collection("admin")
                 .whereEqualTo("email", email)
@@ -349,7 +380,10 @@ public class MainActivity extends AppCompatActivity {
                     Toast.makeText(this, "Error: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                 });
     }
-
+    /**
+     * Requests notification permissions for Android Tiramisu and above.
+     * Checks and requests POST_NOTIFICATIONS permission.
+     */
     private void requestNotificationPermissions() {
         // Check if the app has notification permission
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
@@ -358,7 +392,14 @@ public class MainActivity extends AppCompatActivity {
             }
         }
     }
-
+    /**
+     * Handles permission request results.
+     * Manages notification permission grant/denial.
+     *
+     * @param requestCode The request code passed to requestPermissions
+     * @param permissions The requested permissions
+     * @param grantResults The grant results for the permissions
+     */
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);

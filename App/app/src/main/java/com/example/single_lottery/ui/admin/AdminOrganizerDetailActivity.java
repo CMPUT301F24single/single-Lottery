@@ -17,12 +17,26 @@ import com.example.single_lottery.R;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
-
+/**
+ * Activity for displaying and managing organizer details in admin view.
+ * Provides functionality to view organizer information and handle profile/avatar deletion.
+ * Manages interaction with Firebase Storage and Firestore for data operations.
+ *
+ * @author [Jingyao Gu]
+ * @author [Aaron kim]
+ * @version 1.0
+ */
 public class AdminOrganizerDetailActivity extends AppCompatActivity {
 
     private String organizerId;
     private String profileImageUrl;
-
+    /**
+     * Initializes the activity and sets up the UI components.
+     * Loads organizer details from intent and configures button listeners.
+     * Displays organizer profile information including avatar image.
+     *
+     * @param savedInstanceState Bundle containing the activity's previously saved state
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -66,7 +80,11 @@ public class AdminOrganizerDetailActivity extends AppCompatActivity {
         // Delete profile button click listener
         deleteProfileButton.setOnClickListener(v -> deleteProfile());
     }
-
+    /**
+     * Deletes organizer's avatar image from storage and updates database.
+     * Removes image URL from Firestore and sets default profile image.
+     * Shows appropriate success/failure messages to user.
+     */
     private void deleteAvatar() {
         if (profileImageUrl == null || profileImageUrl.isEmpty()) {
             Toast.makeText(this, "No avatar to delete.", Toast.LENGTH_SHORT).show();
@@ -98,7 +116,11 @@ public class AdminOrganizerDetailActivity extends AppCompatActivity {
                     Toast.makeText(this, "Failed to delete avatar.", Toast.LENGTH_SHORT).show();
                 });
     }
-
+    /**
+     * Deletes organizer's entire profile from Firestore.
+     * Removes organizer document and closes activity on successful deletion.
+     * Shows appropriate success/failure messages to user.
+     */
     private void deleteProfile() {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
 

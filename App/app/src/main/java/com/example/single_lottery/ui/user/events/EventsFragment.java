@@ -71,23 +71,23 @@ public class EventsFragment extends Fragment {
                 .get()
                 .addOnSuccessListener(queryDocumentSnapshots -> {
                     if (queryDocumentSnapshots.isEmpty()) {
-                        noEventsTextView.setVisibility(View.VISIBLE); // 显示“无活动”提示
+                        noEventsTextView.setVisibility(View.VISIBLE); // Show "No Activity" message
                         eventList.clear();
                         eventAdapter.notifyDataSetChanged();
                     } else {
-                        noEventsTextView.setVisibility(View.GONE); // 隐藏提示
+                        noEventsTextView.setVisibility(View.GONE); // Hide Tips
                         eventList.clear();
 
                         for (DocumentSnapshot document : queryDocumentSnapshots.getDocuments()) {
                             String eventId = document.getString("eventId");
 
-                            // 查找 events 集合中的详细信息
+                            // Find detailed information in the events collection
                             db.collection("events").document(eventId)
                                     .get()
                                     .addOnSuccessListener(eventSnapshot -> {
                                         if (eventSnapshot.exists()) {
                                             EventModel event = eventSnapshot.toObject(EventModel.class);
-                                            event.setEventId(eventId); // 设置 eventId
+                                            event.setEventId(eventId); // set eventId
                                             eventList.add(event);
                                             eventAdapter.notifyDataSetChanged();
                                         }
