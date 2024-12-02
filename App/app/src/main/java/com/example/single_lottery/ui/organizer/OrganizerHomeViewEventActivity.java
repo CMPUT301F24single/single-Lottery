@@ -142,6 +142,25 @@ public class OrganizerHomeViewEventActivity extends AppCompatActivity {
         String eventId = getIntent().getStringExtra("event_id");  // Make sure you pass the correct eventId
         loadEventData(eventId);  // Reload activity data every time you return to the page
     }
+    private void countRegistrations(String eventId, int maxWaitingListCount) {
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+
+        db.collection("registered_events")
+                .whereEqualTo("eventId", eventId)
+                .get()
+                .addOnSuccessListener(queryDocumentSnapshots -> {
+                    int currentSignUpCount = queryDocumentSnapshots.size();
+                    if (maxWaitingListCount == Integer.MAX_VALUE){
+                        textViewWaitingListCount.setText(currentSignUpCount + "/" + "unlimited");
+                    }
+                    else {
+                        textViewWaitingListCount.setText(currentSignUpCount + "/" + maxWaitingListCount);
+                    }
+                })
+                .addOnFailureListener(e -> {
+                    Toast.makeText(this, "Failed to load registration count.", Toast.LENGTH_SHORT).show();
+                });
+    }
 
     /**
      * Loads event details from Firestore and updates UI components.
@@ -162,9 +181,10 @@ public class OrganizerHomeViewEventActivity extends AppCompatActivity {
                             textViewEventTime.setText(event.getTime());
                             textViewRegistrationDeadline.setText(event.getRegistrationDeadline());
                             textViewLotteryTime.setText(event.getLotteryTime());
-                            textViewWaitingListCount.setText(String.valueOf(event.getWaitingListCount()));
                             textViewLotteryCount.setText(String.valueOf(event.getLotteryCount()));
                             textViewLocationRequirement.setText(event.isRequiresLocation() ? "Yes" : "No");
+
+                            countRegistrations(eventId, event.getWaitingListCount());
 
 
                             // Use Glide to display event posters
