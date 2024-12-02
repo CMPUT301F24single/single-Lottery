@@ -137,6 +137,10 @@ public class OfflineWorker extends Worker {
                                     for (DocumentSnapshot winner : winners) {
                                         String userId = winner.getString("userId"); // Ensure this matches your Firestore field name
                                         if (userId != null) {
+                                            // Update the status of the winner to "Winner"
+                                            batch.update(db.collection("registered_events").document(winner.getId()), "status", "Winner");
+
+                                            // Create and add notification for the winner
                                             Notification winnerNotification = new Notification(
                                                     eventName + " - Lottery Results",
                                                     "Congratulations, you are a winner!",
@@ -147,10 +151,10 @@ public class OfflineWorker extends Worker {
                                         }
                                     }
 
-
                                     for (DocumentSnapshot loser : losers) {
                                         String userId = loser.getString("userId"); // Ensure this matches your Firestore field name
                                         if (userId != null) {
+                                            // Create and add notification for the loser
                                             Notification loserNotification = new Notification(
                                                     eventName + " - Lottery Results",
                                                     "Sorry, you were not selected.",
@@ -160,7 +164,6 @@ public class OfflineWorker extends Worker {
                                             batch.set(loserNotificationRef, loserNotification);
                                         }
                                     }
-
 
                                     // Commit batch
                                     batch.commit()
@@ -176,6 +179,7 @@ public class OfflineWorker extends Worker {
                 })
                 .addOnFailureListener(e -> Log.e("LotteryWorker", "Error retrieving event name", e));
     }
+
 
 
 
