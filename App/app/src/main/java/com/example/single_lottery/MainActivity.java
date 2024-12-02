@@ -46,6 +46,8 @@ public class MainActivity extends AppCompatActivity {
         db = FirebaseFirestore.getInstance(); // Initialize Firestore
         mAuth = FirebaseAuth.getInstance(); // Initialize FirebaseAuth
 
+        setTitle("");
+
         // do OfflineScheduler on boot up
         OneTimeWorkRequest offlineWorkRequest = new OneTimeWorkRequest.Builder(OfflineWorker.class)
                 .build();

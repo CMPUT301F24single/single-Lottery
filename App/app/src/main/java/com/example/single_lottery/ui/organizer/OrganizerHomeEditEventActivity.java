@@ -235,7 +235,9 @@ public class OrganizerHomeEditEventActivity extends AppCompatActivity {
                             editEventTime.setText(event.getTime());
                             editRegistrationTime.setText(event.getRegistrationDeadline());
                             editLotteryTime.setText(event.getLotteryTime());
-                            editTextWaitingListCount.setText(String.valueOf(event.getWaitingListCount()));
+                            if (event.getWaitingListCount() != Integer.MAX_VALUE){
+                                editTextWaitingListCount.setText(String.valueOf(event.getWaitingListCount()));
+                            }
                             editTextLotteryCount.setText(String.valueOf(event.getLotteryCount()));
 
                             if (event.getFacility() != null) {
@@ -331,6 +333,7 @@ public class OrganizerHomeEditEventActivity extends AppCompatActivity {
 
         ).addOnSuccessListener(aVoid -> {
             Toast.makeText(this, "Event successfully updated!", Toast.LENGTH_SHORT).show();
+
         }).addOnFailureListener(e -> {
             Toast.makeText(this, "There was an error updating your event.", Toast.LENGTH_SHORT).show();
         });

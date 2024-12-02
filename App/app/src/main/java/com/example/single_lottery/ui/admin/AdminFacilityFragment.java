@@ -40,13 +40,6 @@ public class AdminFacilityFragment extends Fragment{
         facilityAdapter = new AdminFacilityAdapter(facilitiesWithEvents, this::deleteEventsByFacility, getContext());
         recyclerView.setAdapter(facilityAdapter);
 
-        // Add DividerItemDecoration (for dividing list of events)
-        DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(
-                recyclerView.getContext(),
-                LinearLayoutManager.VERTICAL
-        );
-        recyclerView.addItemDecoration(dividerItemDecoration);
-
         loadFacilitiesFromFirestore();
 
         return view;

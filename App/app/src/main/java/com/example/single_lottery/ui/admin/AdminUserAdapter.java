@@ -18,16 +18,21 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;  // For loading images (make sure to add Glide dependency)
 import com.example.single_lottery.EventModel;
 import com.example.single_lottery.R;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.List;
 
 public class AdminUserAdapter extends RecyclerView.Adapter<AdminUserAdapter.UserViewHolder> {
     private List<EventModel> userList;
     private Context context;
+    private FirebaseFirestore db;  // Firestore instance
 
     public AdminUserAdapter(Context context, List<EventModel> userList) {
         this.context = context;
         this.userList = userList;
+        this.db = FirebaseFirestore.getInstance(); // Initialize Firestore instance
     }
 
     @NonNull
@@ -44,12 +49,46 @@ public class AdminUserAdapter extends RecyclerView.Adapter<AdminUserAdapter.User
         EventModel user = userList.get(position);
 
         // Set the user name in the TextView
-        if(user.getName() == null || user.getName().isEmpty()){
-            holder.userNameTextView.setText("(no name)");
+        if (user.getName() == null || user.getName().isEmpty()) {
+            holder.adminUserName.setText("(no name)");
+        } else {
+            holder.adminUserName.setText(user.getName());
         }
-        else {
-            holder.userNameTextView.setText(user.getName());
-        }
+
+        // Obtain and set user id
+        db.collection("users")
+                .whereEqualTo("name", user.getName())  // Match the name
+                .whereEqualTo("phone", user.getPhone())  // Match the phone number
+                .get()
+                .addOnSuccessListener(queryDocumentSnapshots -> {
+                    if (!queryDocumentSnapshots.isEmpty()) {
+                        // If a matching document is found
+                        for (DocumentSnapshot document : queryDocumentSnapshots) {
+                            String userId = document.getString("uid"); // Get the 'uid' field from the document
+                            // Set the user ID
+                            holder.adminUserId.setText(userId);
+
+                            // Get the number of events the user is registered for
+                            db.collection("registered_events")
+                                    .whereEqualTo("userId", userId) // Query by user ID
+                                    .get()
+                                    .addOnSuccessListener(eventSnapshots -> {
+                                        int eventCount = eventSnapshots.size(); // Count the number of matching documents
+                                        holder.adminUserEventCount.setText("Involved in " + eventCount + " Events");
+                                    })
+                                    .addOnFailureListener(e -> {
+                                        holder.adminUserEventCount.setText("Error getting event count");
+                                    });
+                        }
+                    } else {
+                        // If no matching user is found
+                        holder.adminUserId.setText("User not found");
+                    }
+                })
+                .addOnFailureListener(e -> {
+                    // Handle any errors in getting the user ID
+                    holder.adminUserId.setText("Error getting user ID");
+                });
 
         // Get the profile image URL from the user model (Firestore data)
         String profileImageUrl = user.getProfileImageUrl();  // Assuming Firestore data is being passed correctly here
@@ -57,13 +96,13 @@ public class AdminUserAdapter extends RecyclerView.Adapter<AdminUserAdapter.User
         // Check if the profile image URL is valid
         if (profileImageUrl == null || profileImageUrl.isEmpty()) {
             // If profile image URL is null or empty, generate the letter avatar
-            generateLetterAvatar(user.getName(), holder.userImageView);
+            generateLetterAvatar(user.getName(), holder.adminUserImage);
         } else {
             // If profile image URL is available, load it using Glide
             Glide.with(context)
                     .load(profileImageUrl)
                     .placeholder(R.drawable.ic_profile)  // Placeholder image while loading
-                    .into(holder.userImageView);
+                    .into(holder.adminUserImage);
         }
 
         // Set the click listener to open the detailed user activity
@@ -74,6 +113,7 @@ public class AdminUserAdapter extends RecyclerView.Adapter<AdminUserAdapter.User
         });
     }
 
+
     @Override
     public int getItemCount() {
         return userList.size();
@@ -81,16 +121,15 @@ public class AdminUserAdapter extends RecyclerView.Adapter<AdminUserAdapter.User
 
     /**
      * Generates a letter avatar when no profile image is set.
-     * Creates circular avatar with user initials.
+     * Creates a circular avatar with user initials.
      *
      * @param name User's display name for initial generation
      */
     private void generateLetterAvatar(String name, ImageView profileImageView) {
         String initials = "";
-        if(name == null || name.isEmpty()){
+        if (name == null || name.isEmpty()) {
             initials += '-';
-        }
-        else {
+        } else {
             String[] nameParts = name.split("\\s+");
             if (nameParts.length > 0) {
                 initials += nameParts[0].charAt(0); // First letter of first name
@@ -120,14 +159,18 @@ public class AdminUserAdapter extends RecyclerView.Adapter<AdminUserAdapter.User
     }
 
     public static class UserViewHolder extends RecyclerView.ViewHolder {
-        ImageView userImageView;
-        TextView userNameTextView;
+        ImageView adminUserImage;
+        TextView adminUserName;
+        TextView adminUserId;
+        TextView adminUserEventCount;
 
         public UserViewHolder(@NonNull View itemView) {
             super(itemView);
             // Bind the ImageView and TextView
-            userImageView = itemView.findViewById(R.id.userImage);  // ImageView in item_user.xml
-            userNameTextView = itemView.findViewById(R.id.userName); // TextView in item_user.xml
+            adminUserImage = itemView.findViewById(R.id.adminUserImage);  // ImageView in item_user.xml
+            adminUserName = itemView.findViewById(R.id.adminUserName);  // TextView in item_user.xml
+            adminUserId = itemView.findViewById(R.id.adminUserId);  // TextView in item_user.xml
+            adminUserEventCount = itemView.findViewById(R.id.adminUserEventCount);  // TextView in item_user.xml
         }
     }
 }

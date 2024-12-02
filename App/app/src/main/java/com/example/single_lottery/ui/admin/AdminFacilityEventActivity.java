@@ -16,7 +16,7 @@ public class AdminFacilityEventActivity extends AppCompatActivity {
 
         if (getSupportActionBar() != null) {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-            getSupportActionBar().setTitle("Events at: " + facility);
+            getSupportActionBar().setTitle("Events at " + facility);
         }
 
         if (savedInstanceState == null){

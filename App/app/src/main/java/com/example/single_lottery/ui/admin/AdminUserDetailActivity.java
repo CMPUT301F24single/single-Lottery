@@ -1,6 +1,10 @@
 package com.example.single_lottery.ui.admin;
 
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.widget.Button;
@@ -23,15 +27,15 @@ public class AdminUserDetailActivity extends AppCompatActivity {
     public static final String EXTRA_USER = "extra_user";
 
     @Override
-    protected void onCreate(@Nullable Bundle savedInstanceState) {
+    protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.admin_user_detail);
         setTitle("User Details");
 
-        // 获取传递的用户数据
+        // Get the passed user data
         EventModel user = (EventModel) getIntent().getSerializableExtra(EXTRA_USER);
 
-        // 绑定 UI 元素
+        // Bind UI elements
         ImageView userProfileImage = findViewById(R.id.userProfileImage);
         TextView userName = findViewById(R.id.userName);
         TextView userEmail = findViewById(R.id.userEmail);
@@ -45,16 +49,25 @@ public class AdminUserDetailActivity extends AppCompatActivity {
             userEmail.setText(String.format("Email: %s", user.getEmail()));
             userPhone.setText(String.format("Phone: %s", user.getPhone()));
 
-            // 加载头像
-            Glide.with(this)
-                    .load(user.getProfileImageUrl())
-                    .placeholder(R.drawable.ic_profile)
-                    .into(userProfileImage);
+            // Get the profile image URL from the user model (Firestore data)
+            String profileImageUrl = user.getProfileImageUrl();  // Assuming Firestore data is being passed correctly here
 
-            // 删除头像按钮逻辑
+            // Check if the profile image URL is valid
+            if (profileImageUrl == null || profileImageUrl.isEmpty()) {
+                // If profile image URL is null or empty, generate the letter avatar
+                generateLetterAvatar(user.getName(), userProfileImage);
+            } else {
+                // If profile image URL is available, load it using Glide
+                Glide.with(this)
+                        .load(profileImageUrl)
+                        .placeholder(R.drawable.ic_profile)  // Placeholder image while loading
+                        .into(userProfileImage);
+            }
+
+            // Delete avatar button logic
             btnDeleteAvatar.setOnClickListener(v -> deleteAvatar(user));
 
-            // 删除用户按钮逻辑
+            // Delete user button logic
             btnDeleteProfile.setOnClickListener(v -> deleteProfile(user));
         }
 
@@ -119,5 +132,44 @@ public class AdminUserDetailActivity extends AppCompatActivity {
                 .addOnFailureListener(e -> {
                     Toast.makeText(this, "Failed to delete avatar: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                 });
+    }
+
+    /**
+     * Generates a letter avatar when no profile image is set.
+     * Creates a circular avatar with user initials.
+     *
+     * @param name User's display name for initial generation
+     */
+    private void generateLetterAvatar(String name, ImageView profileImageView) {
+        String initials = "";
+        if (name == null || name.isEmpty()) {
+            initials += '-';
+        } else {
+            String[] nameParts = name.split("\\s+");
+            if (nameParts.length > 0) {
+                initials += nameParts[0].charAt(0); // First letter of first name
+            }
+            if (nameParts.length > 1) {
+                initials += nameParts[1].charAt(0); // First letter of last name
+            }
+        }
+
+        // Create a Bitmap with 100x100 size (for circular avatar)
+        Bitmap bitmap = Bitmap.createBitmap(100, 100, Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(bitmap);
+
+        // Draw a circular background
+        Paint paint = new Paint();
+        paint.setColor(Color.GRAY); // Background color
+        canvas.drawCircle(50, 50, 50, paint); // Circle at center (50, 50) with radius 50
+
+        // Draw initials in the center of the circle
+        paint.setColor(Color.WHITE); // Text color
+        paint.setTextSize(40);
+        paint.setTextAlign(Paint.Align.CENTER); // Center-align text
+        canvas.drawText(initials, 50, 65, paint); // Draw the initials at position (50, 65)
+
+        // Set the generated bitmap as the profile image
+        profileImageView.setImageBitmap(bitmap);
     }
 }

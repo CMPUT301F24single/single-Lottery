@@ -10,7 +10,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.single_lottery.EventModel;
@@ -34,7 +34,7 @@ public class AdminUserFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_admin_user, container, false);
 
         recyclerView = view.findViewById(R.id.recyclerViewUsers);
-        recyclerView.setLayoutManager(new GridLayoutManager(getContext(), 2)); // Set to grid with 2 columns
+        recyclerView.setLayoutManager(new LinearLayoutManager(getContext())); // Change to LinearLayoutManager for vertical list
 
         userList = new ArrayList<>();
         userAdapter = new AdminUserAdapter(requireContext(), userList);
@@ -72,5 +72,4 @@ public class AdminUserFragment extends Fragment {
             }
         });
     }
-
 }
