@@ -28,9 +28,6 @@
             android:name="com.google.android.geo.API_KEY"
             android:value="${GOOGLE_MAPS_API_KEY}" />
 
-        <meta-data
-            android:name="com.google.firebase.messaging.default_notification_channel_id"
-            android:value="default" />
 
         <activity
             android:name=".MainActivity"
@@ -49,6 +46,7 @@
         <activity
             android:name=".ui.organizer.OrganizerActivity"
             android:exported="true" />
+
         <activity
             android:name=".ui.user.UserActivity"
             android:exported="true" />
@@ -89,6 +87,11 @@
                 <action android:name="com.google.firebase.MESSAGING_EVENT"/>
             </intent-filter>
         </service>
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_channel_id"
+            android:value="notification_channel" />
+
+        <activity android:name=".ui.notification.NotificationActivity" />
 
 
 

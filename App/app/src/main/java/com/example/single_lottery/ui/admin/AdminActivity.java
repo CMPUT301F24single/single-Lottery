@@ -1,15 +1,20 @@
 package com.example.single_lottery.ui.admin;
 
+import android.content.Intent;
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuItem;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 
+import com.example.single_lottery.MainActivity;
 import com.example.single_lottery.R;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 /**
- * Activity class for the admin interface that provides administrative functions and management features.
+ * Activity class for the admin interface that provides administrative functions
+ * and management features.
  * This is the main entry point for admin users to manage the lottery system.
  *
  * @author [Haorui Gao]
@@ -54,5 +59,4 @@ public class AdminActivity extends AppCompatActivity {
                     .commit();
             return true;
         });
-    }
 }

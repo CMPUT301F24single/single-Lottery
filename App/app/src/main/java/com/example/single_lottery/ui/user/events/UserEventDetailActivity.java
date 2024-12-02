@@ -71,6 +71,11 @@ public class UserEventDetailActivity extends AppCompatActivity {
         declineButton = findViewById(R.id.declineButton);
 
         eventId = getIntent().getStringExtra("event_id");
+        if (eventId == null) {
+            Toast.makeText(this, "Event ID not found", Toast.LENGTH_SHORT).show();
+            finish();
+            return;
+        }
         userId = Settings.Secure.getString(getContentResolver(), Settings.Secure.ANDROID_ID);
 
         loadEventDetails(eventId);
@@ -266,7 +271,27 @@ public class UserEventDetailActivity extends AppCompatActivity {
                             db.collection("registered_events").document(document.getId()).delete()
                                     .addOnSuccessListener(aVoid -> {
                                         Toast.makeText(this, "Registration canceled", Toast.LENGTH_SHORT).show();
-                                        finish();
+    
+                                        db.collection("user_locations")
+                                                .whereEqualTo("userId", userId) 
+                                                .get()
+                                                .addOnSuccessListener(locationQuerySnapshot -> {
+                                                    if (!locationQuerySnapshot.isEmpty()) {
+                                                        for (DocumentSnapshot locationDocument : locationQuerySnapshot.getDocuments()) {
+                                                            db.collection("user_locations").document(locationDocument.getId()).delete()
+                                                                    .addOnSuccessListener(aVoid1 -> {
+                                                                        Log.d("UserEventDetailActivity", "User location deleted successfully.");
+                                                                    })
+                                                                    .addOnFailureListener(e -> {
+                                                                        Toast.makeText(this, "Failed to delete user location", Toast.LENGTH_SHORT).show();
+                                                                        Log.e("UserEventDetailActivity", "Error deleting user location", e);
+                                                                    });
+                                                        }
+                                                    }
+                                                })
+                                                .addOnFailureListener(e -> Log.e("UserEventDetailActivity", "Error querying user location", e));
+    
+                                        finish(); 
                                     })
                                     .addOnFailureListener(e -> Toast.makeText(this, "Failed to cancel registration", Toast.LENGTH_SHORT).show());
                         }
@@ -275,44 +300,5 @@ public class UserEventDetailActivity extends AppCompatActivity {
                 .addOnFailureListener(e -> Log.e("UserEventDetailActivity", "Error canceling registration", e));
     }
 
-    private void handleDeclineAndSelectReplacement() {
-        FirebaseFirestore db = FirebaseFirestore.getInstance();
-
-        // 查询所有未被选中的用户
-        db.collection("registered_events")
-                .whereEqualTo("eventId", eventId) // 筛选当前活动
-                .whereEqualTo("status", "Not Selected") // 筛选未被选中的用户
-                .get()
-                .addOnSuccessListener(querySnapshot -> {
-                    if (!querySnapshot.isEmpty()) {
-                        List<DocumentSnapshot> notSelectedUsers = querySnapshot.getDocuments();
-
-                        // 随机选取一名替补用户
-                        Collections.shuffle(notSelectedUsers);
-                        DocumentSnapshot replacementUser = notSelectedUsers.get(0);
-
-                        // 更新替补用户的状态为 Winner
-                        db.collection("registered_events").document(replacementUser.getId())
-                                .update("status", "Winner")
-                                .addOnSuccessListener(aVoid -> {
-                                    Toast.makeText(this, "Replacement user selected as Winner.", Toast.LENGTH_SHORT).show();
-
-                                    // 将当前用户状态更新为 Declined
-                                    updateLotteryStatus("Declined");
-                                })
-                                .addOnFailureListener(e -> {
-                                    Toast.makeText(this, "Failed to update replacement user.", Toast.LENGTH_SHORT).show();
-                                    Log.e("UserEventDetailActivity", "Error updating replacement user", e);
-                                });
-                    } else {
-                        // 如果没有未被选中的用户，仅更新当前用户状态为 Declined
-                        Toast.makeText(this, "No replacement user available.", Toast.LENGTH_SHORT).show();
-                        updateLotteryStatus("Declined");
-                    }
-                })
-                .addOnFailureListener(e -> {
-                    Toast.makeText(this, "Failed to fetch not selected users.", Toast.LENGTH_SHORT).show();
-                    Log.e("UserEventDetailActivity", "Error fetching not selected users", e);
-                });
-    }
 }
+
