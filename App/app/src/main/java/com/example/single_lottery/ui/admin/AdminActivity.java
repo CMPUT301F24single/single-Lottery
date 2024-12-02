@@ -33,8 +33,7 @@ public class AdminActivity extends AppCompatActivity {
         getSupportActionBar().setTitle("Events");
 
         BottomNavigationView bottomNavigationView = findViewById(R.id.admin_nav_bottom_navigation);
-
-        // AdminEventFragment loaded by default
+        // 默认加载 AdminEventFragment
         if (savedInstanceState == null) {
             getSupportFragmentManager().beginTransaction()
                     .replace(R.id.admin_fragment_container, new AdminEventFragment())

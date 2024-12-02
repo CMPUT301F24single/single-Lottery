@@ -25,28 +25,12 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 
-/**
- * Utility class for custom picker actions in UI tests.
- *
- * This class provides methods to programmatically set dates and times in picker dialogs,
- * replacing the deprecated androidx.test.espresso:espresso-contrib.PickerActions.
- * These actions are essential for testing date and time selection in the UI.
- *
- * @author Aaron Kim
- * @version 1.0
+/*
  * Gpt4o: Make custom PickerActions class that select date and time of respective dialogboxes
  * //androidx.test.espresso:espresso-contrib.PickerActions is deprecated and has compatibility issues with running correctly on current environment
  * Functions in this class are used to manually set the date and time in a calendar/clock dialog box in a UI test.
  */
 class PickerActions {
-    /**
-     * Creates a ViewAction that sets a specific date in a DatePicker.
-     *
-     * @param year The year to set
-     * @param month The month to set (0-11)
-     * @param dayOfMonth The day of month to set
-     * @return ViewAction that sets the specified date
-     */
     public static ViewAction setDate(final int year, final int month, final int dayOfMonth) {
         return new ViewAction() {
             @Override
@@ -64,13 +48,6 @@ class PickerActions {
             }
         };
     }
-    /**
-     * Creates a ViewAction that sets a specific time in a TimePicker.
-     *
-     * @param hour The hour to set (0-23)
-     * @param minute The minute to set (0-59)
-     * @return ViewAction that sets the specified time
-     */
     public static ViewAction setTime(final int hour, final int minute) {
         return new ViewAction() {
             @Override
@@ -95,16 +72,9 @@ class PickerActions {
 
 /*
  * Black box testing for creating and viewing an event as an organizer.
-    Things to adjust for while app is still in development:
-    -test case launch will change as the app is able to automatically choose device as one of: {user, organizer, admin}
-    -check deletion of events functionality (if applicable to an organizer)
-    -check for correct inputs (e.g. a lottery date shouldn't exceed the event date)
  */
 
 public class OrganizerEventTest {
-    //before: make an event as an organizer
-    //after: test as an organizer that the event details can be viewed and edited
-    //https://stackoverflow.com/questions/29378552/in-espresso-how-to-avoid-ambiguousviewmatcherexception-when-multiple-views-matc
     public static Matcher<View> withIndex(final Matcher<View> matcher, final int index) {
         return new TypeSafeMatcher<View>() {
             int currentIndex = 0;
@@ -125,12 +95,6 @@ public class OrganizerEventTest {
     @Rule
     public ActivityScenarioRule<MainActivity> scenario = new ActivityScenarioRule<>(MainActivity.class);
 
-    /**
-     * Initial setup for each test.
-     * Navigates to the organizer view and selects the new event creation screen.
-     *
-     * @throws InterruptedException if the thread sleep is interrupted
-     */
     @Before
     public void setup() throws InterruptedException {
         onView(withId(R.id.button_organizer)).perform(click());
@@ -139,15 +103,6 @@ public class OrganizerEventTest {
         Thread.sleep(2000);
     }
 
-    /**
-     * Tests the complete workflow of creating a new event as an organizer.
-     * Validates:
-     * - Event detail input (name, description, waiting list size, lottery count)
-     * - Date and time selection for event time, registration deadline, and lottery time
-     * - Event creation and visibility in the events list
-     *
-     * @throws InterruptedException if the thread sleep is interrupted
-     */
     @Test
     public void newEvent() throws InterruptedException {
         String testEventName = "test case event";

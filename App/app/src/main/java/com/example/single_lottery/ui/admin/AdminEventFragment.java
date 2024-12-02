@@ -22,28 +22,21 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Fragment for displaying the list of events in admin view.
- * Shows all events in a RecyclerView and handles loading event data from Firestore.
- *
- * @author Jingyao Gu
- * @version 1.0
- */
 public class AdminEventFragment extends Fragment {
 
     private RecyclerView recyclerView;
     private AdminEventAdapter eventAdapter;
     private List<EventModel> eventList;
+    private String facilityName;
 
-    /**
-     * Creates and initializes the fragment's user interface.
-     * Sets up RecyclerView with adapter and loads event data.
-     *
-     * @param inflater The layout inflater
-     * @param container The parent view container
-     * @param savedInstanceState Saved instance state bundle
-     * @return The created fragment view
-     */
+    @Override
+    public void onCreate(Bundle savedInstanceState){
+        super.onCreate(savedInstanceState);
+        if(getArguments() != null){
+            facilityName = getArguments().getString("facility_name");
+        }
+    }
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -61,11 +54,6 @@ public class AdminEventFragment extends Fragment {
         return view;
     }
 
-    /**
-     * Loads event data from Firestore database.
-     * Clears existing event list and populates it with fresh data.
-     * Updates the RecyclerView adapter when data is loaded.
-     */
     private void loadEventData() {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
 
@@ -74,7 +62,7 @@ public class AdminEventFragment extends Fragment {
             if (facilityName == null) {
                 for (DocumentSnapshot doc : queryDocumentSnapshots.getDocuments()) {
                     EventModel event = doc.toObject(EventModel.class);
-                    event.setEventId(doc.getId()); // Set the document ID as eventId
+                    event.setEventId(doc.getId()); // 将文档ID设置为eventId
                     eventList.add(event);
                 }
             }

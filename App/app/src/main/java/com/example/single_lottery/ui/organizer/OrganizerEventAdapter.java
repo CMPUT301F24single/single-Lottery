@@ -73,7 +73,7 @@ public class OrganizerEventAdapter extends RecyclerView.Adapter<OrganizerEventAd
         TextView lotteryDateTextView = holder.itemView.findViewById(R.id.organizerLotteryDate);
 
         EventModel event = eventList.get(position);
-        holder.eventNameTextView.setText(event.getName());  // Assume there is a `getName()` method
+        holder.eventNameTextView.setText(event.getName());  // 假设有 `getName()` 方法
 
         facilityTextView.setText(event.getFacility()); // Ensure getFacility() returns the facility
         timeTextView.setText(event.getTime()); // Ensure getTime() returns the time

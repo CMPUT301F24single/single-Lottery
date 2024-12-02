@@ -18,14 +18,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
-/**
- * Worker class responsible for handling lottery draws in the Single Lottery application.
- * Performs periodic checks of event deadlines and executes random lottery selections.
- * Manages notifications to winners and non-winners through Firebase.
- *
- * @author [Haorui Gao]
- * @version 1.0
- */
+
 public class LotteryWorker extends Worker {
 
     public LotteryWorker(@NonNull Context context, @NonNull WorkerParameters params) {

@@ -19,38 +19,18 @@ import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.List;
 
-/**
- * Adapter class for displaying event items in the admin interface.
- * Handles the display and interaction of event items in a RecyclerView.
- *
- * @author Jingyao Gu
- * @version 1.0
- */
 public class AdminEventAdapter extends RecyclerView.Adapter<AdminEventAdapter.AdminEventViewHolder> {
 
     private Context context;
     private List<EventModel> eventList;
     private FirebaseFirestore db;
 
-    /**
-     * Constructor for AdminEventAdapter.
-     *
-     * @param context The context used to inflate layouts
-     * @param eventList List of events to display
-     */
     public AdminEventAdapter(Context context, List<EventModel> eventList) {
         this.context = context;
         this.eventList = eventList;
         this.db = FirebaseFirestore.getInstance();  // Initialize Firestore instance
     }
 
-    /**
-     * Creates new ViewHolder instances for event items.
-     *
-     * @param parent The parent ViewGroup
-     * @param viewType The type of view
-     * @return A new AdminEventViewHolder instance
-     */
     @NonNull
     @Override
     public AdminEventViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -59,13 +39,6 @@ public class AdminEventAdapter extends RecyclerView.Adapter<AdminEventAdapter.Ad
         return new AdminEventViewHolder(view);
     }
 
-    /**
-     * Binds event data to the ViewHolder.
-     * Sets event name, organizer name, and click listener for the view button.
-     *
-     * @param holder The ViewHolder to bind data to
-     * @param position The position of the item in the list
-     */
     @Override
     public void onBindViewHolder(@NonNull AdminEventViewHolder holder, int position) {
         // Get the event data for the current position
@@ -121,32 +94,17 @@ public class AdminEventAdapter extends RecyclerView.Adapter<AdminEventAdapter.Ad
         });
     }
 
-    /**
-     * Gets the total number of events in the list.
-     *
-     * @return The total number of events
-     */
     @Override
     public int getItemCount() {
         // Return the total number of events
         return eventList.size();
     }
 
-    /**
-     * ViewHolder class for event items.
-     * Holds references to the views within each event item layout.
-     */
     public static class AdminEventViewHolder extends RecyclerView.ViewHolder {
         // Declare views for event name, organizer name, and "View" button
         TextView textViewEventName, textViewOrganizerName;
         Button buttonViewEvent; // Reference to the "View" button
 
-        /**
-         * Constructor for AdminEventViewHolder.
-         * Initializes view references from the item layout.
-         *
-         * @param itemView The view containing the event item layout
-         */
         public AdminEventViewHolder(@NonNull View itemView) {
             super(itemView);
             // Initialize the views
