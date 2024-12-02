@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Single_Lottery</string>
+    <string name="app_name">Socialbl</string>
     <string name="title_home">All Events</string>
     <string name="title_dashboard">Registered Events</string>
     <string name="title_notifications">Profile</string>

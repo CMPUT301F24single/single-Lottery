@@ -7,7 +7,14 @@ import android.view.View;
 import android.widget.FrameLayout;
 
 import com.journeyapps.barcodescanner.CaptureActivity;
-
+/**
+ * Activity for scanning QR codes using device camera.
+ * Extends CaptureActivity to provide QR code scanning functionality
+ * with custom back navigation.
+ *
+ * @author [Haorui Gao]
+ * @version 1.0
+ */
 public class QRScannerActivity extends CaptureActivity {
 
     @Override

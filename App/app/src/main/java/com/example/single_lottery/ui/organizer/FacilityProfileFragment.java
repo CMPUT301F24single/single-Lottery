@@ -37,7 +37,14 @@ import com.google.firebase.storage.StorageReference;
 
 import java.io.IOException;
 import java.util.UUID;
-
+/**
+ * Fragment for managing facility profile information.
+ * Handles facility data display, image management, and profile updates.
+ * Manages interaction with Firebase Storage and Firestore for data operations.
+ *
+ * @author [Aaron kim]
+ * @version 1.0
+ */
 public class FacilityProfileFragment extends Fragment {
     private TextView nameTextView, locationTextView;
     private Button editButton, uploadButton, removeImageButton;
@@ -49,7 +56,12 @@ public class FacilityProfileFragment extends Fragment {
     private FirebaseFirestore firestore;
     private FirebaseStorage storage;
     private StorageReference storageReference;
-
+    /**
+     * Initializes the fragment and retrieves installation ID.
+     * Sets up Firebase instance and loads facility profile data.
+     *
+     * @param savedInstanceState Bundle containing the fragment's previously saved state
+     */
     @Override
     public void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
@@ -63,7 +75,15 @@ public class FacilityProfileFragment extends Fragment {
                     }
                 });
     }
-
+    /**
+     * Creates and initializes the fragment's user interface.
+     * Sets up view references and button click listeners.
+     *
+     * @param inflater The layout inflater
+     * @param container The parent view container
+     * @param savedInstanceState Bundle containing the fragment's previously saved state
+     * @return The created fragment view
+     */
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -82,6 +102,12 @@ public class FacilityProfileFragment extends Fragment {
         removeImageButton.setOnClickListener(v -> removeProfileImage());
         return view;
     }
+    /**
+     * Loads facility profile data from Firestore.
+     * Updates UI with fetched facility information.
+     *
+     * @param installationId Unique device installation identifier
+     */
     private void loadFacilityProfile(String installationId) {
         DocumentReference docRef = firestore.collection("facilities").document(installationId);
         docRef.get().addOnCompleteListener(task -> {
@@ -95,6 +121,12 @@ public class FacilityProfileFragment extends Fragment {
             Log.e("ProfileFragment", "failed to load user profile: " + e.getMessage());
         });
     }
+    /**
+     * Updates UI components with facility information.
+     * Handles profile image loading and placeholder generation.
+     *
+     * @param profileImageUrl URL of facility profile image
+     */
     private void updateFacilityDetails(String profileImageUrl) {
         nameTextView.setText(facilityName);
         locationTextView.setText(facilityLocation);
@@ -108,6 +140,12 @@ public class FacilityProfileFragment extends Fragment {
             generateLetterAvatar(facilityName);
         }
     }
+    /**
+     * Generates a letter avatar when no profile image is set.
+     * Creates circular avatar with facility name initials.
+     *
+     * @param name Facility name for initial generation
+     */
     private void generateLetterAvatar(String name) {
         String[] nameParts = name.split("\\s+");
         String initials = "";
@@ -131,6 +169,10 @@ public class FacilityProfileFragment extends Fragment {
         canvas.drawText(initials, 50, 65, paint);
         profileImageView.setImageBitmap(bitmap);
     }
+    /**
+     * Displays dialog for editing facility information.
+     * Allows modification of facility name and location.
+     */
     private void showEditDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
         builder.setTitle("Edit Profile");
@@ -149,12 +191,23 @@ public class FacilityProfileFragment extends Fragment {
                 .setNegativeButton("cancel", (dialog, which) -> dialog.dismiss());
         builder.create().show();
     }
+    /**
+     * Launches system image picker for profile photo selection.
+     */
     private void selectImage() {
         Intent intent = new Intent();
         intent.setType("image/*");
         intent.setAction(Intent.ACTION_GET_CONTENT);
         startActivityForResult(Intent.createChooser(intent, "select image"), 1);
     }
+    /**
+     * Handles result from image selection activity.
+     * Processes selected image and initiates upload.
+     *
+     * @param requestCode Activity request identifier
+     * @param resultCode Result status from image picker
+     * @param data Intent containing selected image data
+     */
     @Override
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -169,6 +222,14 @@ public class FacilityProfileFragment extends Fragment {
             }
         }
     }
+
+    /**
+     * Sets value or hint text for EditText components.
+     *
+     * @param editText Target EditText component
+     * @param value Text value to set
+     * @param hint Hint text for empty state
+     */
     private void setEditTextValue(EditText editText, String value, String hint) {
         if (value == null || value.isEmpty()) {
             editText.setHint(hint);
@@ -176,6 +237,10 @@ public class FacilityProfileFragment extends Fragment {
             editText.setText(value);
         }
     }
+    /**
+     * Manages profile image upload process to Firebase Storage.
+     * Handles existing image deletion and new image upload.
+     */
     private void uploadProfileImage() {
         if (profileImageUri != null) {
             DocumentReference docRef = firestore.collection("facilities").document(installationId);
@@ -202,6 +267,10 @@ public class FacilityProfileFragment extends Fragment {
             Log.e("ProfileFragment", "profileImageUri is null");
         }
     }
+    /**
+     * Uploads new image to Firebase Storage.
+     * Creates unique filename and updates profile data.
+     */
     private void uploadNewImage() {
         final StorageReference profileImageRef = storageReference.child("facility_profileImages/" + UUID.randomUUID().toString() + ".jpg");
         profileImageRef.putFile(profileImageUri)
@@ -215,6 +284,10 @@ public class FacilityProfileFragment extends Fragment {
                     Log.e("ProfileFragment", "Failed to upload new image: " + e.getMessage());
                 });
     }
+    /**
+     * Removes current profile image from storage.
+     * Updates profile to use default avatar.
+     */
     private void removeProfileImage() {
         DocumentReference docRef = firestore.collection("facilities").document(installationId);
         docRef.get().addOnCompleteListener(task -> {
@@ -240,6 +313,13 @@ public class FacilityProfileFragment extends Fragment {
             Log.e("ProfileFragment", "Failed to get user profile: " + e.getMessage());
         });
     }
+    /**
+     * Persists facility profile data to Firestore.
+     * Updates associated event records with new facility name.
+     *
+     * @param installationId Device installation identifier
+     * @param profileImageUrl Storage URL of profile image
+     */
     private void saveFacilityDataToFirestore(String installationId, String profileImageUrl) {
         String deviceID = Settings.Secure.getString(getContext().getContentResolver(), Settings.Secure.ANDROID_ID);
         if (installationId == null) {
