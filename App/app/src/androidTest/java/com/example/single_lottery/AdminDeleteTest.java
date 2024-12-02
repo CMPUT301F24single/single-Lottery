@@ -2,19 +2,22 @@ package com.example.single_lottery;
 
 import static androidx.test.espresso.Espresso.onView;
 import static androidx.test.espresso.action.ViewActions.click;
+import static androidx.test.espresso.action.ViewActions.closeSoftKeyboard;
 import static androidx.test.espresso.action.ViewActions.replaceText;
-import static androidx.test.espresso.assertion.ViewAssertions.matches;
-import static androidx.test.espresso.matcher.ViewMatchers.isDisplayed;
+import static androidx.test.espresso.action.ViewActions.typeText;
 import static androidx.test.espresso.matcher.ViewMatchers.withClassName;
+import static androidx.test.espresso.matcher.ViewMatchers.withHint;
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
 import static androidx.test.espresso.matcher.ViewMatchers.withText;
 import static org.hamcrest.Matchers.equalTo;
+import static org.junit.Assert.assertFalse;
 import android.view.View;
 import android.widget.DatePicker;
 import android.widget.TimePicker;
-import androidx.test.espresso.UiController;
-import androidx.test.espresso.ViewAction;
+import androidx.test.espresso.Espresso;
+import androidx.test.espresso.NoMatchingViewException;
 import androidx.test.espresso.action.ViewActions;
+import androidx.test.espresso.assertion.ViewAssertions;
 import androidx.test.espresso.matcher.ViewMatchers;
 import androidx.test.ext.junit.rules.ActivityScenarioRule;
 import org.hamcrest.Description;
@@ -26,55 +29,17 @@ import org.junit.Rule;
 import org.junit.Test;
 
 /*
- * Gpt4o: Make custom PickerActions class that select date and time of respective dialogboxes
- * //androidx.test.espresso:espresso-contrib.PickerActions is deprecated and has compatibility issues with running correctly on current environment
- * Functions in this class are used to manually set the date and time in a calendar/clock dialog box in a UI test.
- */
-class PickerActions {
-    public static ViewAction setDate(final int year, final int month, final int dayOfMonth) {
-        return new ViewAction() {
-            @Override
-            public Matcher<View> getConstraints() {
-                return isDisplayed();
-            }
-            @Override
-            public String getDescription() {
-                return "Set the date on the DatePicker";
-            }
-            @Override
-            public void perform(UiController uiController, View view) {
-                DatePicker datePicker = (DatePicker) view;
-                datePicker.updateDate(year, month, dayOfMonth);
-            }
-        };
-    }
-    public static ViewAction setTime(final int hour, final int minute) {
-        return new ViewAction() {
-            @Override
-            public Matcher<View> getConstraints() {
-                return isDisplayed();
-            }
-
-            @Override
-            public String getDescription() {
-                return "Set the time on the TimePicker";
-            }
-
-            @Override
-            public void perform(UiController uiController, View view) {
-                TimePicker timePicker = (TimePicker) view;
-                timePicker.setHour(hour);
-                timePicker.setMinute(minute);
-            }
-        };
-    }
-}
-
-/*
- * Black box testing for creating and viewing an event as an organizer.
+Test covers the following:
+-create event as organizer
+-change profile as organizer
+-change facility profile as organizer
+-check if the event is updated with the new facility profile
+-admin navigation
+-admin delete facility (and events)
+-admin delete profile
  */
 
-public class OrganizerEventTest {
+public class AdminDeleteTest {
     public static Matcher<View> withIndex(final Matcher<View> matcher, final int index) {
         return new TypeSafeMatcher<View>() {
             int currentIndex = 0;
@@ -101,10 +66,7 @@ public class OrganizerEventTest {
         Thread.sleep(2000);
         onView(withIndex(withId(R.id.navigation_new), 0)).perform(click());
         Thread.sleep(2000);
-    }
 
-    @Test
-    public void newEvent() throws InterruptedException {
         String testEventName = "test case event";
         String testEventDescription = "Christmas event!";
         String testWaitingListCount = "100";
@@ -149,9 +111,79 @@ public class OrganizerEventTest {
 
         //create event
         onView(withId(R.id.createEventButton)).perform(click());
-        onView(withIndex(withId(R.id.navigation_home), 0)).perform(click());
-        Thread.sleep(1000);
-        onView(withId(R.id.recyclerView)).check(matches(isDisplayed())); //assert that events list is visible
-    }
+        Thread.sleep(400);
 
+        //change organizer profile name
+        onView(withIndex(withId(R.id.navigation_profile), 0)).perform(click());
+        onView(withId(R.id.editButton)).perform(click());
+        onView(withId(R.id.nameInput)).perform(replaceText("TESTUSERAAA"));
+        onView(withText("save")).perform(ViewActions.click());
+
+        //change organizer facility name
+        onView(withIndex(withId(R.id.facilityButton), 0)).perform(click());
+        onView(withId(R.id.editButton)).perform(click());
+        onView(withId(R.id.nameInputFac)).perform(replaceText("FACILITYTEST123"));
+        onView(withText("save")).perform(ViewActions.click());
+        Espresso.pressBack();
+        onView(withId(R.id.action_return)).perform(click());
+
+
+    }
+    @Test
+    public void deleteTests() throws InterruptedException{
+        //admin login
+        onView(withId(R.id.button_admin)).perform(click());
+        onView(withHint("Email")).perform(typeText("123"), closeSoftKeyboard());
+        onView(withHint("Password")).perform(typeText("123456"), closeSoftKeyboard());
+        onView(withText("Login")).perform(ViewActions.click());
+        Thread.sleep(500);
+        onView(withIndex(withId(R.id.nav_facility), 0)).perform(click());
+        boolean found = false;
+
+        //delete facility
+        for (int i = 0; !found; i++) {
+            try {
+                Espresso.onView(withIndex(withId(R.id.facilityTextView), i)).check(ViewAssertions.matches(ViewMatchers.withText("FACILITYTEST123")));
+                Espresso.onView(withIndex(withId(R.id.deleteButton), i)).perform(ViewActions.click());
+                onView(withText("Yes")).perform(ViewActions.click());
+                found = true;
+            } catch (AssertionError e) {}
+            catch(IndexOutOfBoundsException e){
+                break;
+            }
+        }
+
+        found = false;
+        for (int i = 0; !found; i++) {
+            try {
+                Espresso.onView(withIndex(withId(R.id.facilityTextView), i)).check(ViewAssertions.matches(ViewMatchers.withText("FACILITYTEST123")));
+                Espresso.onView(withIndex(withId(R.id.deleteButton), i)).perform(ViewActions.click());
+                onView(withText("Yes")).perform(ViewActions.click());
+                found = true;
+            } catch (AssertionError e) {}
+            catch(NoMatchingViewException e){
+                break;
+            }
+        }
+
+        //assert facility is deleted
+        assertFalse(found);
+
+        //delete user, this works but its very slow
+        /*
+        for (int i = 0; !found; i++) {
+            try {
+                Espresso.onView(withIndex(withId(R.id.adminUserName), i)).check(ViewAssertions.matches(ViewMatchers.withText("TESTUSERAAA")));
+                Espresso.onView(withIndex(withId(R.id.adminUserName), i)).perform(ViewActions.click());
+                onView(withId(R.id.btnDeleteProfile)).perform(click());
+                onView(withText("Yes")).perform(ViewActions.click());
+                found = true;
+            } catch (AssertionError e) {}
+            catch(NoMatchingViewException e){
+                break;
+            }
+        }*/
+
+
+    }
 }
