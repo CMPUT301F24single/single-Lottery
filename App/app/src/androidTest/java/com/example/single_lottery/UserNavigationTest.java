@@ -14,28 +14,12 @@ import org.hamcrest.TypeSafeMatcher;
 import org.junit.Before;
 import org.junit.Test;
 
-/**
- * Black box test class for testing the navigation functionality in the user interface.
- * This class verifies that navigation between different fragments works properly
- * and ensures that all UI elements are visible and properly displayed.
- *
- * Black box test for users.
- * Asserts that navigation works properly and fragments have visible details.
- *
- * @author Aaron Kim
- * @version 1.0
+/*Black box test for users.
+Asserts that navigation works properly and fragments have visible details.
  */
 public class UserNavigationTest {
     public ActivityScenario<UserActivity> scenario;
 
-    /**
-     * Custom matcher for handling multiple views with the same ID in the UI.
-     * Used to select the correct view when multiple views share the same ID in XML layouts.
-     *
-     * @param matcher The base view matcher to use
-     * @param index The index of the view to select when multiple matches exist
-     * @return A TypeSafeMatcher that matches the view at the specified index
-     */
     public static Matcher<View> withIndex(final Matcher<View> matcher, final int index) {
         return new TypeSafeMatcher<View>() {
             int currentIndex = 0;

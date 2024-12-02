@@ -81,7 +81,7 @@ public class EventsFragment extends Fragment {
                         for (DocumentSnapshot document : queryDocumentSnapshots.getDocuments()) {
                             String eventId = document.getString("eventId");
 
-                            // Find detailed information in the events collection
+                            // 查找 events 集合中的详细信息
                             db.collection("events").document(eventId)
                                     .get()
                                     .addOnSuccessListener(eventSnapshot -> {
