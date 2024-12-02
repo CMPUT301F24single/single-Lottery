@@ -175,20 +175,23 @@
                     android:textColor="#000000" />
             </LinearLayout>
 
-            <!-- Edit and Facility Buttons -->
+            <!-- Edit Button -->
             <Button
                 android:id="@+id/editButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:text="Edit" />
-
-            <Button
-                android:id="@+id/facilityButton"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:text="Open Facility Profile" />
         </LinearLayout>
+
+        <!-- Facility Profile Button at the Bottom -->
+        <Button
+            android:id="@+id/facilityButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Open Facility Profile"
+            android:layout_alignParentBottom="true"
+            android:layout_margin="16dp"/>
     </RelativeLayout>
+
 </LinearLayout>

@@ -33,6 +33,7 @@ public class AdminEventDetailActivity extends AppCompatActivity {
     private TextView textViewLotteryTime;
     private TextView textViewWaitingListCount;
     private TextView textViewLotteryCount;
+    private TextView textViewLocationRequirement;
     private ImageView imageViewPoster;
     private Button buttonDeletePoster;
     private Button buttonDeleteEvent;
@@ -106,6 +107,7 @@ public class AdminEventDetailActivity extends AppCompatActivity {
         imageViewPoster = findViewById(R.id.imageViewPoster);
         buttonDeletePoster = findViewById(R.id.buttonDeletePoster);
         buttonDeleteEvent = findViewById(R.id.buttonDeleteEvent);
+        textViewLocationRequirement = findViewById(R.id.textViewLocationRequirement);
     }
 
     private void loadEventDetails(String eventId) {
@@ -122,6 +124,11 @@ public class AdminEventDetailActivity extends AppCompatActivity {
                         textViewLotteryTime.setText(doc.getString("lotteryTime"));
                         textViewWaitingListCount.setText(doc.getLong("waitingListCount") + "/100");
                         textViewLotteryCount.setText(String.valueOf(doc.getLong("lotteryCount")));
+                        if (doc.getBoolean("requiresLocation") == false ) {
+                            textViewLocationRequirement.setText("No");
+                        } else {
+                            textViewLocationRequirement.setText("Yes");
+                        }
 
                         // 加载海报图片
                         String posterUrl = doc.getString("posterUrl");
