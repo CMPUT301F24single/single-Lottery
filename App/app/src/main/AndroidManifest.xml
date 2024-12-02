@@ -76,8 +76,6 @@
 
         <activity android:name=".ui.admin.AdminEventDetailActivity" />
 
-        <activity android:name=".ui.admin.AdminLoginActivity" />
-
         <activity android:name=".ui.admin.AdminOrganizerDetailActivity" />
 
         <activity android:name=".ui.admin.AdminUserDetailActivity" />
