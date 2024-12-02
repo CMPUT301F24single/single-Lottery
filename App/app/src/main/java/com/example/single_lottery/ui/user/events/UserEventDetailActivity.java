@@ -48,6 +48,7 @@ public class UserEventDetailActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.user_event_viewdetail);
+        setTitle("Event Details");
 
         // Bind views
         ImageView backButton = findViewById(R.id.backButton);
@@ -79,7 +80,7 @@ public class UserEventDetailActivity extends AppCompatActivity {
 
         cancelRegistrationButton.setOnClickListener(v -> cancelRegistration(eventId));
         acceptButton.setOnClickListener(v -> updateLotteryStatus("Accepted"));
-        declineButton.setOnClickListener(v -> updateLotteryStatus("Declined"));
+        declineButton.setOnClickListener(v -> updateLotteryStatus("Cancelled"));
     }
 
     /**
@@ -199,7 +200,7 @@ public class UserEventDetailActivity extends AppCompatActivity {
                             eventStatusValueTextView.setText("You accepted the invitation");
                             acceptButton.setVisibility(View.GONE);
                             declineButton.setVisibility(View.GONE);
-                        } else if ("Declined".equals(userStatus)) {
+                        } else if ("Cancelled".equals(userStatus)) {
                             eventStatusValueTextView.setText("You declined the invitation");
                             acceptButton.setVisibility(View.GONE);
                             declineButton.setVisibility(View.GONE);

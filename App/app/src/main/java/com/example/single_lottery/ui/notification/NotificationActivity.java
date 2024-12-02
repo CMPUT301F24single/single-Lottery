@@ -24,8 +24,8 @@ public class NotificationActivity extends AppCompatActivity {
         setContentView(R.layout.activity_notification);
     }
 
-    public static void sendNotification(Context context, String title, String message, List<String> userIds) {
-        if (userIds == null || userIds.isEmpty()) {
+    public static void sendNotification(Context context, String title, String message, String userId) {
+        if (userId == null || userId.isEmpty()) {
             Log.d("NotificationActivity", "No users to notify.");
             return;
         }
@@ -37,17 +37,17 @@ public class NotificationActivity extends AppCompatActivity {
             notificationManager.createNotificationChannel(channel);
         }
 
-        for (String userId : userIds) {
-            NotificationCompat.Builder builder = new NotificationCompat.Builder(context, "notifications")
-                    .setSmallIcon(R.drawable.ic_notification)
-                    .setContentTitle(title)
-                    .setContentText(message)
-                    .setPriority(NotificationCompat.PRIORITY_HIGH)
-                    .setAutoCancel(true);
 
-            int notificationId = userId.hashCode(); // Unique ID per user
-            notificationManager.notify(notificationId, builder.build());
-        }
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(context, "notifications")
+                .setSmallIcon(R.drawable.ic_notification)
+                .setContentTitle(title)
+                .setContentText(message)
+                .setPriority(NotificationCompat.PRIORITY_HIGH)
+                .setAutoCancel(true);
+
+        int notificationId = userId.hashCode(); // Unique ID per user
+        notificationManager.notify(notificationId, builder.build());
+
     }
 
 }
