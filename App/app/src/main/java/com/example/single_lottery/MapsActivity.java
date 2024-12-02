@@ -117,14 +117,16 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
 
-        if (id == R.id.action_return) {
-            // Handle the return to homepage
-            Intent intent = new Intent(MapsActivity.this, OrganizerHomeViewEventActivity.class);  // Corrected context for starting the intent
-            startActivity(intent);
-            finish();  // Optionally finish the current activity so the user can't go back to it
+        // Handle toolbar navigation
+        if (id == android.R.id.home) {
+            onBackPressed();
+            return true;
+        } else if (id == R.id.map_action_return) {
+            onBackPressed();
             return true;
         }
-
         return super.onOptionsItemSelected(item);
     }
+
+
 }
