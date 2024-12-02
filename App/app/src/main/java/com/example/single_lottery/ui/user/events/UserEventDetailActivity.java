@@ -19,6 +19,7 @@ import com.example.single_lottery.R;
 import com.example.single_lottery.ui.notification.Notification;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.WriteBatch;
 
 import java.text.SimpleDateFormat;
 import java.util.Collections;
@@ -271,47 +272,55 @@ public class UserEventDetailActivity extends AppCompatActivity {
                 .addOnSuccessListener(querySnapshot -> {
                     if (!querySnapshot.isEmpty()) {
                         for (DocumentSnapshot document : querySnapshot.getDocuments()) {
-                            // Get the user's status
+                            // Get the user's current status
                             String status = document.getString("status");
 
+                            // Prepare batch to ensure atomic operations
+                            WriteBatch batch = db.batch();
+
+                            // Update status to "Canceled" (or any status that makes sense before deletion)
+                            batch.update(db.collection("registered_events").document(document.getId()), "status", "Canceled");
+
                             // Delete the user from registered_events collection
-                            db.collection("registered_events").document(document.getId()).delete()
-                                    .addOnSuccessListener(aVoid -> {
-                                        Toast.makeText(this, "Registration canceled", Toast.LENGTH_SHORT).show();
+                            batch.delete(db.collection("registered_events").document(document.getId()));
 
-                                        // Call performRedraw if status is "Winner" or "Accepted"
-                                        if ("Winner".equals(status) || "Accepted".equals(status)) {
-                                            performRedraw(eventId); // Modify the lottery count if necessary
+                            // If status was "Winner" or "Accepted", call performRedraw
+                            if ("Winner".equals(status) || "Accepted".equals(status)) {
+                                batch.commit().addOnSuccessListener(aVoid -> {
+                                    performRedraw(eventId); // Modify the lottery count if necessary
+                                });
+                            } else {
+                                batch.commit();
+                            }
+
+                            // Delete the user's location from user_locations collection
+                            db.collection("user_locations")
+                                    .whereEqualTo("userId", userId)
+                                    .get()
+                                    .addOnSuccessListener(locationQuerySnapshot -> {
+                                        if (!locationQuerySnapshot.isEmpty()) {
+                                            for (DocumentSnapshot locationDocument : locationQuerySnapshot.getDocuments()) {
+                                                db.collection("user_locations").document(locationDocument.getId()).delete()
+                                                        .addOnSuccessListener(aVoid1 -> {
+                                                            Log.d("UserEventDetailActivity", "User location deleted successfully.");
+                                                        })
+                                                        .addOnFailureListener(e -> {
+                                                            Toast.makeText(this, "Failed to delete user location", Toast.LENGTH_SHORT).show();
+                                                            Log.e("UserEventDetailActivity", "Error deleting user location", e);
+                                                        });
+                                            }
                                         }
-
-                                        // Delete the user's location from user_locations collection
-                                        db.collection("user_locations")
-                                                .whereEqualTo("userId", userId)
-                                                .get()
-                                                .addOnSuccessListener(locationQuerySnapshot -> {
-                                                    if (!locationQuerySnapshot.isEmpty()) {
-                                                        for (DocumentSnapshot locationDocument : locationQuerySnapshot.getDocuments()) {
-                                                            db.collection("user_locations").document(locationDocument.getId()).delete()
-                                                                    .addOnSuccessListener(aVoid1 -> {
-                                                                        Log.d("UserEventDetailActivity", "User location deleted successfully.");
-                                                                    })
-                                                                    .addOnFailureListener(e -> {
-                                                                        Toast.makeText(this, "Failed to delete user location", Toast.LENGTH_SHORT).show();
-                                                                        Log.e("UserEventDetailActivity", "Error deleting user location", e);
-                                                                    });
-                                                        }
-                                                    }
-                                                })
-                                                .addOnFailureListener(e -> Log.e("UserEventDetailActivity", "Error querying user location", e));
-
-                                        finish();
                                     })
-                                    .addOnFailureListener(e -> Toast.makeText(this, "Failed to cancel registration", Toast.LENGTH_SHORT).show());
+                                    .addOnFailureListener(e -> Log.e("UserEventDetailActivity", "Error querying user location", e));
+
+                            Toast.makeText(this, "Registration canceled", Toast.LENGTH_SHORT).show();
+                            finish();
                         }
                     }
                 })
                 .addOnFailureListener(e -> Log.e("UserEventDetailActivity", "Error canceling registration", e));
     }
+
 
 
 
