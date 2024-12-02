@@ -59,6 +59,7 @@ public class UserHomeDetailActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_user_home_event_detail);
+        setTitle("Event Details");
 
         backButton = findViewById(R.id.backButton);
         backButton.setOnClickListener(v -> finish());
@@ -198,6 +199,17 @@ public class UserHomeDetailActivity extends AppCompatActivity {
                                         buttonSignUp.setEnabled(false);
                                         loadEventData(eventId);
 
+                                        // Update the user's status to "Waiting" after successful sign-up
+                                        db.collection("registered_events")
+                                                .document(documentReference.getId())  // Use the newly added registration document
+                                                .update("status", "Waiting")  // Update the status to "Waiting"
+                                                .addOnSuccessListener(aVoid -> {
+                                                    Log.d("UserHomeDetail", "User status updated to 'Waiting'");
+                                                })
+                                                .addOnFailureListener(e -> {
+                                                    Toast.makeText(this, "Failed to update status.", Toast.LENGTH_SHORT).show();
+                                                });
+
                                         db.collection("events").document(eventId).get()
                                                 .addOnSuccessListener(documentSnapshot -> {
                                                     if (documentSnapshot.exists()) {
@@ -226,6 +238,7 @@ public class UserHomeDetailActivity extends AppCompatActivity {
             Toast.makeText(this, "Error parsing registration deadline", Toast.LENGTH_SHORT).show();
         }
     }
+
 
 
     @Override
