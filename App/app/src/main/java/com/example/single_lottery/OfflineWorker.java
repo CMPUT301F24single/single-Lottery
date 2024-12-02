@@ -114,9 +114,9 @@ public class OfflineWorker extends Worker {
         db.collection("events").document(eventId).get()
                 .addOnSuccessListener(eventDocumentSnapshot -> {
                     if (eventDocumentSnapshot.exists()) {
-                        String eventName = eventDocumentSnapshot.getString("name"); // Extract event name
+                        String eventName = eventDocumentSnapshot.getString("name");
 
-                        // Now fetch the registered users for this event
+                        // Fetch the registered users for this event
                         db.collection("registered_events")
                                 .whereEqualTo("eventId", eventId)
                                 .get()
@@ -124,73 +124,60 @@ public class OfflineWorker extends Worker {
                                     List<DocumentSnapshot> registeredUsers = querySnapshot.getDocuments();
                                     int winnersCount = Math.min(registeredUsers.size(), lotteryCount);
 
-                                    // Shuffle the list to get random winners
+                                    // Shuffle the list to randomize
                                     Collections.shuffle(registeredUsers);
 
-                                    // Get winners and losers
+                                    // Select winners and losers
                                     List<DocumentSnapshot> winners = registeredUsers.subList(0, winnersCount);
                                     List<DocumentSnapshot> losers = registeredUsers.subList(winnersCount, registeredUsers.size());
 
-                                    // Prepare WriteBatch for notifications
+                                    // Prepare batch to ensure atomic operations
                                     WriteBatch batch = db.batch();
 
-                                    // Update winners
                                     for (DocumentSnapshot winner : winners) {
-                                        // Update winner status
-                                        batch.update(db.collection("registered_events").document(winner.getId()), "status", "Winner");
-
-                                        // Add notification for winner
-                                        Notification winnerNotification = new Notification(
-                                                eventName + " - Lottery Results",
-                                                "Congratulations, you are a winner!",
-                                                winner.getId()
-                                        );
-                                        DocumentReference winnerNotificationRef = db.collection("notifications").document();
-                                        batch.set(winnerNotificationRef, winnerNotification);
+                                        String userId = winner.getString("userId"); // Ensure this matches your Firestore field name
+                                        if (userId != null) {
+                                            Notification winnerNotification = new Notification(
+                                                    eventName + " - Lottery Results",
+                                                    "Congratulations, you are a winner!",
+                                                    userId
+                                            );
+                                            DocumentReference winnerNotificationRef = db.collection("notifications").document();
+                                            batch.set(winnerNotificationRef, winnerNotification);
+                                        }
                                     }
 
-                                    // Update losers
+
                                     for (DocumentSnapshot loser : losers) {
-                                        // Add notification for loser
-                                        Notification loserNotification = new Notification(
-                                                eventName + " - Lottery Results",
-                                                "Sorry, you were not selected.",
-                                                loser.getId()
-                                        );
-                                        DocumentReference loserNotificationRef = db.collection("notifications").document();
-                                        batch.set(loserNotificationRef, loserNotification);
+                                        String userId = loser.getString("userId"); // Ensure this matches your Firestore field name
+                                        if (userId != null) {
+                                            Notification loserNotification = new Notification(
+                                                    eventName + " - Lottery Results",
+                                                    "Sorry, you were not selected.",
+                                                    userId
+                                            );
+                                            DocumentReference loserNotificationRef = db.collection("notifications").document();
+                                            batch.set(loserNotificationRef, loserNotification);
+                                        }
                                     }
 
-                                    // Commit the batch to upload all changes
+
+                                    // Commit batch
                                     batch.commit()
                                             .addOnSuccessListener(aVoid -> {
-                                                // Update event 'drawn' status to true
                                                 db.collection("events").document(eventId).update("drawnStatus", true)
-                                                        .addOnSuccessListener(unused -> {
-                                                            Log.d("LotteryWorker", "Lottery completed for event: " + eventId);
-                                                            Toast.makeText(getApplicationContext(), "Lottery and notifications completed.", Toast.LENGTH_SHORT).show();
-                                                        })
-                                                        .addOnFailureListener(e -> {
-                                                            Log.e("LotteryWorker", "Error updating event drawn status", e);
-                                                            Toast.makeText(getApplicationContext(), "Failed to update event status.", Toast.LENGTH_SHORT).show();
-                                                        });
+                                                        .addOnSuccessListener(unused -> Log.d("LotteryWorker", "Lottery completed for event: " + eventId))
+                                                        .addOnFailureListener(e -> Log.e("LotteryWorker", "Error updating event status", e));
                                             })
-                                            .addOnFailureListener(e -> {
-                                                Log.e("LotteryWorker", "Error committing batch", e);
-                                                Toast.makeText(getApplicationContext(), "Failed to save notifications.", Toast.LENGTH_SHORT).show();
-                                            });
+                                            .addOnFailureListener(e -> Log.e("LotteryWorker", "Error committing batch", e));
                                 })
-                                .addOnFailureListener(e -> {
-                                    Log.e("LotteryWorker", "Error retrieving registered users", e);
-                                    Toast.makeText(getApplicationContext(), "Failed to load registered users.", Toast.LENGTH_SHORT).show();
-                                });
+                                .addOnFailureListener(e -> Log.e("LotteryWorker", "Error retrieving registered users", e));
                     }
                 })
-                .addOnFailureListener(e -> {
-                    Log.e("LotteryWorker", "Error retrieving event name", e);
-                    Toast.makeText(getApplicationContext(), "Failed to load event name.", Toast.LENGTH_SHORT).show();
-                });
+                .addOnFailureListener(e -> Log.e("LotteryWorker", "Error retrieving event name", e));
     }
+
+
 
 
 
@@ -214,24 +201,46 @@ public class OfflineWorker extends Worker {
                     if (!querySnapshot.isEmpty()) {
                         // Loop through all notifications for the current user
                         for (DocumentSnapshot notificationDoc : querySnapshot.getDocuments()) {
-                            // Extract the fields from the document
+                            // Extract the fields from the notification document
                             String title = notificationDoc.getString("title");
                             String message = notificationDoc.getString("message");
                             String userId = notificationDoc.getString("userId");
 
-                            // Ensure title, message, and userId are valid
+                            // Check if the title, message, and userId are valid
                             if (title != null && message != null && userId != null) {
-                                // Send notification
-                                NotificationActivity.sendNotification(getApplicationContext(), title, message, userId);
+                                // Retrieve user notification preferences
+                                db.collection("users")
+                                        .whereEqualTo("uid", userId)
+                                        .get()
+                                        .addOnSuccessListener(userSnapshot -> {
+                                            if (!userSnapshot.isEmpty()) {
+                                                // Get the user's notification preference
+                                                DocumentSnapshot userDoc = userSnapshot.getDocuments().get(0);
+                                                boolean notificationStatus = userDoc.getBoolean("notificationsEnabled");
 
-                                // Delete the notification document from Firestore after sending
-                                db.collection("notifications").document(notificationDoc.getId())
-                                        .delete()
-                                        .addOnSuccessListener(aVoid -> {
-                                            Log.d("Notification", "Notification for user " + userId + " deleted.");
+                                                // If notifications are enabled, send the notification
+                                                if (notificationStatus) {
+                                                    // Send the notification
+                                                    NotificationActivity.sendNotification(getApplicationContext(), title, message, userId);
+                                                } else {
+                                                    // Log that notifications are disabled for this user
+                                                    Log.d("Notification", "Notifications are disabled for user " + userId);
+                                                }
+                                                // Delete the notification document from Firestore
+                                                db.collection("notifications").document(notificationDoc.getId())
+                                                        .delete()
+                                                        .addOnSuccessListener(aVoid -> {
+                                                            Log.d("Notification", "Notification for user " + userId + " deleted.");
+                                                        })
+                                                        .addOnFailureListener(e -> {
+                                                            Log.e("Notification", "Error deleting notification for user " + userId, e);
+                                                        });
+                                            } else {
+                                                Log.e("Notification", "User document not found for userId: " + userId);
+                                            }
                                         })
                                         .addOnFailureListener(e -> {
-                                            Log.e("Notification", "Error deleting notification for user " + userId, e);
+                                            Log.e("Notification", "Error retrieving user preferences for userId: " + userId, e);
                                         });
                             } else {
                                 Log.e("Notification", "Invalid notification data: Missing title, message, or userId.");
@@ -245,4 +254,5 @@ public class OfflineWorker extends Worker {
                     Log.e("Notification", "Error retrieving notifications", e);
                 });
     }
+
 }

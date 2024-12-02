@@ -1,27 +1,27 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="horizontal"
-    android:padding="16dp"
+    android:padding="8dp"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:gravity="center_vertical"> <!-- Centers child elements vertically -->
+    android:gravity="center_vertical">
 
     <ImageButton
         android:id="@+id/userCancelButton"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:src="@drawable/baseline_do_not_disturb_alt_24"
         android:contentDescription="View Details"
         android:background="@android:color/transparent"
-        android:layout_gravity="center_vertical"/> <!-- Centers the ImageButton vertically -->
+        android:layout_gravity="center_vertical"/>
 
     <TextView
         android:id="@+id/userNameTextView"
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:layout_weight="1"
         android:text="User Name"
         android:textSize="16sp"
-        android:layout_gravity="center_vertical" /> <!-- Centers the TextView vertically -->
+        android:layout_gravity="center_vertical"/>
 
 </LinearLayout>

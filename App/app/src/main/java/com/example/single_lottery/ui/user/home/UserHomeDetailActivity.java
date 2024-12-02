@@ -59,6 +59,7 @@ public class UserHomeDetailActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_user_home_event_detail);
+        setTitle("Event Details");
 
         backButton = findViewById(R.id.backButton);
         backButton.setOnClickListener(v -> finish());

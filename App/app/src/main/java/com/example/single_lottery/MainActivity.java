@@ -1,6 +1,7 @@
 package com.example.single_lottery;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.provider.Settings;
@@ -8,9 +9,12 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.EditText;
 import android.widget.Toast;
+import android.widget.ToggleButton;
+
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.work.OneTimeWorkRequest;
@@ -58,6 +62,7 @@ public class MainActivity extends AppCompatActivity {
             Button buttonUser = findViewById(R.id.button_user);
             Button buttonOrganizer = findViewById(R.id.button_organizer);
             Button buttonAdmin = findViewById(R.id.button_admin);
+            ImageButton notificationButton = findViewById(R.id.notificationButton);  // Add reference to the notification button
 
             View.OnClickListener listener = v -> {
                 if (v.getId() == R.id.button_admin) {
@@ -74,8 +79,105 @@ public class MainActivity extends AppCompatActivity {
             buttonUser.setOnClickListener(listener);
             buttonOrganizer.setOnClickListener(listener);
             buttonAdmin.setOnClickListener(listener);
+
+            // Add click listener for the notificationButton
+            notificationButton.setOnClickListener(v -> {
+                // Create the AlertDialog with ToggleButton and OK button
+                AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+                builder.setTitle("Notification Settings");
+
+                // Create a ToggleButton
+                final ToggleButton toggleButton = new ToggleButton(MainActivity.this);
+                toggleButton.setTextOn("Notifications On");
+                toggleButton.setTextOff("Notifications Off");
+
+                // Retrieve the current notification setting
+                FirebaseInstallations.getInstance().getId()
+                        .addOnCompleteListener(task -> {
+                            if (task.isSuccessful()) {
+                                String installationId = task.getResult();  // Get Installation ID
+                                Log.d("Installation ID", "Installation ID: " + installationId);
+
+                                // Check if notification preference exists in Firestore
+                                db.collection("users")
+                                        .document(installationId)
+                                        .get()
+                                        .addOnSuccessListener(documentSnapshot -> {
+                                            if (documentSnapshot.exists()) {
+                                                // Get the notification preference from Firestore
+                                                Boolean notificationsEnabled = documentSnapshot.getBoolean("notificationsEnabled");
+                                                if (notificationsEnabled != null) {
+                                                    toggleButton.setChecked(notificationsEnabled);
+                                                } else {
+                                                    // Fallback to SharedPreferences if no preference exists in Firestore
+                                                    SharedPreferences sharedPreferences = getSharedPreferences("app_preferences", MODE_PRIVATE);
+                                                    boolean savedPreference = sharedPreferences.getBoolean("notifications_enabled", true);  // Default to true if not set
+                                                    toggleButton.setChecked(savedPreference);
+                                                }
+                                            } else {
+                                                // If the document doesn't exist, use SharedPreferences as fallback
+                                                SharedPreferences sharedPreferences = getSharedPreferences("app_preferences", MODE_PRIVATE);
+                                                boolean savedPreference = sharedPreferences.getBoolean("notifications_enabled", true);  // Default to true if not set
+                                                toggleButton.setChecked(savedPreference);
+                                            }
+                                        })
+                                        .addOnFailureListener(e -> {
+                                            Log.d("Firestore", "Error fetching notification preference: " + e.getMessage());
+                                            // Fallback to SharedPreferences if Firestore call fails
+                                            SharedPreferences sharedPreferences = getSharedPreferences("app_preferences", MODE_PRIVATE);
+                                            boolean savedPreference = sharedPreferences.getBoolean("notifications_enabled", true);  // Default to true if not set
+                                            toggleButton.setChecked(savedPreference);
+                                        });
+                            } else {
+                                Log.d("Installation ID", "Failed to get Installation ID.");
+                                // Fallback to SharedPreferences if installation ID is not retrieved
+                                SharedPreferences sharedPreferences = getSharedPreferences("app_preferences", MODE_PRIVATE);
+                                boolean savedPreference = sharedPreferences.getBoolean("notifications_enabled", true);  // Default to true if not set
+                                toggleButton.setChecked(savedPreference);
+                            }
+                        });
+
+                // Add the ToggleButton to the dialog
+                builder.setView(toggleButton);
+
+                // Set the OK button to dismiss the dialog
+                builder.setPositiveButton("OK", (dialog, which) -> {
+                    // Handle the action if necessary (e.g., save the notification state)
+                    boolean isNotificationEnabled = toggleButton.isChecked();
+
+                    // Save the notification preference in shared preferences
+                    SharedPreferences sharedPreferences = getSharedPreferences("app_preferences", MODE_PRIVATE);
+                    SharedPreferences.Editor editor = sharedPreferences.edit();
+                    editor.putBoolean("notifications_enabled", isNotificationEnabled);
+                    editor.apply();
+
+                    // Now, update the notification preference in Firestore
+                    FirebaseInstallations.getInstance().getId()
+                            .addOnCompleteListener(task -> {
+                                if (task.isSuccessful()) {
+                                    String installationId = task.getResult();  // Get Installation ID
+                                    Log.d("Installation ID", "Installation ID: " + installationId);
+
+                                    // Update the Firestore document with the notification preference
+                                    db.collection("users")
+                                            .document(installationId)
+                                            .update("notificationsEnabled", isNotificationEnabled)
+                                            .addOnSuccessListener(aVoid -> Log.d("Firestore", "Notification preference updated successfully"))
+                                            .addOnFailureListener(e -> Log.d("Firestore", "Error updating notification preference: " + e.getMessage()));
+                                } else {
+                                    Log.d("Installation ID", "Failed to get Installation ID.");
+                                }
+                            });
+                });
+
+                // Show the dialog
+                builder.create().show();
+            });
+
+
         }
     }
+
 
     private void saveUID() {
         // Step 1: Get the Firebase Installation ID
