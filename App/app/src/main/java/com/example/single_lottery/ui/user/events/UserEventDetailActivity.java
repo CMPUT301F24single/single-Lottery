@@ -326,12 +326,6 @@ public class UserEventDetailActivity extends AppCompatActivity {
                     if (eventDocumentSnapshot.exists()) {
                         String eventName = eventDocumentSnapshot.getString("name");
 
-                        // Check if eventName is null or empty
-                        if (eventName == null) {
-                            Log.e("LotteryWorker", "Event name is null.");
-                            return; // Exit early to avoid further processing
-                        }
-
                         // Fetch the registered users who are in the "Waiting" status for this event
                         db.collection("registered_events")
                                 .whereEqualTo("eventId", eventId)
@@ -345,54 +339,35 @@ public class UserEventDetailActivity extends AppCompatActivity {
                                         DocumentSnapshot winnerDocument = waitingUsers.get(0); // Select a random winner
                                         String userId = winnerDocument.getString("userId");
 
-                                        // Ensure userId is valid
-                                        if (userId == null || userId.isEmpty()) {
-                                            Log.e("LotteryWorker", "User ID is null or empty.");
-                                            return; // Exit early to avoid errors
-                                        }
+                                        // Ensure the eventId in the document matches the provided eventId
+                                        String eventIdFromDoc = winnerDocument.getString("eventId");
+                                        if (eventIdFromDoc != null && eventIdFromDoc.equals(eventId)) {
+                                            // Update the status of the selected user to "Winner"
+                                            db.collection("registered_events").document(winnerDocument.getId())
+                                                    .update("status", "Winner")
+                                                    .addOnSuccessListener(aVoid -> {
+                                                        Log.d("LotteryWorker", "User " + userId + " has been selected as a winner.");
 
-                                        // Ensure the eventId and userId in the document match
-                                        db.collection("registered_events").document(winnerDocument.getId())
-                                                .get()
-                                                .addOnSuccessListener(documentSnapshot -> {
-                                                    String eventIdFromDoc = documentSnapshot.getString("eventId");
-                                                    String userIdFromDoc = documentSnapshot.getString("userId");
+                                                        // Optionally send a notification to the winner
+                                                        String title = "Event Notification - " + eventName;
+                                                        String message = "Congratulations, you have been selected!";
 
-                                                    // Check if eventId and userId match
-                                                    if (eventIdFromDoc != null && eventIdFromDoc.equals(eventId)
-                                                            && userIdFromDoc != null && userIdFromDoc.equals(userId)) {
-
-                                                        // Update the status of the selected user to "Winner"
-                                                        db.collection("registered_events").document(winnerDocument.getId())
-                                                                .update("status", "Winner")
-                                                                .addOnSuccessListener(aVoid -> {
-                                                                    Log.d("LotteryWorker", "User " + userId + " has been selected as a winner.");
-
-                                                                    // Optionally send a notification to the winner
-                                                                    String title = "Event Notification - " + eventName;
-                                                                    String message = "Congratulations, you have been selected!";
-
-                                                                    // Create and send the notification document
-                                                                    Notification notification = new Notification(title, message, userId);
-                                                                    db.collection("notifications").add(notification)
-                                                                            .addOnSuccessListener(documentReference -> {
-                                                                                Log.d("LotteryWorker", "Notification sent to user " + userId);
-                                                                            })
-                                                                            .addOnFailureListener(e -> {
-                                                                                Log.e("LotteryWorker", "Error sending notification", e);
-                                                                            });
+                                                        // Create and send the notification document
+                                                        Notification notification = new Notification(title, message, userId);
+                                                        db.collection("notifications").add(notification)
+                                                                .addOnSuccessListener(documentReference -> {
+                                                                    Log.d("LotteryWorker", "Notification sent to user " + userId);
                                                                 })
                                                                 .addOnFailureListener(e -> {
-                                                                    Log.e("LotteryWorker", "Error updating status to Winner", e);
+                                                                    Log.e("LotteryWorker", "Error sending notification", e);
                                                                 });
-                                                    } else {
-                                                        Log.e("LotteryWorker", "User or eventId mismatch, cannot update status.");
-                                                    }
-                                                })
-                                                .addOnFailureListener(e -> {
-                                                    Log.e("LotteryWorker", "Error retrieving document to check user/eventId", e);
-                                                });
-
+                                                    })
+                                                    .addOnFailureListener(e -> {
+                                                        Log.e("LotteryWorker", "Error updating status to Winner", e);
+                                                    });
+                                        } else {
+                                            Log.e("LotteryWorker", "User's eventId does not match the selected eventId.");
+                                        }
                                     } else {
                                         Log.d("LotteryWorker", "No users found in the waiting list for the event.");
                                     }
@@ -404,7 +379,6 @@ public class UserEventDetailActivity extends AppCompatActivity {
                 })
                 .addOnFailureListener(e -> Log.e("LotteryWorker", "Error retrieving event name", e));
     }
-
 
 
 
