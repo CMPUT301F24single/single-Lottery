@@ -37,7 +37,8 @@ public class OrganizerQRCode extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_qrcode); 
+        setContentView(R.layout.activity_qrcode);
+        setTitle("Event QR Code");
 
         qrCodeImageView = findViewById(R.id.imageViewQRCode);
         eventId = getIntent().getStringExtra("event_id"); 
