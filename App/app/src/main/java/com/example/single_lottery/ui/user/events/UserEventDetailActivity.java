@@ -274,15 +274,15 @@ public class UserEventDetailActivity extends AppCompatActivity {
                             // Get the user's status
                             String status = document.getString("status");
 
-                            // Call performRedraw if status is "Winner" or "Accepted"
-                            if ("Winner".equals(status) || "Accepted".equals(status)) {
-                                performRedraw(eventId); // Modify the lottery count if necessary
-                            }
-
                             // Delete the user from registered_events collection
                             db.collection("registered_events").document(document.getId()).delete()
                                     .addOnSuccessListener(aVoid -> {
                                         Toast.makeText(this, "Registration canceled", Toast.LENGTH_SHORT).show();
+
+                                        // Call performRedraw if status is "Winner" or "Accepted"
+                                        if ("Winner".equals(status) || "Accepted".equals(status)) {
+                                            performRedraw(eventId); // Modify the lottery count if necessary
+                                        }
 
                                         // Delete the user's location from user_locations collection
                                         db.collection("user_locations")
@@ -312,7 +312,6 @@ public class UserEventDetailActivity extends AppCompatActivity {
                 })
                 .addOnFailureListener(e -> Log.e("UserEventDetailActivity", "Error canceling registration", e));
     }
-
 
 
 
