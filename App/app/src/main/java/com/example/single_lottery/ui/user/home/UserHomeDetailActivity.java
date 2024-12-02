@@ -2,6 +2,7 @@ package com.example.single_lottery.ui.user.home;
 
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.location.Location;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.provider.Settings;
@@ -219,7 +220,11 @@ public class UserHomeDetailActivity extends AppCompatActivity {
                                                     if (documentSnapshot.exists()) {
                                                         EventModel event = documentSnapshot.toObject(EventModel.class);
                                                         if (event != null && event.isRequiresLocation()) {
-                                                            getUserLocation(eventId, userId);
+                                                            if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                                                                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, LOCATION_PERMISSION_REQUEST_CODE);
+                                                            } else {
+                                                                getUserLocation(eventId, userId);
+                                                            }
                                                         }
                                                     }
                                                 });
@@ -264,11 +269,10 @@ public class UserHomeDetailActivity extends AppCompatActivity {
 
         if (ContextCompat.checkSelfPermission(this,
                 Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-            android.location.Location lastKnownLocation = locationManager
-                    .getLastKnownLocation(LocationManager.GPS_PROVIDER);
-            if (lastKnownLocation != null) {
-                double latitude = lastKnownLocation.getLatitude();
-                double longitude = lastKnownLocation.getLongitude();
+                    Location location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+            if (location != null) {
+                double latitude = location.getLatitude();
+                double longitude = location.getLongitude();
 
                 Log.d("UserLocation", "Latitude: " + latitude + ", Longitude: " + longitude);
 
