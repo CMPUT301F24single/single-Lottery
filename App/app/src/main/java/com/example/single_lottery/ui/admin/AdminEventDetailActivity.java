@@ -122,9 +122,9 @@ public class AdminEventDetailActivity extends AppCompatActivity {
                         textViewTime.setText(doc.getString("time"));
                         textViewRegistrationDeadline.setText(doc.getString("registrationDeadline"));
                         textViewLotteryTime.setText(doc.getString("lotteryTime"));
-                        textViewWaitingListCount.setText(doc.getLong("waitingListCount") + "/100");
+                        textViewWaitingListCount.setText(doc.getLong("waitingListCount")+"");
                         textViewLotteryCount.setText(String.valueOf(doc.getLong("lotteryCount")));
-                        if (doc.getBoolean("requiresLocation") == false ) {
+                        if (Boolean.TRUE.equals(doc.getBoolean("requiresLocation")) == false ) {
                             textViewLocationRequirement.setText("No");
                         } else {
                             textViewLocationRequirement.setText("Yes");

@@ -152,8 +152,12 @@ public class UserHomeDetailActivity extends AppCompatActivity {
                 .get()
                 .addOnSuccessListener(queryDocumentSnapshots -> {
                     int currentSignUpCount = queryDocumentSnapshots.size();
-
-                    textViewWaitingListCount.setText(currentSignUpCount + "/" + maxWaitingListCount);
+                    if (maxWaitingListCount == Integer.MAX_VALUE){
+                        textViewWaitingListCount.setText(currentSignUpCount + "/" + "unlimited");
+                    }
+                    else {
+                        textViewWaitingListCount.setText(currentSignUpCount + "/" + maxWaitingListCount);
+                    }
                 })
                 .addOnFailureListener(e -> {
                     Toast.makeText(this, "Failed to load registration count.", Toast.LENGTH_SHORT).show();

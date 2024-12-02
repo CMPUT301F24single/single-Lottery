@@ -58,8 +58,9 @@
             android:id="@+id/deleteButton"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:text="Delete Facility"
+            android:text="Delete"
             android:layout_weight="1"
+            android:textSize="14sp"
             android:layout_marginStart="4dp" />
     </LinearLayout>
 
