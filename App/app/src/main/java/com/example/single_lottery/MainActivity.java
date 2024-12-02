@@ -3,6 +3,7 @@ package com.example.single_lottery;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.text.TextUtils;
@@ -48,12 +49,11 @@ public class MainActivity extends AppCompatActivity {
 
         setTitle("");
 
-        // do OfflineScheduler on boot up
-        OneTimeWorkRequest offlineWorkRequest = new OneTimeWorkRequest.Builder(OfflineWorker.class)
-                .build();
-        // Enqueue the work request
-        WorkManager.getInstance(this).enqueue(offlineWorkRequest);
+        // ensure notification preferences are set
+        initializeNotificationPreferences();
+        requestNotificationPermissions();
 
+        // do OfflineScheduler on boot up
         OfflineScheduler();
 
         showLandingScreen = getIntent().getBooleanExtra("showLandingScreen", true);
@@ -180,6 +180,49 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    private void initializeNotificationPreferences() {
+        FirebaseInstallations.getInstance().getId()
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        String installationId = task.getResult();
+                        Log.d("Installation ID", "Installation ID: " + installationId);
+
+                        db.collection("users")
+                                .document(installationId)
+                                .get()
+                                .addOnSuccessListener(documentSnapshot -> {
+                                    if (documentSnapshot.exists()) {
+                                        Boolean notificationsEnabled = documentSnapshot.getBoolean("notificationsEnabled");
+                                        if (notificationsEnabled == null) {
+                                            // If not set, default to true
+                                            db.collection("users")
+                                                    .document(installationId)
+                                                    .update("notificationsEnabled", true)
+                                                    .addOnSuccessListener(aVoid ->
+                                                            Log.d("Firestore", "Notification preference initialized to true."))
+                                                    .addOnFailureListener(e ->
+                                                            Log.d("Firestore", "Error initializing notification preference: " + e.getMessage()));
+                                        }
+                                    } else {
+                                        // If document doesn't exist, create it with notificationsEnabled set to true
+                                        db.collection("users")
+                                                .document(installationId)
+                                                .set(Collections.singletonMap("notificationsEnabled", true))
+                                                .addOnSuccessListener(aVoid ->
+                                                        Log.d("Firestore", "Notification preference initialized and document created."))
+                                                .addOnFailureListener(e ->
+                                                        Log.d("Firestore", "Error creating document: " + e.getMessage()));
+                                    }
+                                })
+                                .addOnFailureListener(e ->
+                                        Log.d("Firestore", "Error fetching notification preference: " + e.getMessage()));
+                    } else {
+                        Log.d("Installation ID", "Failed to get Installation ID.");
+                    }
+                });
+    }
+
+
 
     private void saveUID() {
         // Step 1: Get the Firebase Installation ID
@@ -305,6 +348,15 @@ public class MainActivity extends AppCompatActivity {
                 .addOnFailureListener(e -> {
                     Toast.makeText(this, "Error: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                 });
+    }
+
+    private void requestNotificationPermissions() {
+        // Check if the app has notification permission
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            if (checkSelfPermission(android.Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
+                requestPermissions(new String[]{android.Manifest.permission.POST_NOTIFICATIONS}, REQUEST_CODE);
+            }
+        }
     }
 
     @Override
