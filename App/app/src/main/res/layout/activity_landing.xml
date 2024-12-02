@@ -1,18 +1,92 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:padding="16dp">
 
+    <!-- Notification Button in the top right corner -->
+    <ImageButton
+        android:id="@+id/notificationButton"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:background="@android:color/transparent"
+        app:srcCompat="@drawable/baseline_notifications_active_24"
+        android:contentDescription="Notification Icon"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentEnd="true"/>
 
-    <!-- Container for buttons centered on the screen -->
+    <!-- ImageView centered with remaining space -->
+    <ImageView
+        android:id="@+id/imageView"
+        android:layout_width="240dp"
+        android:layout_height="240dp"
+        app:srcCompat="@drawable/logo"
+        android:layout_centerHorizontal="true"
+        android:layout_below="@id/notificationButton"
+        android:layout_marginTop="35dp"
+        android:layout_marginBottom="50dp" />
+
+    <!-- LinearLayout containing both TextViews (Welcome and Slogan) -->
     <LinearLayout
-        android:layout_width="wrap_content"
+        android:id="@+id/textViewContainer"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
         android:gravity="center"
-        android:layout_centerInParent="true">
+        android:background="@drawable/rounded_corners_grey"
+        android:padding="10dp"
+        android:layout_below="@id/imageView"
+        android:layout_marginTop="10dp">
 
+        <TextView
+            android:id="@+id/welcomeText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:fontFamily="@font/abeezee"
+            android:text="Welcome to Sociabl!"
+            android:textAlignment="center"
+            android:textColor="@color/purple_700"
+            android:textSize="34sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/sloganText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
+            android:fontFamily="@font/abeezee"
+            android:text="Join the fun, host the moment!"
+            android:textAlignment="center"
+            android:textColor="@color/purple_700"
+            android:textSize="18sp"
+            android:textStyle="italic" />
+    </LinearLayout>
+
+    <!-- LinearLayout containing the prompt text and buttons -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:gravity="center"
+        android:background="@drawable/rounded_corners_blue"
+        android:padding="16dp"
+        android:layout_below="@id/textViewContainer"
+        android:layout_marginTop="20dp">
+
+        <!-- Prompt Text -->
+        <TextView
+            android:id="@+id/chooseOptionText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/abeezee"
+            android:text="Please select an option: "
+            android:textAlignment="center"
+            android:textColor="@color/black"
+            android:textSize="12sp"
+            android:textStyle="bold|italic" />
+
+        <!-- Buttons -->
         <Button
             android:id="@+id/button_user"
             android:layout_width="200dp"
@@ -32,16 +106,4 @@
             android:text="Admin" />
     </LinearLayout>
 
-    <!-- ImageButton placed in the top-right corner with smaller size -->
-    <ImageButton
-        android:id="@+id/notificationButton"
-        android:layout_width="48dp"
-        android:layout_height="48dp"
-        android:layout_alignParentEnd="true"
-        android:background="@android:color/transparent"
-        android:layout_alignParentTop="true"
-        app:srcCompat="@drawable/baseline_notifications_active_24"
-        android:contentDescription="Notification Icon"
-        android:layout_marginEnd="16dp"
-        android:layout_marginTop="16dp" />
 </RelativeLayout>
