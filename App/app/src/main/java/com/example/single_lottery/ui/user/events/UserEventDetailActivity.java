@@ -27,11 +27,6 @@ import java.util.Locale;
  * Activity for displaying event details from user perspective.
  * Handles event registration, lottery status updates and registration cancellation.
  *
- * Outstanding Issues:
- * - Push notifications not working yet (can't notify users when they win)
- * - Need to implement FCM to send notifications when lottery results are out
- * - No notification system for event status changes and deadlines
- *
  * @author [Jingyao Gu]
  * @version 1.0
  */
@@ -53,9 +48,10 @@ public class UserEventDetailActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.user_event_viewdetail);
+        setTitle("Event Details");
 
         // Bind views
-        Button backButton = findViewById(R.id.backButton);
+        ImageView backButton = findViewById(R.id.backButton);
         backButton.setOnClickListener(v -> finish());
 
         eventPosterImageView = findViewById(R.id.imageViewPoster);
@@ -84,7 +80,7 @@ public class UserEventDetailActivity extends AppCompatActivity {
 
         cancelRegistrationButton.setOnClickListener(v -> cancelRegistration(eventId));
         acceptButton.setOnClickListener(v -> updateLotteryStatus("Accepted"));
-        declineButton.setOnClickListener(v -> updateLotteryStatus("Declined"));
+        declineButton.setOnClickListener(v -> updateLotteryStatus("Cancelled"));
     }
 
     /**
@@ -99,15 +95,17 @@ public class UserEventDetailActivity extends AppCompatActivity {
                 .get()
                 .addOnSuccessListener(documentSnapshot -> {
                     if (documentSnapshot.exists()) {
+                        // Retrieve the event details
                         String eventName = documentSnapshot.getString("name");
                         String eventDescription = documentSnapshot.getString("description");
                         String eventFacility = documentSnapshot.getString("facility");
-                        eventTime = documentSnapshot.getString("time"); // 获取活动时间
+                        eventTime = documentSnapshot.getString("time");
                         registrationDeadline = documentSnapshot.getString("registrationDeadline");
                         lotteryTime = documentSnapshot.getString("lotteryTime");
                         String waitingListCount = documentSnapshot.getLong("waitingListCount") + "";
                         String lotteryCount = documentSnapshot.getLong("lotteryCount") + "";
 
+                        // Set event details to views
                         eventNameTextView.setText(eventName);
                         eventTimeTextView.setText(eventTime);
                         registrationDeadlineTextView.setText(registrationDeadline);
@@ -117,11 +115,25 @@ public class UserEventDetailActivity extends AppCompatActivity {
                         eventDescriptionTextView.setText(eventDescription);
                         eventFacilityTextView.setText(eventFacility);
 
+                        // Safely retrieve the 'requiresLocation' field (boolean)
+                        Boolean requiresLocationBoolean = documentSnapshot.getBoolean("requiresLocation");
+                        // If 'requiresLocation' is null, set default value as false
+                        boolean requiresLocation = (requiresLocationBoolean != null) ? requiresLocationBoolean : false;
+
+                        // Set location text based on the boolean value
+                        TextView eventLocationTextView = findViewById(R.id.eventLocationTextView);
+                        eventLocationTextView.setText(requiresLocation ? "Yes" : "No");
+
+                        // Load the poster image
                         String posterUrl = documentSnapshot.getString("posterUrl");
                         if (posterUrl != null && !posterUrl.isEmpty()) {
                             Glide.with(this).load(posterUrl).into(eventPosterImageView);
+                        } else {
+                            // Load a default image if posterUrl is empty or null
+                            Glide.with(this).load(R.drawable.defaultbackground).into(eventPosterImageView);
                         }
 
+                        // Update event status
                         updateEventStatus();
                     } else {
                         Toast.makeText(this, "Event not found", Toast.LENGTH_SHORT).show();
@@ -129,6 +141,9 @@ public class UserEventDetailActivity extends AppCompatActivity {
                 })
                 .addOnFailureListener(e -> Log.e("UserEventDetailActivity", "Error loading event details", e));
     }
+
+
+
 
     /**
      * Updates event status display based on current time and deadlines.
@@ -143,7 +158,7 @@ public class UserEventDetailActivity extends AppCompatActivity {
             SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault());
             Date deadlineDate = dateFormat.parse(registrationDeadline);
             Date lotteryDate = dateFormat.parse(lotteryTime);
-            Date eventEndDate = dateFormat.parse(eventTime); // End time of the event
+            Date eventEndDate = dateFormat.parse(eventTime); // 活动的结束时间
             Date currentDate = new Date();
 
             if (currentDate.before(deadlineDate)) {
@@ -198,7 +213,7 @@ public class UserEventDetailActivity extends AppCompatActivity {
                             eventStatusValueTextView.setText("You accepted the invitation");
                             acceptButton.setVisibility(View.GONE);
                             declineButton.setVisibility(View.GONE);
-                        } else if ("Declined".equals(userStatus)) {
+                        } else if ("Cancelled".equals(userStatus)) {
                             eventStatusValueTextView.setText("You declined the invitation");
                             acceptButton.setVisibility(View.GONE);
                             declineButton.setVisibility(View.GONE);

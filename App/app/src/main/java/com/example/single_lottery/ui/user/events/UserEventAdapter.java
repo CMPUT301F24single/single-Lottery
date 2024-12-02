@@ -1,7 +1,9 @@
 package com.example.single_lottery.ui.user.events;
 
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
+import android.provider.Settings;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,6 +18,10 @@ import com.example.single_lottery.R;
 
 import com.example.single_lottery.ui.user.home.UserHomeDetailActivity;
 import com.example.single_lottery.ui.user.home.UserHomeAdapter;
+import com.example.single_lottery.ui.user.profile.User;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.List;
 
@@ -30,6 +36,7 @@ public class UserEventAdapter extends RecyclerView.Adapter<UserEventAdapter.User
 
     private List<EventModel> eventList;
     private Context context;
+    private FirebaseFirestore db;
 
     /**
      * Creates new adapter instance with event list.
@@ -40,6 +47,7 @@ public class UserEventAdapter extends RecyclerView.Adapter<UserEventAdapter.User
     public UserEventAdapter(Context context, List<EventModel> eventList) {
         this.context = context;
         this.eventList = eventList;
+        this.db = FirebaseFirestore.getInstance();
     }
 
     @NonNull
@@ -54,8 +62,21 @@ public class UserEventAdapter extends RecyclerView.Adapter<UserEventAdapter.User
         EventModel event = eventList.get(position);
         holder.eventNameTextView.setText(event.getName());
 
-        TextView lotteryDateTextView = holder.itemView.findViewById(R.id.lotteryDate);
-        lotteryDateTextView.setText("Lottery Date: " + event.getLotteryTime());
+        ContentResolver contentResolver = context.getContentResolver();
+
+        TextView lotteryDateTextView = holder.itemView.findViewById(R.id.eventLotteryDate);
+        TextView facilityTextView = holder.itemView.findViewById(R.id.eventFacilityTextView);
+        TextView timeTextView = holder.itemView.findViewById(R.id.eventTimeTextView);
+        TextView statusTextView = holder.itemView.findViewById(R.id.eventStatusTextView);
+        String eventId = event.getEventId();
+        String userId = Settings.Secure.getString(contentResolver, Settings.Secure.ANDROID_ID);
+        setUserStatus(userId, eventId, statusTextView);
+
+
+        facilityTextView.setText(event.getFacility());
+        timeTextView.setText(event.getTime());
+        lotteryDateTextView.setText(event.getLotteryTime());
+
 
         holder.viewButton.setOnClickListener(v -> {
             Intent intent = new Intent(context, UserEventDetailActivity.class);
@@ -63,11 +84,6 @@ public class UserEventAdapter extends RecyclerView.Adapter<UserEventAdapter.User
             context.startActivity(intent);
         });
     }
-
-
-
-
-
 
     @Override
     public int getItemCount() {
@@ -88,5 +104,33 @@ public class UserEventAdapter extends RecyclerView.Adapter<UserEventAdapter.User
 
             viewButton = itemView.findViewById(R.id.viewButton);
         }
+    }
+    /**
+     * Checks user status for the given event.
+     *
+     * @param userId User's unique ID
+     * @param eventId Event's unique ID
+     * @param statusTextView TextView to display the user's status
+     */
+    private void setUserStatus(String userId, String eventId, TextView statusTextView) {
+        // Query the Firestore collection to find the registration for the event
+        db.collection("registered_events")
+                .whereEqualTo("userId", userId)
+                .whereEqualTo("eventId", eventId)
+                .get()
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        QuerySnapshot querySnapshot = task.getResult();
+                        if (querySnapshot != null && !querySnapshot.isEmpty()) {
+                            DocumentSnapshot document = querySnapshot.getDocuments().get(0);
+                            String status = document.getString("status");  // Assuming "status" is the field in Firestore
+                            statusTextView.setText(status);  // Set the status to the TextView
+                        } else {
+                            statusTextView.setText("Not Registered");  // No matching document found
+                        }
+                    } else {
+                        statusTextView.setText("Error fetching status");
+                    }
+                });
     }
 }

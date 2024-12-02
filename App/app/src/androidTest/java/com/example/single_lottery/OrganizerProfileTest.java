@@ -24,28 +24,12 @@ import org.junit.Test;
 
 import java.util.concurrent.CountDownLatch;
 
-/**
- * Test class for the Organizer Profile functionality in the Single Lottery application.
- * This class contains UI tests that verify the proper functioning of the organizer profile
- * editing and display features, including interaction with Firestore database.
- *
- * User profile fragment test that checks that fields are editable and up to date with firestore.
- *
- * @author Aaron Kim
- * @version 1.0
+/*
+User profile fragment test that checks that fields are editable and up to date with firestore.
  */
 public class OrganizerProfileTest {
     private String installationId;
 
-    /**
-     * Custom matcher for handling multiple views with the same ID in the UI.
-     * Used to select the correct view when multiple views share the same ID in XML layouts.
-     *
-     * @param matcher The base view matcher to use
-     * @param index The index of the view to select when multiple matches exist
-     * @return A TypeSafeMatcher that matches the view at the specified index
-     * @see TypeSafeMatcher
-     */
     //https://stackoverflow.com/questions/29378552/in-espresso-how-to-avoid-ambiguousviewmatcherexception-when-multiple-views-matc
     //Ensure that the correct button is clicked when overlapping buttons have the same id in .xml
     public static Matcher<View> withIndex(final Matcher<View> matcher, final int index) {
@@ -66,16 +50,6 @@ public class OrganizerProfileTest {
         };
     }
 
-    /**
-     * Loads the organizer profile data from Firestore database.
-     * This method synchronously retrieves the organizer's name, email, and phone number.
-     *
-     * @param installationId The unique installation ID used to identify the organizer in Firestore
-     * @return String array containing the organizer's profile information:
-     *         index 0: name
-     *         index 1: email
-     *         index 2: phone number
-     */
     private String[] loadOrganizerProfile(String installationId) {
         final String[] userProfile = new String[3];
         final CountDownLatch latch = new CountDownLatch(1);
@@ -110,22 +84,9 @@ public class OrganizerProfileTest {
         }
         return userProfile;
     }
-
-    /**
-     * Rule to launch the MainActivity for testing.
-     */
     @Rule
     public ActivityScenarioRule<MainActivity> scenario = new ActivityScenarioRule<>(MainActivity.class);
 
-    /**
-     * Sets up the test environment before each test case.
-     * This method:
-     * 1. Retrieves the Firebase installation ID
-     * 2. Navigates to the organizer section
-     * 3. Opens the profile fragment
-     *
-     * @throws InterruptedException if the thread sleep is interrupted
-     */
     @Before
     public void setup() throws InterruptedException {
         FirebaseInstallations.getInstance().getId()
@@ -141,13 +102,6 @@ public class OrganizerProfileTest {
         onView(withIndex(withId(R.id.navigation_profile), 0)).perform(click());
     }
 
-    /**
-     * Tests the organizer profile editing functionality.
-     * This test:
-     * 1. Enters test data for name, email, and phone
-     * 2. Saves the changes
-     * 3. Verifies that the changes are reflected in both the UI and Firestore
-     */
     @Test
     public void editOrganizer(){
         String testName = "Organizer Test";

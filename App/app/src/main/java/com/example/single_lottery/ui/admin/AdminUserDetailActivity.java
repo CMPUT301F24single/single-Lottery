@@ -1,6 +1,10 @@
 package com.example.single_lottery.ui.admin;
 
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.widget.Button;
@@ -18,78 +22,69 @@ import com.example.single_lottery.R;
 import com.google.firebase.database.annotations.Nullable;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
-/**
- * Activity for displaying and managing user details in admin view.
- * Allows viewing user information and handling profile/avatar deletion.
- *
- * @author Jingyao Gu
- * @version 1.0
- */
+
 public class AdminUserDetailActivity extends AppCompatActivity {
-    /** Key for passing user data through intent */
     public static final String EXTRA_USER = "extra_user";
-    /**
-     * Initializes the activity, sets up UI components and loads user details.
-     * Configures buttons for avatar and profile deletion.
-     *
-     * @param savedInstanceState Saved instance state bundle
-     */
+
     @Override
-    protected void onCreate(@Nullable Bundle savedInstanceState) {
+    protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.admin_user_detail);
+        setTitle("User Details");
 
         // Get the passed user data
         EventModel user = (EventModel) getIntent().getSerializableExtra(EXTRA_USER);
 
-        // Binding UI Elements
+        // Bind UI elements
         ImageView userProfileImage = findViewById(R.id.userProfileImage);
         TextView userName = findViewById(R.id.userName);
         TextView userEmail = findViewById(R.id.userEmail);
         TextView userPhone = findViewById(R.id.userPhone);
         Button btnDeleteAvatar = findViewById(R.id.btnDeleteAvatar);
         Button btnDeleteProfile = findViewById(R.id.btnDeleteProfile);
+        ImageView backButton = findViewById(R.id.adminUserBackButton);  // Back button reference
 
         if (user != null) {
             userName.setText(user.getName());
             userEmail.setText(String.format("Email: %s", user.getEmail()));
             userPhone.setText(String.format("Phone: %s", user.getPhone()));
 
-            // Loading avatar
-            Glide.with(this)
-                    .load(user.getProfileImageUrl())
-                    .placeholder(R.drawable.ic_profile)
-                    .into(userProfileImage);
+            // Get the profile image URL from the user model (Firestore data)
+            String profileImageUrl = user.getProfileImageUrl();  // Assuming Firestore data is being passed correctly here
 
-            // Delete the avatar button logicv
+            // Check if the profile image URL is valid
+            if (profileImageUrl == null || profileImageUrl.isEmpty()) {
+                // If profile image URL is null or empty, generate the letter avatar
+                generateLetterAvatar(user.getName(), userProfileImage);
+            } else {
+                // If profile image URL is available, load it using Glide
+                Glide.with(this)
+                        .load(profileImageUrl)
+                        .placeholder(R.drawable.ic_profile)  // Placeholder image while loading
+                        .into(userProfileImage);
+            }
+
+            // Delete avatar button logic
             btnDeleteAvatar.setOnClickListener(v -> deleteAvatar(user));
 
-            // Delete User Button Logic
+            // Delete user button logic
             btnDeleteProfile.setOnClickListener(v -> deleteProfile(user));
         }
+
+        // Set click listener for the back button
+        backButton.setOnClickListener(v -> finish());
     }
-    /**
-     * Handles action bar item selections, specifically back navigation.
-     *
-     * @param item The selected menu item
-     * @return true if the event was handled, false otherwise
-     */
+
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        if (item.getItemId() == android.R.id.home) { // The ID of the back button
-            onBackPressed(); // return to previous page
+        if (item.getItemId() == android.R.id.home) { // 返回按钮的 ID
+            onBackPressed(); // 返回上一页
             return true;
         }
         return super.onOptionsItemSelected(item);
     }
 
-    /**
-     * Deletes user's profile after confirmation.
-     * Removes user data from Firestore database.
-     * Shows confirmation dialog before deletion.
-     *
-     * @param user The user to be deleted
-     */
+    // 删除用户文档逻辑
     private void deleteProfile(EventModel user) {
         if (user.getEventId() == null) {
             Toast.makeText(this, "User ID is missing!", Toast.LENGTH_SHORT).show();
@@ -99,7 +94,7 @@ public class AdminUserDetailActivity extends AppCompatActivity {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         DocumentReference userRef = db.collection("users").document(user.getEventId());
 
-        // Prompt to confirm deletion
+        // 提示确认删除
         new AlertDialog.Builder(this)
                 .setTitle("Delete User")
                 .setMessage("Are you sure you want to delete this user?")
@@ -107,7 +102,7 @@ public class AdminUserDetailActivity extends AppCompatActivity {
                     userRef.delete()
                             .addOnSuccessListener(aVoid -> {
                                 Toast.makeText(this, "User deleted successfully!", Toast.LENGTH_SHORT).show();
-                                finish(); // Close the current page
+                                finish(); // 关闭当前页面
                             })
                             .addOnFailureListener(e -> {
                                 Toast.makeText(this, "Failed to delete user: " + e.getMessage(), Toast.LENGTH_SHORT).show();
@@ -117,15 +112,9 @@ public class AdminUserDetailActivity extends AppCompatActivity {
                 .show();
     }
 
-
-    /**
-     * Deletes user's avatar image.
-     * Removes profile image URL from database and shows default avatar.
-     *
-     * @param user The user whose avatar should be deleted
-     */
+    // 删除头像逻辑
     private void deleteAvatar(EventModel user) {
-        // Check if eventId is null
+        // 检查 eventId 是否为 null
         if (user.getEventId() == null) {
             Toast.makeText(this, "User ID is missing!", Toast.LENGTH_SHORT).show();
             return;
@@ -145,4 +134,42 @@ public class AdminUserDetailActivity extends AppCompatActivity {
                 });
     }
 
+    /**
+     * Generates a letter avatar when no profile image is set.
+     * Creates a circular avatar with user initials.
+     *
+     * @param name User's display name for initial generation
+     */
+    private void generateLetterAvatar(String name, ImageView profileImageView) {
+        String initials = "";
+        if (name == null || name.isEmpty()) {
+            initials += '-';
+        } else {
+            String[] nameParts = name.split("\\s+");
+            if (nameParts.length > 0) {
+                initials += nameParts[0].charAt(0); // First letter of first name
+            }
+            if (nameParts.length > 1) {
+                initials += nameParts[1].charAt(0); // First letter of last name
+            }
+        }
+
+        // Create a Bitmap with 100x100 size (for circular avatar)
+        Bitmap bitmap = Bitmap.createBitmap(100, 100, Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(bitmap);
+
+        // Draw a circular background
+        Paint paint = new Paint();
+        paint.setColor(Color.GRAY); // Background color
+        canvas.drawCircle(50, 50, 50, paint); // Circle at center (50, 50) with radius 50
+
+        // Draw initials in the center of the circle
+        paint.setColor(Color.WHITE); // Text color
+        paint.setTextSize(40);
+        paint.setTextAlign(Paint.Align.CENTER); // Center-align text
+        canvas.drawText(initials, 50, 65, paint); // Draw the initials at position (50, 65)
+
+        // Set the generated bitmap as the profile image
+        profileImageView.setImageBitmap(bitmap);
+    }
 }

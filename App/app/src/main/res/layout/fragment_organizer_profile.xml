@@ -1,4 +1,3 @@
-<?xml version="1.0" encoding="utf-8"?>
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
@@ -14,7 +13,8 @@
         android:gravity="center"
         android:layout_marginLeft="8dp"
         android:layout_marginRight="8dp"
-        android:layout_marginTop="8dp">
+        android:layout_marginTop="8dp"
+        android:elevation="4dp">
 
         <!-- Profile Image Centered in Blue Section -->
         <ImageView
@@ -24,7 +24,8 @@
             android:layout_centerHorizontal="true"
             android:layout_marginTop="16dp"
             android:padding="8dp"
-            android:src="@drawable/org" />
+            android:src="@drawable/org"
+            android:elevation="4dp" />
 
         <!-- Upload and Remove Buttons Below Profile Image -->
         <LinearLayout
@@ -60,7 +61,8 @@
         android:layout_marginLeft="8dp"
         android:layout_marginRight="8dp"
         android:layout_marginTop="8dp"
-        android:layout_marginBottom="8dp">
+        android:layout_marginBottom="8dp"
+        android:elevation="4dp">
 
         <!-- Profile Information Fields -->
         <LinearLayout
@@ -119,7 +121,7 @@
                     android:textSize="18sp"
                     android:textColor="#000000" />
             </LinearLayout>
-            
+
             <!-- Phone Layout -->
             <LinearLayout
                 android:layout_width="match_parent"
@@ -170,16 +172,33 @@
                     android:text="E. Information about the organizer"
                     android:textSize="16sp"
                     android:textColor="#000000" />
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginTop="16dp">
+
+                    <Button
+                        android:id="@+id/editButton"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Edit Profile"
+                        android:layout_marginEnd="8dp" />
+
+                    <Button
+                        android:id="@+id/facilityButton"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Facility"
+                        android:layout_marginStart="8dp" />
+                </LinearLayout>
             </LinearLayout>
-
-            <!-- Edit Button -->
-            <Button
-                android:id="@+id/editButton"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:text="Edit" />
-
         </LinearLayout>
+
+
+
     </RelativeLayout>
+
 </LinearLayout>

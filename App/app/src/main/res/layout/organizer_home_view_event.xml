@@ -12,7 +12,8 @@
         android:contentDescription="Back Button"
         android:layout_alignParentTop="true"
         android:layout_alignParentStart="true"
-        android:layout_margin="16dp" />
+        android:layout_marginLeft="16dp"
+        android:layout_marginTop="16dp"/>
 
     <!-- ScrollView to Allow Scrolling of Content -->
     <ScrollView
@@ -31,7 +32,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="200dp"
                 android:scaleType="centerCrop"
-                android:contentDescription="Event Poster"/>
+                android:contentDescription="Event Poster"
+                android:layout_marginBottom="8dp"/>
 
             <!-- Event Details Container with Padding -->
             <LinearLayout
@@ -78,20 +80,13 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:textSize="17sp"/>
-                    <TextView
-                        android:id="@+id/textViewLocationRequirement"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Location is required: No"
-                        android:textSize="16sp"
-                        android:layout_marginTop="16dp"/>
                 </LinearLayout>
 
                 <!-- Event Facility -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical"
+                    android:orientation="horizontal"
                     android:layout_marginStart="8dp">
                     <TextView
                         android:layout_width="wrap_content"
@@ -101,11 +96,11 @@
                         android:textSize="17sp"/>
                     <TextView
                         android:id="@+id/textViewEventFacility"
-                        android:layout_width="match_parent"
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
+                        android:layout_weight="1"
                         android:textSize="17sp"/>
                 </LinearLayout>
-
 
                 <!-- Event Time -->
                 <LinearLayout
@@ -196,7 +191,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Lottery Count:"
+                        android:text="Lottery Count: "
                         android:textStyle="bold"
                         android:textSize="17sp"/>
                     <TextView
@@ -206,6 +201,27 @@
                         android:layout_weight="1"
                         android:textSize="17sp"/>
                 </LinearLayout>
+
+                <!-- Location Requirement (Moved Below Event Details) -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginStart="8dp">
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Geolocation: "
+                        android:textStyle="bold"
+                        android:textSize="17sp"/>
+                    <TextView
+                        android:id="@+id/textViewLocationRequirement"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="No"
+                        android:textSize="17sp"/>
+                </LinearLayout>
+
             </LinearLayout>
 
             <!-- View Waiting List Button -->
@@ -221,13 +237,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Lottery WINNERS" />
-
-            <!-- View Losers Button -->
-            <Button
-                android:id="@+id/buttonViewLosers"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="lottery LOSERS" />
 
             <!-- View Cancelled Users Button -->
             <Button

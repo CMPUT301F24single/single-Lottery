@@ -30,10 +30,10 @@ public class AdminActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.admin_homepage);
+        getSupportActionBar().setTitle("Events");
 
         BottomNavigationView bottomNavigationView = findViewById(R.id.admin_nav_bottom_navigation);
-
-        // AdminEventFragment loaded by default
+        // 默认加载 AdminEventFragment
         if (savedInstanceState == null) {
             getSupportFragmentManager().beginTransaction()
                     .replace(R.id.admin_fragment_container, new AdminEventFragment())
@@ -45,12 +45,16 @@ public class AdminActivity extends AppCompatActivity {
 
             if (item.getItemId() == R.id.nav_event) {
                 selectedFragment = new AdminEventFragment();
+                getSupportActionBar().setTitle("Events");
             } else if (item.getItemId() == R.id.nav_organizer) {
                 selectedFragment = new AdminOrganizerFragment();
+                getSupportActionBar().setTitle("Organizers");
             } else if (item.getItemId() == R.id.nav_user) {
                 selectedFragment = new AdminUserFragment();
+                getSupportActionBar().setTitle("Users");
             } else if (item.getItemId() == R.id.nav_facility) {
                 selectedFragment = new AdminFacilityFragment(); // 新增 Facility Fragment
+                getSupportActionBar().setTitle("Facilities");
             } else {
                 return false;
             }

@@ -22,40 +22,19 @@ import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.ArrayList;
 import java.util.List;
-/**
- * Fragment for managing organizers in admin view.
- * Displays list of organizers and handles navigation to organizer details.
- *
- * @author Jingyao Gu
- * @version 1.0
- */
+
 public class AdminOrganizerFragment extends Fragment {
 
     private RecyclerView recyclerView;
     private AdminOrganizerAdapter adapter;
     private final List<EventModel> organizerList = new ArrayList<>();
-    /**
-     * Creates and initializes the fragment's user interface.
-     * Sets up RecyclerView with adapter and loads organizer data.
-     *
-     * @param inflater The layout inflater
-     * @param container The parent view container
-     * @param savedInstanceState Saved instance state bundle
-     * @return The created fragment view
-     */
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_admin_organizer, container, false);
         recyclerView = view.findViewById(R.id.recyclerViewOrganizers);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-
-        // Add DividerItemDecoration (for dividing list of events)
-        DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(
-                recyclerView.getContext(),
-                LinearLayoutManager.VERTICAL
-        );
-        recyclerView.addItemDecoration(dividerItemDecoration);
 
         adapter = new AdminOrganizerAdapter(getContext(), organizerList, organizer -> {
             Intent intent = new Intent(getContext(), AdminOrganizerDetailActivity.class);
@@ -68,14 +47,10 @@ public class AdminOrganizerFragment extends Fragment {
             startActivity(intent);
         });
         recyclerView.setAdapter(adapter);
-        loadOrganizers(); // Loading Organizer Data
+        loadOrganizers(); // 加载组织者数据
         return view;
     }
-    /**
-     * Loads organizer data from Firestore database.
-     * Clears existing organizer list and updates with fresh data.
-     * Updates adapter when data is loaded.
-     */
+
     private void loadOrganizers() {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
 
@@ -85,7 +60,7 @@ public class AdminOrganizerFragment extends Fragment {
                     for (DocumentSnapshot document : querySnapshot) {
                         EventModel organizer = document.toObject(EventModel.class);
                         if (organizer != null) {
-                            // Bind document ID to model
+                            // 绑定文档 ID 到 model
                             organizer.setOrganizerDeviceID(document.getId());
                             organizerList.add(organizer);
                         }

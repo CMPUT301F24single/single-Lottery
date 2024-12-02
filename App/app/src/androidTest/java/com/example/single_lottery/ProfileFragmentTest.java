@@ -24,28 +24,12 @@ import org.junit.Test;
 
 import java.util.concurrent.CountDownLatch;
 
-/**
- * Test class for the User Profile functionality in the Single Lottery application.
- * This class contains UI tests that verify the proper functioning of the user profile
- * viewing and editing features, including synchronization with Firestore database.
- *
- * User profile fragment test that checks that fields are editable and up to date with firestore.
- *
- * @author Aaron Kim
- * @version 1.0
+/*
+User profile fragment test that checks that fields are editable and up to date with firestore.
  */
 public class ProfileFragmentTest {
     private String installationId;
 
-    /**
-     * Custom matcher for handling multiple views with the same ID in the UI.
-     * Used to select the correct view when multiple views share the same ID in XML layouts.
-     *
-     * @param matcher The base view matcher to use
-     * @param index The index of the view to select when multiple matches exist
-     * @return A TypeSafeMatcher that matches the view at the specified index
-     * @see TypeSafeMatcher
-     */
     //https://stackoverflow.com/questions/29378552/in-espresso-how-to-avoid-ambiguousviewmatcherexception-when-multiple-views-matc
     //Ensure that the correct button is clicked when overlapping buttons have the same id in .xml
     public static Matcher<View> withIndex(final Matcher<View> matcher, final int index) {
@@ -66,16 +50,6 @@ public class ProfileFragmentTest {
         };
     }
 
-    /**
-     * Loads the user profile data from Firestore database.
-     * This method synchronously retrieves the user's name, email, and phone number.
-     *
-     * @param installationId The unique installation ID used to identify the user in Firestore
-     * @return String array containing the user's profile information:
-     *         index 0: name
-     *         index 1: email
-     *         index 2: phone number
-     */
     private String[] loadUserProfile(String installationId) {
         final String[] userProfile = new String[3];
         final CountDownLatch latch = new CountDownLatch(1);
@@ -113,15 +87,6 @@ public class ProfileFragmentTest {
     @Rule
     public ActivityScenarioRule<MainActivity> scenario = new ActivityScenarioRule<>(MainActivity.class);
 
-    /**
-     * Sets up the test environment before each test case.
-     * This method:
-     * Retrieves the Firebase installation ID
-     * Navigates to the user section
-     * Opens the notifications fragment
-     *
-     * @throws InterruptedException if the thread sleep is interrupted
-     */
     @Before
     public void setup() throws InterruptedException {
         FirebaseInstallations.getInstance().getId()
@@ -136,10 +101,6 @@ public class ProfileFragmentTest {
         Thread.sleep(500);
         onView(withIndex(withId(R.id.navigation_notifications), 0)).perform(click());
     }
-    /**
-     * Tests that the current user details are correctly displayed.
-     * Verifies that the UI elements show the same information as stored in Firestore.
-     */
     @Test
     public void currentUserDetails(){
         String[] details = loadUserProfile(installationId);
@@ -148,13 +109,6 @@ public class ProfileFragmentTest {
         onView(withId(R.id.phoneTextView)).check(matches(withText(details[2])));
     }
 
-    /**
-     * Tests the user profile editing functionality.
-     * This test:
-     * Enters test data for name, email, and phone
-     * Saves the changes
-     * Verifies that the changes are reflected in both the UI and Firestore
-     */
     @Test
     public void editedUserDetails(){
         String testName = "John299292";

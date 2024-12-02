@@ -2,6 +2,7 @@ package com.example.single_lottery.ui.user.home;
 
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.location.Location;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.provider.Settings;
@@ -59,6 +60,7 @@ public class UserHomeDetailActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_user_home_event_detail);
+        setTitle("Event Details");
 
         backButton = findViewById(R.id.backButton);
         backButton.setOnClickListener(v -> finish());
@@ -109,28 +111,32 @@ public class UserHomeDetailActivity extends AppCompatActivity {
                             textViewRegistrationDeadline.setText(event.getRegistrationDeadline());
                             textViewLotteryTime.setText(event.getLotteryTime());
                             textViewLotteryCount.setText(String.valueOf(event.getLotteryCount()));
-                            textViewLocationRequirement.setText("Geolocation: " + (event.isRequiresLocation() ? "Yes" : "No"));
+                            textViewLocationRequirement.setText(event.isRequiresLocation() ? "Yes" : "No");
 
-                            registrationDeadline = event.getRegistrationDeadline(); // Store Registration Deadline
-                            boolean requiresLocation = event.isRequiresLocation(); // Check if event requires location
+                            registrationDeadline = event.getRegistrationDeadline();
+                            boolean requiresLocation = event.isRequiresLocation();
 
                             if (requiresLocation) {
-                                getUserLocation(eventId,
-                                        Settings.Secure.getString(getContentResolver(), Settings.Secure.ANDROID_ID));
+                                getUserLocation(eventId, Settings.Secure.getString(getContentResolver(), Settings.Secure.ANDROID_ID));
                             }
 
-                            if (event.getPosterUrl() != null) {
+                            // Check if posterUrl is null or empty, and set default poster if necessary
+                            if (event.getPosterUrl() != null && !event.getPosterUrl().isEmpty()) {
                                 Glide.with(this).load(event.getPosterUrl()).into(imageViewPoster);
+                            } else {
+                                Glide.with(this).load(R.drawable.defaultbackground).into(imageViewPoster); // Use your default poster image
                             }
 
-                            // Get real-time registration number
                             countRegistrations(eventId, event.getWaitingListCount());
                         }
                     }
                 })
                 .addOnFailureListener(e -> {
+                    Toast.makeText(this, "Failed to load event data.", Toast.LENGTH_SHORT).show();
                 });
     }
+
+
 
     /**
      * Updates registration count display.
@@ -142,22 +148,23 @@ public class UserHomeDetailActivity extends AppCompatActivity {
     private void countRegistrations(String eventId, int maxWaitingListCount) {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
 
-        // Query the number of registration records that meet the eventId condition in
-        // the registered_events collection
         db.collection("registered_events")
                 .whereEqualTo("eventId", eventId)
                 .get()
                 .addOnSuccessListener(queryDocumentSnapshots -> {
-                    int currentSignUpCount = queryDocumentSnapshots.size(); // The number of documents obtained is the
-                                                                            // number of applicants
-
-                    // Set the format of "Number of registrations/maximum number"
-                    textViewWaitingListCount.setText(currentSignUpCount + "/" + maxWaitingListCount);
+                    int currentSignUpCount = queryDocumentSnapshots.size();
+                    if (maxWaitingListCount == Integer.MAX_VALUE){
+                        textViewWaitingListCount.setText(currentSignUpCount + "/" + "unlimited");
+                    }
+                    else {
+                        textViewWaitingListCount.setText(currentSignUpCount + "/" + maxWaitingListCount);
+                    }
                 })
                 .addOnFailureListener(e -> {
                     Toast.makeText(this, "Failed to load registration count.", Toast.LENGTH_SHORT).show();
                 });
     }
+
 
     /**
      * Handles event registration process.
@@ -168,69 +175,71 @@ public class UserHomeDetailActivity extends AppCompatActivity {
      */
     private void signUpForEvent() {
         try {
-            // Check if you are within the registration deadline
             SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault());
             Date deadlineDate = dateFormat.parse(registrationDeadline);
             Date currentDate = new Date();
 
             if (currentDate.after(deadlineDate)) {
-                // If the registration deadline has passed, display a reminder message and exit
                 Toast.makeText(this, "Registration is closed. Sign-up is not allowed.", Toast.LENGTH_SHORT).show();
                 return;
             }
 
-            // Registration Logic
             FirebaseFirestore db = FirebaseFirestore.getInstance();
             String userId = Settings.Secure.getString(getContentResolver(), Settings.Secure.ANDROID_ID);
 
-            // Create a registration record in the registered_events collection
             Map<String, Object> registrationData = new HashMap<>();
             registrationData.put("eventId", eventId);
             registrationData.put("userId", userId);
-            registrationData.put("timestamp", System.currentTimeMillis()); // Optional: Record the registration time
+            registrationData.put("timestamp", System.currentTimeMillis());
 
-            // Check if the user has registered
             db.collection("registered_events")
                     .whereEqualTo("eventId", eventId)
                     .whereEqualTo("userId", userId)
                     .get()
                     .addOnSuccessListener(queryDocumentSnapshots -> {
                         if (queryDocumentSnapshots.isEmpty()) {
-                            // The user has not registered yet, add a registration record
                             db.collection("registered_events").add(registrationData)
                                     .addOnSuccessListener(documentReference -> {
-                                        Toast.makeText(this, "Successfully signed up for the event!",
-                                                Toast.LENGTH_SHORT).show();
+                                        Toast.makeText(this, "Successfully signed up for the event!", Toast.LENGTH_SHORT).show();
                                         buttonSignUp.setEnabled(false);
-                                        loadEventData(eventId); // Update page display
+                                        loadEventData(eventId);
 
-                                        // Check the location requirement before getting user's location
-                                        // Re-fetch the event data to check for location requirement
+                                        // Update the user's status to "Waiting" after successful sign-up
+                                        db.collection("registered_events")
+                                                .document(documentReference.getId())  // Use the newly added registration document
+                                                .update("status", "Waiting")  // Update the status to "Waiting"
+                                                .addOnSuccessListener(aVoid -> {
+                                                    Log.d("UserHomeDetail", "User status updated to 'Waiting'");
+                                                })
+                                                .addOnFailureListener(e -> {
+                                                    Toast.makeText(this, "Failed to update status.", Toast.LENGTH_SHORT).show();
+                                                });
+
                                         db.collection("events").document(eventId).get()
                                                 .addOnSuccessListener(documentSnapshot -> {
                                                     if (documentSnapshot.exists()) {
                                                         EventModel event = documentSnapshot.toObject(EventModel.class);
                                                         if (event != null && event.isRequiresLocation()) {
-                                                            getUserLocation(eventId, userId); // Only get location if
-                                                                                              // required
+                                                            if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                                                                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, LOCATION_PERMISSION_REQUEST_CODE);
+                                                            } else {
+                                                                getUserLocation(eventId, userId);
+                                                            }
                                                         }
                                                     }
                                                 });
 
                                     })
                                     .addOnFailureListener(e -> {
-                                        Toast.makeText(this, "Failed to sign up. Please try again.", Toast.LENGTH_SHORT)
-                                                .show();
+                                        Toast.makeText(this, "Failed to sign up. Please try again.", Toast.LENGTH_SHORT).show();
                                     });
                         } else {
-                            Toast.makeText(this, "You have already signed up for this event.", Toast.LENGTH_SHORT)
-                                    .show();
+                            Toast.makeText(this, "You have already signed up for this event.", Toast.LENGTH_SHORT).show();
                             buttonSignUp.setEnabled(false);
                         }
                     })
                     .addOnFailureListener(e -> {
-                        Toast.makeText(this, "Failed to check registration status. Please try again.",
-                                Toast.LENGTH_SHORT).show();
+                        Toast.makeText(this, "Failed to check registration status. Please try again.", Toast.LENGTH_SHORT).show();
                     });
 
         } catch (ParseException e) {
@@ -238,6 +247,8 @@ public class UserHomeDetailActivity extends AppCompatActivity {
             Toast.makeText(this, "Error parsing registration deadline", Toast.LENGTH_SHORT).show();
         }
     }
+
+
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
@@ -258,11 +269,10 @@ public class UserHomeDetailActivity extends AppCompatActivity {
 
         if (ContextCompat.checkSelfPermission(this,
                 Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-            android.location.Location lastKnownLocation = locationManager
-                    .getLastKnownLocation(LocationManager.GPS_PROVIDER);
-            if (lastKnownLocation != null) {
-                double latitude = lastKnownLocation.getLatitude();
-                double longitude = lastKnownLocation.getLongitude();
+                    Location location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+            if (location != null) {
+                double latitude = location.getLatitude();
+                double longitude = location.getLongitude();
 
                 Log.d("UserLocation", "Latitude: " + latitude + ", Longitude: " + longitude);
 
@@ -312,4 +322,5 @@ public class UserHomeDetailActivity extends AppCompatActivity {
                     Toast.makeText(this, "Failed to query user location.", Toast.LENGTH_SHORT).show();
                 });
     }
+
 }

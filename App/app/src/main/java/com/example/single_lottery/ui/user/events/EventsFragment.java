@@ -52,13 +52,6 @@ public class EventsFragment extends Fragment {
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         recyclerView.setAdapter(eventAdapter);
 
-        // adding dividers between registered events
-        DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(
-                recyclerView.getContext(),
-                LinearLayoutManager.VERTICAL
-        );
-        recyclerView.addItemDecoration(dividerItemDecoration);
-
         loadRegisteredEvents();
 
         return view;
@@ -88,7 +81,7 @@ public class EventsFragment extends Fragment {
                         for (DocumentSnapshot document : queryDocumentSnapshots.getDocuments()) {
                             String eventId = document.getString("eventId");
 
-                            // Find detailed information in the events collection
+                            // 查找 events 集合中的详细信息
                             db.collection("events").document(eventId)
                                     .get()
                                     .addOnSuccessListener(eventSnapshot -> {

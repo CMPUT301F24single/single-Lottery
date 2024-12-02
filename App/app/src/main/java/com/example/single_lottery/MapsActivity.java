@@ -1,38 +1,37 @@
 package com.example.single_lottery;
 
+import androidx.appcompat.widget.Toolbar;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.FragmentActivity;
 
+import com.example.single_lottery.ui.organizer.OrganizerHomeViewEventActivity;
+import com.example.single_lottery.ui.user.UserActivity;
+import com.google.android.gms.maps.model.LatLng;
+
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.view.View;
 import android.widget.Toast;
 
+import com.example.single_lottery.R;
+import com.example.single_lottery.databinding.ActivityMapsBinding;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
-import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
-import com.example.single_lottery.databinding.ActivityMapsBinding;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.ArrayList;
 
-/**
- * Activity for map display and location stuff.
- *
- * Outstanding Issues:
- * - Location works fine on emulator but breaks on real phones ugh
- * - Need to fix location permissions and updates on actual devices
- * - Like seriously why does this only work in emulator??
- *
- * @author [Haorui Gao]
- * @version 1.0
- */
-public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
+public class MapsActivity extends AppCompatActivity implements OnMapReadyCallback {
 
     private GoogleMap mMap;
-    private ActivityMapsBinding binding;
+    private com.example.single_lottery.databinding.ActivityMapsBinding binding;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,8 +39,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         binding = ActivityMapsBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
+        setTitle("Map");
 
-        String eventId = getIntent().getStringExtra("eventId");
+        String eventId = getIntent().getStringExtra("eventId");  // Corrected key for event ID
         Log.d("MapsActivity", "Event ID:" + eventId);
         loadLocations(eventId);
 
@@ -96,7 +96,37 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
-        String eventId = getIntent().getStringExtra("event_id");
+        String eventId = getIntent().getStringExtra("eventId");  // Corrected key for event ID
         loadLocations(eventId);
     }
+
+    /**
+     * Handles navigation up action.
+     * Required for proper back navigation.
+     *
+     * @return true if navigation handled, false otherwise
+     */
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu to add items to the action bar if present
+        getMenuInflater().inflate(R.menu.map_actionbar, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+
+        // Handle toolbar navigation
+        if (id == android.R.id.home) {
+            onBackPressed();
+            return true;
+        } else if (id == R.id.map_action_return) {
+            onBackPressed();
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+
 }

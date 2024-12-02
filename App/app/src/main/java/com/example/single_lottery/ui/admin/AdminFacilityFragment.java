@@ -1,7 +1,6 @@
 package com.example.single_lottery.ui.admin;
 
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,32 +20,15 @@ import com.google.firebase.firestore.WriteBatch;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
-/**
- * Fragment for managing facilities in admin view.
- * Shows list of facilities and their associated events, with ability to delete facilities.
- *
- * @author Jingyao Gu
- * @version 1.0
- */
-public class AdminFacilityFragment extends Fragment {
+
+public class AdminFacilityFragment extends Fragment{
 
     private RecyclerView recyclerView;
     private AdminFacilityAdapter facilityAdapter;
     private List<Map<String, String>> facilitiesWithEvents = new ArrayList<>();
 
-    /**
-     * Creates and initializes the fragment's user interface.
-     * Sets up RecyclerView with adapter and loads facility data.
-     *
-     * @param inflater The layout inflater
-     * @param container The parent view container
-     * @param savedInstanceState Saved instance state bundle
-     * @return The created fragment view
-     */
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -55,58 +37,48 @@ public class AdminFacilityFragment extends Fragment {
         recyclerView = view.findViewById(R.id.facilityRecyclerView);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
-        facilityAdapter = new AdminFacilityAdapter(facilitiesWithEvents, this::deleteEventsByFacility);
+        facilityAdapter = new AdminFacilityAdapter(facilitiesWithEvents, this::deleteEventsByFacility, getContext());
         recyclerView.setAdapter(facilityAdapter);
-
-        // Add DividerItemDecoration (for dividing list of events)
-        DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(
-                recyclerView.getContext(),
-                LinearLayoutManager.VERTICAL
-        );
-        recyclerView.addItemDecoration(dividerItemDecoration);
 
         loadFacilitiesFromFirestore();
 
         return view;
     }
 
-    /**
-     * Loads facilities and their associated events from Firestore.
-     * Clears existing list and updates with fresh data.
-     * Updates adapter when data is loaded.
-     */
     private void loadFacilitiesFromFirestore() {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         db.collection("events")
                 .get()
                 .addOnSuccessListener(queryDocumentSnapshots -> {
-                    facilitiesWithEvents.clear(); // clear old data
+                    facilitiesWithEvents.clear(); // 清空旧数据
 
                     for (DocumentSnapshot document : queryDocumentSnapshots.getDocuments()) {
                         String facility = document.getString("facility");
-                        String eventName = document.getString("name"); // get event name
+                        String eventName = document.getString("name"); // 获取 event name
 
                         if (facility != null && !facility.isEmpty() && eventName != null && !eventName.isEmpty()) {
                             Map<String, String> facilityEvent = new HashMap<>();
                             facilityEvent.put("facility", facility);
-                            facilityEvent.put("eventName", eventName);
-                            facilitiesWithEvents.add(facilityEvent); // add to list
+                            boolean alreadyExists = false;
+                            for (Map<String, String> existingEvent : facilitiesWithEvents) {
+                                if (facility.equals(existingEvent.get("facility"))) {
+                                    alreadyExists = true;
+                                    break;
+                                }
+                            }
+
+                            if (!alreadyExists) {
+                                facilitiesWithEvents.add(facilityEvent);
+                            }
                         }
                     }
-
-                    facilityAdapter.notifyDataSetChanged(); // update RecyclerView
+                    facilityAdapter.notifyDataSetChanged(); // 更新 RecyclerView
                 })
                 .addOnFailureListener(e -> {
                     Toast.makeText(getContext(), "Failed to load facilities.", Toast.LENGTH_SHORT).show();
                 });
     }
-    /**
-     * Deletes all events associated with a specific facility.
-     * Uses batch operation to delete multiple events atomically.
-     * Updates UI after successful deletion.
-     *
-     * @param facility The name of the facility whose events should be deleted
-     */
+
     private void deleteEventsByFacility(String facility) {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         db.collection("events")
@@ -121,9 +93,9 @@ public class AdminFacilityFragment extends Fragment {
                     batch.commit()
                             .addOnSuccessListener(aVoid -> {
                                 Toast.makeText(getContext(), "All events with facility deleted successfully.", Toast.LENGTH_SHORT).show();
-                                // Remove all records of this facility
+                                // 移除该 facility 的所有记录
                                 facilitiesWithEvents.removeIf(map -> map.get("facility").equals(facility));
-                                facilityAdapter.notifyDataSetChanged(); // renew UI
+                                facilityAdapter.notifyDataSetChanged(); // 刷新 UI
                             })
                             .addOnFailureListener(e -> {
                                 Toast.makeText(getContext(), "Failed to delete events.", Toast.LENGTH_SHORT).show();
