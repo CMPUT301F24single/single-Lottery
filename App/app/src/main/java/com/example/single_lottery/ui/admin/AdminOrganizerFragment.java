@@ -22,13 +22,30 @@ import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.ArrayList;
 import java.util.List;
-
+/**
+ * Fragment for managing organizers in admin view.
+ * Displays list of organizers and handles navigation to organizer details.
+ * Manages loading and displaying organizer data from Firestore.
+ *
+ * @author [Jingyao Gu]
+ * @author [Aaron kim]
+ * @version 1.0
+ */
 public class AdminOrganizerFragment extends Fragment {
 
     private RecyclerView recyclerView;
     private AdminOrganizerAdapter adapter;
     private final List<EventModel> organizerList = new ArrayList<>();
-
+    /**
+     * Creates and initializes the fragment's user interface.
+     * Sets up RecyclerView with adapter and configures click handling for
+     * navigation to organizer details.
+     *
+     * @param inflater The layout inflater
+     * @param container The parent view container
+     * @param savedInstanceState Bundle containing the fragment's previously saved state
+     * @return The created fragment view
+     */
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -47,10 +64,15 @@ public class AdminOrganizerFragment extends Fragment {
             startActivity(intent);
         });
         recyclerView.setAdapter(adapter);
-        loadOrganizers(); // 加载组织者数据
+        loadOrganizers(); // load Organizer data
         return view;
     }
-
+    /**
+     * Loads organizer data from Firestore database.
+     * Clears existing organizer list and updates with fresh data.
+     * Binds document IDs to organizer models and updates adapter.
+     * Handles any errors during data loading.
+     */
     private void loadOrganizers() {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
 
@@ -60,7 +82,7 @@ public class AdminOrganizerFragment extends Fragment {
                     for (DocumentSnapshot document : querySnapshot) {
                         EventModel organizer = document.toObject(EventModel.class);
                         if (organizer != null) {
-                            // 绑定文档 ID 到 model
+                            // Bind document ID to model
                             organizer.setOrganizerDeviceID(document.getId());
                             organizerList.add(organizer);
                         }

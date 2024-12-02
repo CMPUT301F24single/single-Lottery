@@ -29,13 +29,26 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
-
+/**
+ * Background worker class for handling offline lottery operations.
+ * Manages periodic lottery draws and notification delivery.
+ * Handles interaction with Firestore for data persistence and updates.
+ *
+ * @author [Aaron kim]
+ * @author [Gabriel Bautista]
+ * @version 1.0
+ */
 public class OfflineWorker extends Worker {
 
     public OfflineWorker(@NonNull Context context, @NonNull WorkerParameters params) {
         super(context, params);
     }
-
+    /**
+     * Executes worker tasks when scheduled.
+     * Performs lottery check and sends notifications with delay.
+     *
+     * @return Result indicating task completion status
+     */
     @NonNull
     @Override
     public Result doWork() {

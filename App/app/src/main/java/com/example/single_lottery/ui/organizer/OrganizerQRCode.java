@@ -27,13 +27,25 @@ import java.io.ByteArrayOutputStream;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
-
+/**
+ * Activity for managing QR code generation and display for events.
+ * Handles QR code creation, storage, regeneration, and display functionality.
+ * Manages interaction with Firebase Storage and Firestore for QR code persistence.
+ *
+ * @author [Haorui Gao]
+ * @version 1.0
+ */
 public class OrganizerQRCode extends AppCompatActivity {
 
     private ImageView qrCodeImageView;
     private String eventId;
     private String qrCodeUrl;
-
+    /**
+     * Initializes the activity and sets up QR code functionality.
+     * Sets up UI elements and checks for existing QR codes.
+     *
+     * @param savedInstanceState Bundle containing the activity's previously saved state
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -57,7 +69,12 @@ public class OrganizerQRCode extends AppCompatActivity {
 
         checkAndDisplayExistingQRCode(eventId);
     }
-
+    /**
+     * Checks for and displays existing QR code for an event.
+     * Generates new QR code if none exists.
+     *
+     * @param eventId ID of event to check QR code for
+     */
     private void checkAndDisplayExistingQRCode(String eventId) {
         FirebaseFirestore.getInstance().collection("QRCode")
                 .whereEqualTo("eventId", eventId)
@@ -77,7 +94,12 @@ public class OrganizerQRCode extends AppCompatActivity {
                 })
                 .addOnFailureListener(e -> Log.e("OrganizerQRCode", "Error checking for existing QR code", e));
     }
-
+    /**
+     * Generates a new QR code for an event.
+     * Creates QR code bitmap and saves it to Firebase.
+     *
+     * @param eventId ID of event to generate QR code for
+     */
     private void generateQRCode(String eventId) {
         String qrCodeId = UUID.randomUUID().toString();
         try {
@@ -94,6 +116,14 @@ public class OrganizerQRCode extends AppCompatActivity {
         }
     }
 
+    /**
+     * Saves generated QR code bitmap to Firebase Storage.
+     * Creates unique storage reference and uploads image data.
+     *
+     * @param qrCodeId Unique identifier for QR code
+     * @param eventId Associated event identifier
+     * @param bitmap QR code bitmap to save
+     */
     private void saveQRCodeToFirebase(String qrCodeId, String eventId, Bitmap bitmap) {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         bitmap.compress(Bitmap.CompressFormat.PNG, 100, baos);
@@ -108,7 +138,14 @@ public class OrganizerQRCode extends AppCompatActivity {
                 }))
                 .addOnFailureListener(e -> Log.e("OrganizerQRCode", "Error saving QR code to Firebase Storage: ", e));
     }
-
+    /**
+     * Saves QR code metadata to Firestore.
+     * Stores event ID, type, and image URL reference.
+     *
+     * @param qrCodeId Unique identifier for QR code
+     * @param eventId Associated event identifier
+     * @param qrCodeUrl Storage URL of saved QR code image
+     */
     private void saveQrCodeDetailsToFirestore(String qrCodeId, String eventId, String qrCodeUrl) {
         Map<String, Object> qrCodeDetails = new HashMap<>();
         qrCodeDetails.put("eventId", eventId);
@@ -120,7 +157,13 @@ public class OrganizerQRCode extends AppCompatActivity {
                 .addOnSuccessListener(aVoid -> Log.d("OrganizerQRCode", "QR code details saved successfully"))
                 .addOnFailureListener(e -> Log.e("OrganizerQRCode", "Error saving QR code details to Firestore", e));
     }
-
+    /**
+     * Deletes existing QR code from Firebase Storage and Firestore.
+     * Executes callback on successful deletion.
+     *
+     * @param eventId ID of event whose QR code should be deleted
+     * @param onSuccess Callback to execute after successful deletion
+     */
     private void deleteExistingQRCode(String eventId, Runnable onSuccess) {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         db.collection("QRCode")
@@ -147,7 +190,13 @@ public class OrganizerQRCode extends AppCompatActivity {
                 })
                 .addOnFailureListener(e -> Log.e("OrganizerQRCode", "Error finding existing QR code to delete", e));
     }
-
+    /**
+     * Extracts storage file path from Firebase Storage URL.
+     * Handles URL parsing and path extraction.
+     *
+     * @param qrCodeUrl Full Firebase Storage URL
+     * @return Extracted file path or null if extraction fails
+     */
     private String extractFilePathFromUrl(String qrCodeUrl) {
         if (qrCodeUrl == null || qrCodeUrl.isEmpty()) {
             return null;
@@ -167,7 +216,12 @@ public class OrganizerQRCode extends AppCompatActivity {
         }
         return null;
     }
-
+    /**
+     * Displays QR code image from URL using Glide.
+     * Loads image into ImageView component.
+     *
+     * @param imageUrl URL of QR code image to display
+     */
     private void displayQRCodeImageByUrl(String imageUrl) {
         Glide.with(this)
                 .load(imageUrl)

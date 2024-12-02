@@ -31,7 +31,14 @@ import com.google.firebase.storage.StorageReference;
 
 import java.io.IOException;
 import java.util.UUID;
-
+/**
+ * Fragment for managing organizer profile information.
+ * Handles organizer data display, profile image management, and updates to both user and organizer collections.
+ * Manages interaction with Firebase Storage and Firestore for data operations.
+ *
+ * @author [Haorui Gao]
+ * @version 1.0
+ */
 public class OrganizerProfilePageFragment extends Fragment {
     private TextView nameTextView, emailTextView, phoneTextView, infoTextView;
     private Button editButton, uploadButton, removeImageButton, facilityButton;
@@ -47,7 +54,15 @@ public class OrganizerProfilePageFragment extends Fragment {
     private FirebaseFirestore firestore;
     private FirebaseStorage storage;
     private StorageReference storageReference;
-
+    /**
+     * Creates and initializes the fragment's user interface.
+     * Sets up view references, initializes Firebase instances, and configures button listeners.
+     *
+     * @param inflater The layout inflater
+     * @param container The parent view container
+     * @param savedInstanceState Bundle containing the fragment's previously saved state
+     * @return The created fragment view
+     */
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -88,6 +103,12 @@ public class OrganizerProfilePageFragment extends Fragment {
 
         return view;
     }
+    /**
+     * Loads organizer profile data from both users and organizers collections.
+     * Updates UI with fetched information.
+     *
+     * @param installationId Unique device installation identifier
+     */
 
     private void loadOrganizerProfile(String installationId) {
         DocumentReference userDocRef = firestore.collection("users").document(installationId);
@@ -120,7 +141,12 @@ public class OrganizerProfilePageFragment extends Fragment {
             Log.e("OrganizerProfilePageFragment", "failed to load user profile: " + e.getMessage());
         });
     }
-
+    /**
+     * Updates UI components with organizer information.
+     * Handles profile image loading and generates avatar if needed.
+     *
+     * @param profileImageUrl URL of profile image to display
+     */
     private void updateOrganizerDetails(String profileImageUrl) {
         nameTextView.setText(organizerName);
         emailTextView.setText(organizerEmail);
@@ -136,12 +162,19 @@ public class OrganizerProfilePageFragment extends Fragment {
             generateLetterAvatar(organizerName);
         }
     }
-
+    /**
+     * Navigates to facility profile management screen.
+     */
     private void openFacilityProfile() {
         Intent intent = new Intent(getActivity(), FacilityProfile.class);
         startActivity(intent);
     }
-
+    /**
+     * Generates a letter avatar when no profile image is set.
+     * Creates circular avatar with organizer name initials.
+     *
+     * @param name Organizer's name for initial generation
+     */
     private void generateLetterAvatar(String name) {
         String initials = "";
         if(name == null || name.isEmpty()){
@@ -170,7 +203,10 @@ public class OrganizerProfilePageFragment extends Fragment {
 
         profileImageView.setImageBitmap(bitmap);
     }
-
+    /**
+     * Shows dialog for editing organizer information.
+     * Allows modification of name, email, phone, and company info.
+     */
     private void showEditDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         builder.setTitle("Edit Profile");
@@ -199,14 +235,23 @@ public class OrganizerProfilePageFragment extends Fragment {
 
         builder.create().show();
     }
-
+    /**
+     * Launches system image picker for profile photo selection.
+     */
     private void selectImage() {
         Intent intent = new Intent();
         intent.setType("image/*");
         intent.setAction(Intent.ACTION_GET_CONTENT);
         startActivityForResult(Intent.createChooser(intent, "select image"), 1);
     }
-
+    /**
+     * Handles result from image selection activity.
+     * Processes selected image and initiates upload.
+     *
+     * @param requestCode Activity request identifier
+     * @param resultCode Result status from image picker
+     * @param data Intent containing selected image data
+     */
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -222,7 +267,13 @@ public class OrganizerProfilePageFragment extends Fragment {
             }
         }
     }
-
+    /**
+     * Sets value or hint text for EditText components.
+     *
+     * @param editText Target EditText component
+     * @param value Text value to set
+     * @param hint Hint text for empty state
+     */
     private void setEditTextValue(EditText editText, String value, String hint) {
         if (value == null || value.isEmpty()) {
             editText.setHint(hint);
@@ -230,7 +281,10 @@ public class OrganizerProfilePageFragment extends Fragment {
             editText.setText(value);
         }
     }
-
+    /**
+     * Manages profile image upload process to Firebase Storage.
+     * Handles existing image deletion and new image upload.
+     */
     private void uploadProfileImage() {
         if (profileImageUri != null) {
             DocumentReference docRef = firestore.collection("organizers").document(installationId);
@@ -257,7 +311,10 @@ public class OrganizerProfilePageFragment extends Fragment {
             Log.e("OrgProfileFragment", "profileImageUri is null");
         }
     }
-
+    /**
+     * Uploads new image to Firebase Storage.
+     * Creates unique filename and updates profile data.
+     */
     private void uploadNewImage() {
         final StorageReference profileImageRef = storageReference.child("organizer_profileImages/" + UUID.randomUUID().toString() + ".jpg");
         profileImageRef.putFile(profileImageUri)
@@ -271,7 +328,10 @@ public class OrganizerProfilePageFragment extends Fragment {
                     Log.e("ProfileFragment", "Failed to upload new image: " + e.getMessage());
                 });
     }
-
+    /**
+     * Removes current profile image from storage.
+     * Updates profile to use default avatar.
+     */
     private void removeProfileImage() {
         DocumentReference docRef = firestore.collection("organizers").document(installationId);
         docRef.get().addOnCompleteListener(task -> {
@@ -297,7 +357,13 @@ public class OrganizerProfilePageFragment extends Fragment {
             Log.e("OrgProfileFragment", "Failed to get user profile: " + e.getMessage());
         });
     }
-
+    /**
+     * Saves organizer data to both users and organizers collections in Firestore.
+     * Updates profile information including profile image URL.
+     *
+     * @param installationId Device installation identifier
+     * @param profileImageUrl Storage URL of profile image
+     */
     private void saveOrganizerDataToFirestore(String installationId, String profileImageUrl) {
         if (installationId == null) {
             Log.e("OrganizerProfilePageFragment", "installationId is null");

@@ -21,14 +21,27 @@ import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.ArrayList;
 import java.util.List;
-
+/**
+ * Fragment for displaying the list of events in admin view.
+ * Shows all events or events filtered by facility name in a RecyclerView.
+ * Handles loading event data from Firestore and updating the display.
+ *
+ * @author [Jingyao Gu]
+ * @author [Aaron kim]
+ * @version 1.0
+ */
 public class AdminEventFragment extends Fragment {
 
     private RecyclerView recyclerView;
     private AdminEventAdapter eventAdapter;
     private List<EventModel> eventList;
     private String facilityName;
-
+    /**
+     * Initializes the fragment and retrieves any passed arguments.
+     * Extracts facility name from arguments if present for filtering events.
+     *
+     * @param savedInstanceState Bundle containing the fragment's previously saved state
+     */
     @Override
     public void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
@@ -36,7 +49,15 @@ public class AdminEventFragment extends Fragment {
             facilityName = getArguments().getString("facility_name");
         }
     }
-
+    /**
+     * Creates and initializes the fragment's user interface.
+     * Sets up RecyclerView with adapter and loads event data.
+     *
+     * @param inflater The layout inflater
+     * @param container The parent view container
+     * @param savedInstanceState Bundle containing the fragment's previously saved state
+     * @return The created fragment view
+     */
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -53,7 +74,12 @@ public class AdminEventFragment extends Fragment {
 
         return view;
     }
-
+    /**
+     * Loads event data from Firestore database.
+     * If facilityName is provided, filters events by facility.
+     * Otherwise loads all events.
+     * Updates the RecyclerView adapter with the loaded data.
+     */
     private void loadEventData() {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
 
