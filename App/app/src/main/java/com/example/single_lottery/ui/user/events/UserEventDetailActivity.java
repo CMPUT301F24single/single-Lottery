@@ -95,15 +95,17 @@ public class UserEventDetailActivity extends AppCompatActivity {
                 .get()
                 .addOnSuccessListener(documentSnapshot -> {
                     if (documentSnapshot.exists()) {
+                        // Retrieve the event details
                         String eventName = documentSnapshot.getString("name");
                         String eventDescription = documentSnapshot.getString("description");
                         String eventFacility = documentSnapshot.getString("facility");
-                        eventTime = documentSnapshot.getString("time"); // 获取活动时间
+                        eventTime = documentSnapshot.getString("time");
                         registrationDeadline = documentSnapshot.getString("registrationDeadline");
                         lotteryTime = documentSnapshot.getString("lotteryTime");
                         String waitingListCount = documentSnapshot.getLong("waitingListCount") + "";
                         String lotteryCount = documentSnapshot.getLong("lotteryCount") + "";
 
+                        // Set event details to views
                         eventNameTextView.setText(eventName);
                         eventTimeTextView.setText(eventTime);
                         registrationDeadlineTextView.setText(registrationDeadline);
@@ -113,9 +115,17 @@ public class UserEventDetailActivity extends AppCompatActivity {
                         eventDescriptionTextView.setText(eventDescription);
                         eventFacilityTextView.setText(eventFacility);
 
-                        String posterUrl = documentSnapshot.getString("posterUrl");
+                        // Safely retrieve the 'requiresLocation' field (boolean)
+                        Boolean requiresLocationBoolean = documentSnapshot.getBoolean("requiresLocation");
+                        // If 'requiresLocation' is null, set default value as false
+                        boolean requiresLocation = (requiresLocationBoolean != null) ? requiresLocationBoolean : false;
 
-                        // Check if there is a poster URL, if not use a default poster image
+                        // Set location text based on the boolean value
+                        TextView eventLocationTextView = findViewById(R.id.eventLocationTextView);
+                        eventLocationTextView.setText(requiresLocation ? "Yes" : "No");
+
+                        // Load the poster image
+                        String posterUrl = documentSnapshot.getString("posterUrl");
                         if (posterUrl != null && !posterUrl.isEmpty()) {
                             Glide.with(this).load(posterUrl).into(eventPosterImageView);
                         } else {
@@ -123,6 +133,7 @@ public class UserEventDetailActivity extends AppCompatActivity {
                             Glide.with(this).load(R.drawable.defaultbackground).into(eventPosterImageView);
                         }
 
+                        // Update event status
                         updateEventStatus();
                     } else {
                         Toast.makeText(this, "Event not found", Toast.LENGTH_SHORT).show();
@@ -130,6 +141,8 @@ public class UserEventDetailActivity extends AppCompatActivity {
                 })
                 .addOnFailureListener(e -> Log.e("UserEventDetailActivity", "Error loading event details", e));
     }
+
+
 
 
     /**

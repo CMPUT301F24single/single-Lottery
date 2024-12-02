@@ -171,6 +171,12 @@ public class OrganizerHomeViewEventActivity extends AppCompatActivity {
                             if (event.getPosterUrl() != null) {
                                 Glide.with(this).load(event.getPosterUrl()).into(imageViewPoster);
                             }
+                            else {
+                                Glide.with(this).load(R.drawable.defaultbackground).into(imageViewPoster);
+                            }
+
+
+
                         }
                     }
                 })

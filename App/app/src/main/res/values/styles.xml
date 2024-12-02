@@ -5,6 +5,12 @@
         <!-- Customize your theme here -->
         <item name="colorPrimary">@color/purple_500</item>
         <item name="colorPrimaryDark">@color/purple_700</item>
-        <item name="colorAccent">@color/teal_200</item>b
+        <item name="colorAccent">@color/teal_200</item>
+    </style>
+
+    <!-- Splash Screen Theme -->
+    <style name="AppTheme.Splash" parent="Theme.AppCompat.Light.NoActionBar">
+        <!-- Set the background color for the splash screen -->
+        <item name="android:windowBackground">@color/purple_700</item>
     </style>
 </resources>

@@ -331,6 +331,10 @@ public class OrganizerHomeEditEventActivity extends AppCompatActivity {
 
         ).addOnSuccessListener(aVoid -> {
             Toast.makeText(this, "Event successfully updated!", Toast.LENGTH_SHORT).show();
+            Intent intent = new Intent(OrganizerHomeEditEventActivity.this, OrganizerHomeViewEventActivity.class);
+            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP); // Clear the stack so the user can't go back to this page
+            startActivity(intent);
+            finish();
         }).addOnFailureListener(e -> {
             Toast.makeText(this, "There was an error updating your event.", Toast.LENGTH_SHORT).show();
         });

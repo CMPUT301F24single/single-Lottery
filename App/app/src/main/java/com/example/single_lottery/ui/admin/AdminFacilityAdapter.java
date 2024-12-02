@@ -14,6 +14,8 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 import com.example.single_lottery.R;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
 
 import java.util.List;
 import java.util.Map;
@@ -45,6 +47,20 @@ public class AdminFacilityAdapter extends RecyclerView.Adapter<AdminFacilityAdap
 
         holder.facilityTextView.setText(facility);
 
+        // Count the number of events at this facility from Firestore
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        db.collection("events")
+                .whereEqualTo("facility", facility)
+                .get()
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful() && task.getResult() != null) {
+                        int eventCount = task.getResult().size();
+                        holder.adminFacilityEventCount.setText(eventCount + " Events");
+                    } else {
+                        holder.adminFacilityEventCount.setText("0 Events");
+                    }
+                });
+
         holder.eventsButton.setOnClickListener(v -> {
             Intent intent = new Intent(context, AdminFacilityEventActivity.class);
             intent.putExtra(AdminFacilityEventActivity.facility_name, facility);
@@ -55,7 +71,7 @@ public class AdminFacilityAdapter extends RecyclerView.Adapter<AdminFacilityAdap
             if (deleteListener != null) {
                 new AlertDialog.Builder(holder.itemView.getContext())
                         .setMessage("Are you sure you want to delete this facility? You will delete every event at this facility.")
-                        .setCancelable(false)  // Disable cancel by tapping outside the dialog
+                        .setCancelable(false)
                         .setPositiveButton("Yes", (dialog, which) -> {
                             if (deleteListener != null) {
                                 deleteListener.onFacilityDelete(facility);
@@ -69,6 +85,7 @@ public class AdminFacilityAdapter extends RecyclerView.Adapter<AdminFacilityAdap
         });
     }
 
+
     @Override
     public int getItemCount() {
         return facilitiesWithEvents.size();
@@ -79,12 +96,15 @@ public class AdminFacilityAdapter extends RecyclerView.Adapter<AdminFacilityAdap
         TextView facilityTextView;
         Button deleteButton;
         Button eventsButton;
+        TextView adminFacilityEventCount;
 
         public FacilityViewHolder(@NonNull View itemView) {
             super(itemView);
             facilityTextView = itemView.findViewById(R.id.facilityTextView);
             eventsButton = itemView.findViewById(R.id.viewEventsButton);
             deleteButton = itemView.findViewById(R.id.deleteButton);
+            adminFacilityEventCount = itemView.findViewById(R.id.adminFacilityEventCount);
+
         }
     }
 
