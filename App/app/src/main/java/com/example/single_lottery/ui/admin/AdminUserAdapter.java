@@ -20,16 +20,34 @@ import com.example.single_lottery.EventModel;
 import com.example.single_lottery.R;
 
 import java.util.List;
-
+/**
+ * Adapter for displaying user items in admin view.
+ * Handles the display and interaction of user data in a RecyclerView.
+ *
+ * @author Jingyao Gu
+ * @version 1.0
+ */
 public class AdminUserAdapter extends RecyclerView.Adapter<AdminUserAdapter.UserViewHolder> {
     private List<EventModel> userList;
     private Context context;
-
+    /**
+     * Constructor for AdminUserAdapter.
+     *
+     * @param context Context used to inflate layouts
+     * @param userList List of users to display
+     */
     public AdminUserAdapter(Context context, List<EventModel> userList) {
         this.context = context;
         this.userList = userList;
     }
 
+    /**
+     * Creates new ViewHolder instances for user items.
+     *
+     * @param parent The parent ViewGroup
+     * @param viewType The view type
+     * @return A new UserViewHolder instance
+     */
     @NonNull
     @Override
     public UserViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -38,7 +56,13 @@ public class AdminUserAdapter extends RecyclerView.Adapter<AdminUserAdapter.User
                 .inflate(R.layout.admin_item_user, parent, false); // Inflate item_user.xml
         return new UserViewHolder(view);
     }
-
+    /**
+     * Binds user data to the ViewHolder.
+     * Sets user name and click listener for navigation to user details.
+     *
+     * @param holder The ViewHolder to bind data to
+     * @param position The position in the list
+     */
     @Override
     public void onBindViewHolder(@NonNull UserViewHolder holder, int position) {
         EventModel user = userList.get(position);
@@ -73,7 +97,11 @@ public class AdminUserAdapter extends RecyclerView.Adapter<AdminUserAdapter.User
             context.startActivity(intent);
         });
     }
-
+    /**
+     * Gets the total number of users in the list.
+     *
+     * @return The total number of users
+     */
     @Override
     public int getItemCount() {
         return userList.size();
@@ -118,11 +146,19 @@ public class AdminUserAdapter extends RecyclerView.Adapter<AdminUserAdapter.User
         // Set the generated bitmap as the profile image
         profileImageView.setImageBitmap(bitmap);
     }
-
+    /**
+     * ViewHolder class for user items.
+     * Holds reference to the text view that displays user name.
+     */
     public static class UserViewHolder extends RecyclerView.ViewHolder {
         ImageView userImageView;
         TextView userNameTextView;
-
+        /**
+         * Constructor for UserViewHolder.
+         * Initializes text view reference from the item layout.
+         *
+         * @param itemView The view containing the user item layout
+         */
         public UserViewHolder(@NonNull View itemView) {
             super(itemView);
             // Bind the ImageView and TextView

@@ -27,6 +27,11 @@ import java.util.Locale;
  * Activity for displaying event details from user perspective.
  * Handles event registration, lottery status updates and registration cancellation.
  *
+ * Outstanding Issues:
+ * - Push notifications not working yet (can't notify users when they win)
+ * - Need to implement FCM to send notifications when lottery results are out
+ * - No notification system for event status changes and deadlines
+ *
  * @author [Jingyao Gu]
  * @version 1.0
  */
@@ -144,7 +149,7 @@ public class UserEventDetailActivity extends AppCompatActivity {
             SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault());
             Date deadlineDate = dateFormat.parse(registrationDeadline);
             Date lotteryDate = dateFormat.parse(lotteryTime);
-            Date eventEndDate = dateFormat.parse(eventTime); // 活动的结束时间
+            Date eventEndDate = dateFormat.parse(eventTime); // End time of the event
             Date currentDate = new Date();
 
             if (currentDate.before(deadlineDate)) {

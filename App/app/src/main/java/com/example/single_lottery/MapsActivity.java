@@ -28,7 +28,18 @@ import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.ArrayList;
 
-public class MapsActivity extends AppCompatActivity implements OnMapReadyCallback {
+/**
+ * Activity for map display and location stuff.
+ *
+ * Outstanding Issues:
+ * - Location works fine on emulator but breaks on real phones ugh
+ * - Need to fix location permissions and updates on actual devices
+ * - Like seriously why does this only work in emulator??
+ *
+ * @author [Haorui Gao]
+ * @version 1.0
+ */
+public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
 
     private GoogleMap mMap;
     private com.example.single_lottery.databinding.ActivityMapsBinding binding;
