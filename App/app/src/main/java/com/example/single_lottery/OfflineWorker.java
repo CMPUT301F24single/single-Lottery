@@ -137,17 +137,20 @@ public class OfflineWorker extends Worker {
                                     for (DocumentSnapshot winner : winners) {
                                         String userId = winner.getString("userId"); // Ensure this matches your Firestore field name
                                         if (userId != null) {
-                                            // Update the status of the winner to "Winner"
-                                            batch.update(db.collection("registered_events").document(winner.getId()), "status", "Winner");
+                                            // Ensure the eventId and userId match before updating the status
+                                            if (winner.getString("eventId").equals(eventId) && winner.getString("userId").equals(userId)) {
+                                                // Update the status of the winner to "Winner"
+                                                batch.update(db.collection("registered_events").document(winner.getId()), "status", "Winner");
 
-                                            // Create and add notification for the winner
-                                            Notification winnerNotification = new Notification(
-                                                    eventName + " - Lottery Results",
-                                                    "Congratulations, you are a winner!",
-                                                    userId
-                                            );
-                                            DocumentReference winnerNotificationRef = db.collection("notifications").document();
-                                            batch.set(winnerNotificationRef, winnerNotification);
+                                                // Create and add notification for the winner
+                                                Notification winnerNotification = new Notification(
+                                                        eventName + " - Lottery Results",
+                                                        "Congratulations, you are a winner!",
+                                                        userId
+                                                );
+                                                DocumentReference winnerNotificationRef = db.collection("notifications").document();
+                                                batch.set(winnerNotificationRef, winnerNotification);
+                                            }
                                         }
                                     }
 
