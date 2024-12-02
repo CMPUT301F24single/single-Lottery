@@ -134,38 +134,26 @@ public class OfflineWorker extends Worker {
                                     // Prepare batch to ensure atomic operations
                                     WriteBatch batch = db.batch();
 
-                                    // Handle winners
                                     for (DocumentSnapshot winner : winners) {
                                         String userId = winner.getString("userId"); // Ensure this matches your Firestore field name
                                         if (userId != null) {
-                                            // Query the registered_events collection with both eventId and userId to get the specific document
-                                            db.collection("registered_events")
-                                                    .whereEqualTo("eventId", eventId)
-                                                    .whereEqualTo("userId", userId)
-                                                    .get()
-                                                    .addOnSuccessListener(winnerQuerySnapshot -> {
-                                                        if (!winnerQuerySnapshot.isEmpty()) {
-                                                            // Since we expect only one document, we can take the first one
-                                                            DocumentSnapshot registeredEvent = winnerQuerySnapshot.getDocuments().get(0);
+                                            // Ensure the eventId and userId match before updating the status
+                                            if (winner.getString("eventId").equals(eventId) && winner.getString("userId").equals(userId)) {
+                                                // Update the status of the winner to "Winner"
+                                                batch.update(db.collection("registered_events").document(winner.getId()), "status", "Winner");
 
-                                                            // Update the status of the winner to "Winner"
-                                                            batch.update(db.collection("registered_events").document(registeredEvent.getId()), "status", "Winner");
-
-                                                            // Create and add notification for the winner
-                                                            Notification winnerNotification = new Notification(
-                                                                    eventName + " - Lottery Results",
-                                                                    "Congratulations, you are a winner!",
-                                                                    userId
-                                                            );
-                                                            DocumentReference winnerNotificationRef = db.collection("notifications").document();
-                                                            batch.set(winnerNotificationRef, winnerNotification);
-                                                        }
-                                                    })
-                                                    .addOnFailureListener(e -> Log.e("LotteryWorker", "Error querying registered_events for userId: " + userId, e));
+                                                // Create and add notification for the winner
+                                                Notification winnerNotification = new Notification(
+                                                        eventName + " - Lottery Results",
+                                                        "Congratulations, you are a winner!",
+                                                        userId
+                                                );
+                                                DocumentReference winnerNotificationRef = db.collection("notifications").document();
+                                                batch.set(winnerNotificationRef, winnerNotification);
+                                            }
                                         }
                                     }
 
-                                    // Handle losers
                                     for (DocumentSnapshot loser : losers) {
                                         String userId = loser.getString("userId"); // Ensure this matches your Firestore field name
                                         if (userId != null) {
@@ -180,7 +168,7 @@ public class OfflineWorker extends Worker {
                                         }
                                     }
 
-                                    // Commit the batch
+                                    // Commit batch
                                     batch.commit()
                                             .addOnSuccessListener(aVoid -> {
                                                 db.collection("events").document(eventId).update("drawnStatus", true)
@@ -194,8 +182,6 @@ public class OfflineWorker extends Worker {
                 })
                 .addOnFailureListener(e -> Log.e("LotteryWorker", "Error retrieving event name", e));
     }
-
-
 
 
 
