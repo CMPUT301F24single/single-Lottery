@@ -68,13 +68,15 @@
                 android:id="@+id/waitingListCountEditText"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textSize="16sp"
+                android:textSize="14sp"
+                android:inputType="number"
                 android:hint="Waiting List Count (leave blank if no limit)" />
 
             <EditText
                 android:id="@+id/lotteryCountEditText"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:inputType="number"
                 android:hint="Lottery Count" />
 
             <!-- Select Event Time -->

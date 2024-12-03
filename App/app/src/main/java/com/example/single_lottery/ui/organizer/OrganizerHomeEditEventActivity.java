@@ -58,7 +58,6 @@ public class OrganizerHomeEditEventActivity extends AppCompatActivity {
     private ImageView imageViewPoster;
     private Button buttonUpdate;
     private String eventId;
-    private EditText editTextEventFacility; // new
     private Switch locationRequirementSwitch;
 
 
@@ -86,7 +85,6 @@ public class OrganizerHomeEditEventActivity extends AppCompatActivity {
         // Initializing the View
         editTextEventName = findViewById(R.id.editTextEventName);
         editTextEventDescription = findViewById(R.id.editTextEventDescription);
-        editTextEventFacility = findViewById(R.id.editTextEventFacility); // new
         editTextEventTime = findViewById(R.id.editEventTime);
         editTextRegistrationTime = findViewById(R.id.editRegistrationTime);
         editTextLotteryTime = findViewById(R.id.editLotteryTime);
@@ -240,10 +238,6 @@ public class OrganizerHomeEditEventActivity extends AppCompatActivity {
                             }
                             editTextLotteryCount.setText(String.valueOf(event.getLotteryCount()));
 
-                            if (event.getFacility() != null) {
-                                editTextEventFacility.setText(event.getFacility());
-                            }
-
                             locationRequirementSwitch.setChecked(event.isRequiresLocation());
 
                             // Check if a poster URL exists
@@ -282,14 +276,17 @@ public class OrganizerHomeEditEventActivity extends AppCompatActivity {
         String editedWaitingListCount = editTextWaitingListCount.getText().toString().trim();
         String editedLotteryCount = editTextLotteryCount.getText().toString().trim();
         String editedEventDescription = editTextEventDescription.getText().toString();
-        String editedEventFacility =editTextEventFacility.getText().toString();
         int waitingListCount;
         int lotteryCount;
         try {
-
             // Set default values for waiting list and lottery numbers
             waitingListCount = editedWaitingListCount.isEmpty() ? Integer.MAX_VALUE : Integer.parseInt(editedWaitingListCount);
             lotteryCount = editedLotteryCount.isEmpty() ? waitingListCount : Integer.parseInt(editedLotteryCount);
+
+            if (editedLotteryCount.isEmpty()){
+                Toast.makeText(this, "Please fill in all required fields.", Toast.LENGTH_SHORT).show();
+                return;
+            }
 
             // Check if the number of tickets is less than or equal to the number of waiting lists
             if (lotteryCount > waitingListCount) {
@@ -325,10 +322,9 @@ public class OrganizerHomeEditEventActivity extends AppCompatActivity {
                 "time", editedEventTime,
                 "registrationDeadline", editedRegistrationDeadline,
                 "lotteryTime", editedLotteryTime,
-                "waitingListCount", Integer.parseInt(editedWaitingListCount),
-                "lotteryCount", Integer.parseInt(editedLotteryCount),
+                "waitingListCount", waitingListCount,
+                "lotteryCount", lotteryCount,
                 "description", editedEventDescription,
-                "facility", editedEventFacility, // new
                 "requiresLocation", locationRequirementSwitch.isChecked()
 
         ).addOnSuccessListener(aVoid -> {

@@ -90,7 +90,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="8dp"
-                    android:hint="Enter waiting list count"
+                    android:textSize="16sp"
+                    android:hint="Enter waiting list count (empty for no limit)"
                     android:inputType="number" />
 
                 <!-- Lottery Count -->
@@ -125,22 +126,6 @@
                     android:hint="Enter event description"
                     android:inputType="textMultiLine" />
 
-
-                <!-- new Event facility -->
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="8dp"
-                    android:layout_marginTop="8dp"
-                    android:text="Event Facitlity" />
-
-                <EditText
-                    android:id="@+id/editTextEventFacility"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="8dp"
-                    android:hint="Enter Event Facility"
-                    android:inputType="textMultiLine" />
 
                 <!-- Event Time -->
                 <LinearLayout

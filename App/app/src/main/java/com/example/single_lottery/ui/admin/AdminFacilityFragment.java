@@ -16,6 +16,8 @@ import com.example.single_lottery.R;
 import com.google.firebase.database.annotations.Nullable;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.Query;
+import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.firestore.WriteBatch;
 
 import java.util.ArrayList;
@@ -36,6 +38,7 @@ public class AdminFacilityFragment extends Fragment{
     private RecyclerView recyclerView;
     private AdminFacilityAdapter facilityAdapter;
     private List<Map<String, String>> facilitiesWithEvents = new ArrayList<>();
+    private List<String> eventIds = new ArrayList<>();
     /**
      * Creates and initializes the fragment's user interface.
      * Sets up RecyclerView with adapter and loads facility data.
@@ -90,6 +93,7 @@ public class AdminFacilityFragment extends Fragment{
 
                             if (!alreadyExists) {
                                 facilitiesWithEvents.add(facilityEvent);
+                                eventIds.add(document.getId());
                             }
                         }
                     }
@@ -127,6 +131,32 @@ public class AdminFacilityFragment extends Fragment{
                             .addOnFailureListener(e -> {
                                 Toast.makeText(getContext(), "Failed to delete events.", Toast.LENGTH_SHORT).show();
                             });
+
+                    for(String eventId : eventIds) {
+                        Query query = db.collection("registered_events")
+                                .whereEqualTo("eventId", eventId);
+                        query.get().addOnCompleteListener(task -> {
+                            if (task.isSuccessful()) {
+                                QuerySnapshot querySnapshot = task.getResult();
+                                if (querySnapshot != null && !querySnapshot.isEmpty()) {
+                                    for (DocumentSnapshot document : querySnapshot.getDocuments()) {
+                                        // Delete each document
+                                        db.collection("registered_events").document(document.getId()).delete()
+                                                .addOnSuccessListener(aVoid -> {
+                                                    System.out.println("Document successfully deleted!");
+                                                })
+                                                .addOnFailureListener(e -> {
+                                                    System.err.println("Error deleting document: " + e.getMessage());
+                                                });
+                                    }
+                                } else {
+                                    System.out.println("No documents found with eventId: " + eventId);
+                                }
+                            } else {
+                                System.err.println("Query failed: " + task.getException().getMessage());
+                            }
+                        });
+                    }
                 })
                 .addOnFailureListener(e -> {
                     Toast.makeText(getContext(), "Failed to find events.", Toast.LENGTH_SHORT).show();
