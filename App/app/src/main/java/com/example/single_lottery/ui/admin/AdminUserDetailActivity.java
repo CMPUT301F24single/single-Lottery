@@ -6,6 +6,7 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.view.MenuItem;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -21,7 +22,11 @@ import com.example.single_lottery.EventModel;
 import com.example.single_lottery.R;
 import com.google.firebase.database.annotations.Nullable;
 import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.Query;
+import com.google.firebase.firestore.QuerySnapshot;
+
 /**
  * Activity for displaying and managing user details in admin view.
  * Allows viewing user information and handling profile/avatar deletion.
@@ -116,6 +121,7 @@ public class AdminUserDetailActivity extends AppCompatActivity {
             Toast.makeText(this, "User ID is missing!", Toast.LENGTH_SHORT).show();
             return;
         }
+        String currentUID = Settings.Secure.getString(getContentResolver(), Settings.Secure.ANDROID_ID);;
 
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         DocumentReference userRef = db.collection("users").document(user.getEventId());
@@ -125,6 +131,30 @@ public class AdminUserDetailActivity extends AppCompatActivity {
                 .setTitle("Delete User")
                 .setMessage("Are you sure you want to delete this user?")
                 .setPositiveButton("Yes", (dialog, which) -> {
+                    Query query = db.collection("registered_events")
+                            .whereEqualTo("userId", currentUID);
+
+                    query.get().addOnCompleteListener(task -> {
+                        if (task.isSuccessful()) {
+                            QuerySnapshot querySnapshot = task.getResult();
+                            if (querySnapshot != null && !querySnapshot.isEmpty()) {
+                                for (DocumentSnapshot document : querySnapshot.getDocuments()) {
+                                    // Delete each document
+                                    db.collection("registered_events").document(document.getId()).delete()
+                                            .addOnSuccessListener(aVoid -> {
+                                                System.out.println("Document successfully deleted!");
+                                            })
+                                            .addOnFailureListener(e -> {
+                                                System.err.println("Error deleting document: " + e.getMessage());
+                                            });
+                                }
+                            } else {
+                                System.out.println("No documents found with eventId: " + currentUID);
+                            }
+                        } else {
+                            System.err.println("Query failed: " + task.getException().getMessage());
+                        }
+                    });
                     userRef.delete()
                             .addOnSuccessListener(aVoid -> {
                                 Toast.makeText(this, "User deleted successfully!", Toast.LENGTH_SHORT).show();

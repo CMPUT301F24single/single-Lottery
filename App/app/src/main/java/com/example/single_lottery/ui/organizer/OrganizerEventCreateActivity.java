@@ -224,6 +224,11 @@ public class OrganizerEventCreateActivity extends AppCompatActivity {
             waitingListCount = waitingListStr.isEmpty() ? Integer.MAX_VALUE : Integer.parseInt(waitingListStr);
             lotteryCount = lotteryCountStr.isEmpty() ? waitingListCount : Integer.parseInt(lotteryCountStr);
 
+            if (lotteryCountStr.isEmpty()){
+                Toast.makeText(this, "Please fill in all required fields.", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
             // Check if the number of tickets is less than or equal to the number of waiting lists
             if (lotteryCount > waitingListCount) {
                 Toast.makeText(this, "Lottery count cannot exceed waiting list count", Toast.LENGTH_SHORT).show();

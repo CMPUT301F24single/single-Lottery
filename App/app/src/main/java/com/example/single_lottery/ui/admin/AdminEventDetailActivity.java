@@ -20,7 +20,10 @@ import com.example.single_lottery.EventModel;
 import com.example.single_lottery.R;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.annotations.Nullable;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.Query;
+import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 /**
@@ -258,6 +261,30 @@ public class AdminEventDetailActivity extends AppCompatActivity {
                                 Log.e("DeleteEvent", "Failed to delete event document", e);
                                 Toast.makeText(this, "Failed to delete event", Toast.LENGTH_SHORT).show();
                             });
+                    Query query = db.collection("registered_events")
+                            .whereEqualTo("eventId", eventId);
+
+                    query.get().addOnCompleteListener(task -> {
+                        if (task.isSuccessful()) {
+                            QuerySnapshot querySnapshot = task.getResult();
+                            if (querySnapshot != null && !querySnapshot.isEmpty()) {
+                                for (DocumentSnapshot document : querySnapshot.getDocuments()) {
+                                    // Delete each document
+                                    db.collection("registered_events").document(document.getId()).delete()
+                                            .addOnSuccessListener(aVoid -> {
+                                                System.out.println("Document successfully deleted!");
+                                            })
+                                            .addOnFailureListener(e -> {
+                                                System.err.println("Error deleting document: " + e.getMessage());
+                                            });
+                                }
+                            } else {
+                                System.out.println("No documents found with eventId: " + eventId);
+                            }
+                        } else {
+                            System.err.println("Query failed: " + task.getException().getMessage());
+                        }
+                    });
                 })
                 .addOnFailureListener(e -> {
                     progressDialog.dismiss();
