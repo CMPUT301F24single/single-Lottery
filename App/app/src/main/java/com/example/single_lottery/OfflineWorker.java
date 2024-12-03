@@ -29,13 +29,26 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
-
+/**
+ * Background worker class for handling offline lottery operations.
+ * Manages periodic lottery draws and notification delivery.
+ * Handles interaction with Firestore for data persistence and updates.
+ *
+ * @author [Aaron kim]
+ * @author [Gabriel Bautista]
+ * @version 1.0
+ */
 public class OfflineWorker extends Worker {
 
     public OfflineWorker(@NonNull Context context, @NonNull WorkerParameters params) {
         super(context, params);
     }
-
+    /**
+     * Executes worker tasks when scheduled.
+     * Performs lottery check and sends notifications with delay.
+     *
+     * @return Result indicating task completion status
+     */
     @NonNull
     @Override
     public Result doWork() {
@@ -137,20 +150,27 @@ public class OfflineWorker extends Worker {
                                     for (DocumentSnapshot winner : winners) {
                                         String userId = winner.getString("userId"); // Ensure this matches your Firestore field name
                                         if (userId != null) {
-                                            Notification winnerNotification = new Notification(
-                                                    eventName + " - Lottery Results",
-                                                    "Congratulations, you are a winner!",
-                                                    userId
-                                            );
-                                            DocumentReference winnerNotificationRef = db.collection("notifications").document();
-                                            batch.set(winnerNotificationRef, winnerNotification);
+                                            // Ensure the eventId and userId match before updating the status
+                                            if (winner.getString("eventId").equals(eventId) && winner.getString("userId").equals(userId)) {
+                                                // Update the status of the winner to "Winner"
+                                                batch.update(db.collection("registered_events").document(winner.getId()), "status", "Winner");
+
+                                                // Create and add notification for the winner
+                                                Notification winnerNotification = new Notification(
+                                                        eventName + " - Lottery Results",
+                                                        "Congratulations, you are a winner!",
+                                                        userId
+                                                );
+                                                DocumentReference winnerNotificationRef = db.collection("notifications").document();
+                                                batch.set(winnerNotificationRef, winnerNotification);
+                                            }
                                         }
                                     }
-
 
                                     for (DocumentSnapshot loser : losers) {
                                         String userId = loser.getString("userId"); // Ensure this matches your Firestore field name
                                         if (userId != null) {
+                                            // Create and add notification for the loser
                                             Notification loserNotification = new Notification(
                                                     eventName + " - Lottery Results",
                                                     "Sorry, you were not selected.",
@@ -160,7 +180,6 @@ public class OfflineWorker extends Worker {
                                             batch.set(loserNotificationRef, loserNotification);
                                         }
                                     }
-
 
                                     // Commit batch
                                     batch.commit()
@@ -176,6 +195,7 @@ public class OfflineWorker extends Worker {
                 })
                 .addOnFailureListener(e -> Log.e("LotteryWorker", "Error retrieving event name", e));
     }
+
 
 
 

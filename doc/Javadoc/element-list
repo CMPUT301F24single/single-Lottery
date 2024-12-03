@@ -1,5 +1,6 @@
 com.example.single_lottery
 com.example.single_lottery.ui.admin
+com.example.single_lottery.ui.notification
 com.example.single_lottery.ui.organizer
 com.example.single_lottery.ui.scan
 com.example.single_lottery.ui.user

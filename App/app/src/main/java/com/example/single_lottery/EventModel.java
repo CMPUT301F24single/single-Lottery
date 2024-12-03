@@ -7,7 +7,8 @@ import java.io.Serializable;
  * Stores event details including timing, capacity and registration information.
  * Used for Firestore data mapping.
  *
- * @author [Haorui Gao]
+ * @author [Aaron kim]
+ * @author [Gabriel Bautista]
  * @version 1.0
  */
 public class EventModel implements Serializable {

@@ -23,7 +23,15 @@ import com.google.firebase.database.annotations.Nullable;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
-
+/**
+ * Activity for displaying and managing event details in admin view.
+ * Provides functionality to view event information, delete posters, QR codes,
+ * and entire events. Handles interaction with Firebase Storage and Firestore.
+ *
+ * @author [Jingyao Gu]
+ * @author [Aaron kim]
+ * @version 1.0
+ */
 public class AdminEventDetailActivity extends AppCompatActivity {
 
     private TextView textViewName;
@@ -38,7 +46,12 @@ public class AdminEventDetailActivity extends AppCompatActivity {
     private Button buttonDeletePoster;
     private Button buttonDeleteEvent;
     private ProgressDialog progressDialog;
-
+    /**
+     * Initializes the activity, sets up UI components and button listeners.
+     * Loads event details if valid event ID is provided.
+     *
+     * @param savedInstanceState Saved instance state bundle
+     */
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -95,7 +108,10 @@ public class AdminEventDetailActivity extends AppCompatActivity {
     }
 
 
-
+    /**
+     * Initializes all view references from the layout.
+     * Binds UI components to their respective fields.
+     */
     private void initViews() {
         textViewName = findViewById(R.id.textViewEventName);
         textViewDescription = findViewById(R.id.textViewEventDescription);
@@ -109,14 +125,20 @@ public class AdminEventDetailActivity extends AppCompatActivity {
         buttonDeleteEvent = findViewById(R.id.buttonDeleteEvent);
         textViewLocationRequirement = findViewById(R.id.textViewLocationRequirement);
     }
-
+    /**
+     * Loads event details from Firestore database.
+     * Updates UI with event information including name, description, times,
+     * and poster image if available.
+     *
+     * @param eventId ID of the event to load
+     */
     private void loadEventDetails(String eventId) {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
 
         db.collection("events").document(eventId).get()
                 .addOnSuccessListener(doc -> {
                     if (doc.exists()) {
-                        // 设置活动信息
+                        // Installation activity information
                         textViewName.setText(doc.getString("name"));
                         textViewDescription.setText(doc.getString("description"));
                         textViewTime.setText(doc.getString("time"));
@@ -130,7 +152,7 @@ public class AdminEventDetailActivity extends AppCompatActivity {
                             textViewLocationRequirement.setText("Yes");
                         }
 
-                        // 加载海报图片
+                        // Loading marine images
                         String posterUrl = doc.getString("posterUrl");
                         if (posterUrl != null && !posterUrl.isEmpty()) {
                             Glide.with(this).load(posterUrl).into(imageViewPoster);
@@ -139,12 +161,17 @@ public class AdminEventDetailActivity extends AppCompatActivity {
                 })
                 .addOnFailureListener(e -> Log.e("AdminEventDetail", "Error loading event details", e));
     }
-
+    /**
+     * Deletes the event poster from storage and removes poster URL from database.
+     * Shows progress dialog during deletion process.
+     *
+     * @param eventId ID of the event whose poster should be deleted
+     */
     private void deletePoster(String eventId) {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         FirebaseStorage storage = FirebaseStorage.getInstance();
 
-        // 显示加载对话框
+        // Display loading conversation frame
         progressDialog.setMessage("Deleting poster...");
         progressDialog.show();
 
@@ -155,7 +182,7 @@ public class AdminEventDetailActivity extends AppCompatActivity {
                     Log.d("DeletePoster", "Poster URL: " + posterUrl);
 
                     if (posterUrl != null && !posterUrl.isEmpty()) {
-                        // 删除存储中的海报文件
+                        // Delete poster files in storage
                         StorageReference posterRef = storage.getReferenceFromUrl(posterUrl);
                         posterRef.delete()
                                 .addOnSuccessListener(aVoid -> {
@@ -191,7 +218,13 @@ public class AdminEventDetailActivity extends AppCompatActivity {
                     progressDialog.dismiss();
                 });
     }
-
+    /**
+     * Deletes an event and its associated data from the database.
+     * Includes deletion of poster if it exists.
+     * Shows confirmation dialog before deletion.
+     *
+     * @param eventId ID of the event to delete
+     */
     private void deleteEvent(String eventId) {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         FirebaseStorage storage = FirebaseStorage.getInstance();
@@ -232,7 +265,13 @@ public class AdminEventDetailActivity extends AppCompatActivity {
                     Toast.makeText(this, "Failed to fetch event details", Toast.LENGTH_SHORT).show();
                 });
     }
-
+    /**
+     * Deletes the QR code associated with an event.
+     * Removes QR code hash from the event document in database.
+     * Shows progress dialog during deletion.
+     *
+     * @param eventId ID of the event whose QR code should be deleted
+     */
     private void deleteQRCode(String eventId) {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
 

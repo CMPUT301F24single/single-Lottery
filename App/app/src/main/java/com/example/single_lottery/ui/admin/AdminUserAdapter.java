@@ -23,18 +23,37 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.List;
-
+/**
+ * Adapter for displaying user items in admin view.
+ * Handles the display and interaction of user data in a RecyclerView.
+ * Manages profile image loading, event count queries, and navigation to user details.
+ *
+ * @author [Jingyao Gu]
+ * @author [Aaron kim]
+ * @version 1.0
+ */
 public class AdminUserAdapter extends RecyclerView.Adapter<AdminUserAdapter.UserViewHolder> {
     private List<EventModel> userList;
     private Context context;
     private FirebaseFirestore db;  // Firestore instance
-
+    /**
+     * Constructor for AdminUserAdapter.
+     *
+     * @param context Context used for resource loading and navigation
+     * @param userList List of user data to display
+     */
     public AdminUserAdapter(Context context, List<EventModel> userList) {
         this.context = context;
         this.userList = userList;
         this.db = FirebaseFirestore.getInstance(); // Initialize Firestore instance
     }
-
+    /**
+     * Creates new ViewHolder instances for user items.
+     *
+     * @param parent The parent ViewGroup
+     * @param viewType The view type
+     * @return A new UserViewHolder instance
+     */
     @NonNull
     @Override
     public UserViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -43,7 +62,14 @@ public class AdminUserAdapter extends RecyclerView.Adapter<AdminUserAdapter.User
                 .inflate(R.layout.admin_item_user, parent, false); // Inflate item_user.xml
         return new UserViewHolder(view);
     }
-
+    /**
+     * Binds user data to the ViewHolder.
+     * Sets up name, ID, event count display and profile image.
+     * Queries Firestore for user ID and registered event count.
+     *
+     * @param holder The ViewHolder to bind data to
+     * @param position The position in the list
+     */
     @Override
     public void onBindViewHolder(@NonNull UserViewHolder holder, int position) {
         EventModel user = userList.get(position);
@@ -113,7 +139,11 @@ public class AdminUserAdapter extends RecyclerView.Adapter<AdminUserAdapter.User
         });
     }
 
-
+    /**
+     * Gets the total number of users in the list.
+     *
+     * @return The total number of users
+     */
     @Override
     public int getItemCount() {
         return userList.size();
@@ -157,13 +187,22 @@ public class AdminUserAdapter extends RecyclerView.Adapter<AdminUserAdapter.User
         // Set the generated bitmap as the profile image
         profileImageView.setImageBitmap(bitmap);
     }
-
+    /**
+     * ViewHolder class for user items.
+     * Holds references to views within each user item layout.
+     */
     public static class UserViewHolder extends RecyclerView.ViewHolder {
         ImageView adminUserImage;
         TextView adminUserName;
         TextView adminUserId;
         TextView adminUserEventCount;
 
+        /**
+         * Constructor for UserViewHolder.
+         * Initializes view references from the item layout.
+         *
+         * @param itemView The view containing the user item layout
+         */
         public UserViewHolder(@NonNull View itemView) {
             super(itemView);
             // Bind the ImageView and TextView

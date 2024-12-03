@@ -16,11 +16,14 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.bumptech.glide.Glide;
 import com.example.single_lottery.R;
+import com.example.single_lottery.ui.notification.Notification;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.text.SimpleDateFormat;
+import java.util.Collections;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 
 /**
@@ -268,12 +271,22 @@ public class UserEventDetailActivity extends AppCompatActivity {
                 .addOnSuccessListener(querySnapshot -> {
                     if (!querySnapshot.isEmpty()) {
                         for (DocumentSnapshot document : querySnapshot.getDocuments()) {
+                            // Get the user's status
+                            String status = document.getString("status");
+
+                            // Call performRedraw if status is "Winner" or "Accepted"
+                            if ("Winner".equals(status) || "Accepted".equals(status)) {
+                                performRedraw(eventId); // Modify the lottery count if necessary
+                            }
+
+                            // Delete the user from registered_events collection
                             db.collection("registered_events").document(document.getId()).delete()
                                     .addOnSuccessListener(aVoid -> {
                                         Toast.makeText(this, "Registration canceled", Toast.LENGTH_SHORT).show();
-    
+
+                                        // Delete the user's location from user_locations collection
                                         db.collection("user_locations")
-                                                .whereEqualTo("userId", userId) 
+                                                .whereEqualTo("userId", userId)
                                                 .get()
                                                 .addOnSuccessListener(locationQuerySnapshot -> {
                                                     if (!locationQuerySnapshot.isEmpty()) {
@@ -290,8 +303,8 @@ public class UserEventDetailActivity extends AppCompatActivity {
                                                     }
                                                 })
                                                 .addOnFailureListener(e -> Log.e("UserEventDetailActivity", "Error querying user location", e));
-    
-                                        finish(); 
+
+                                        finish();
                                     })
                                     .addOnFailureListener(e -> Toast.makeText(this, "Failed to cancel registration", Toast.LENGTH_SHORT).show());
                         }
@@ -299,4 +312,76 @@ public class UserEventDetailActivity extends AppCompatActivity {
                 })
                 .addOnFailureListener(e -> Log.e("UserEventDetailActivity", "Error canceling registration", e));
     }
+
+
+
+
+
+
+    private void performRedraw(String eventId) {
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+
+        // First, get the event name by querying the events collection
+        db.collection("events").document(eventId).get()
+                .addOnSuccessListener(eventDocumentSnapshot -> {
+                    if (eventDocumentSnapshot.exists()) {
+                        String eventName = eventDocumentSnapshot.getString("name");
+
+                        // Fetch the registered users who are in the "Waiting" status for this event
+                        db.collection("registered_events")
+                                .whereEqualTo("eventId", eventId)
+                                .whereEqualTo("status", "Waiting")
+                                .get()
+                                .addOnSuccessListener(querySnapshot -> {
+                                    List<DocumentSnapshot> waitingUsers = querySnapshot.getDocuments();
+                                    if (!waitingUsers.isEmpty()) {
+                                        // Randomly pick one winner from the waiting users
+                                        Collections.shuffle(waitingUsers);
+                                        DocumentSnapshot winnerDocument = waitingUsers.get(0); // Select a random winner
+                                        String userId = winnerDocument.getString("userId");
+
+                                        // Ensure the eventId in the document matches the provided eventId
+                                        String eventIdFromDoc = winnerDocument.getString("eventId");
+                                        if (eventIdFromDoc != null && eventIdFromDoc.equals(eventId)) {
+                                            // Update the status of the selected user to "Winner"
+                                            db.collection("registered_events").document(winnerDocument.getId())
+                                                    .update("status", "Winner")
+                                                    .addOnSuccessListener(aVoid -> {
+                                                        Log.d("LotteryWorker", "User " + userId + " has been selected as a winner.");
+
+                                                        // Optionally send a notification to the winner
+                                                        String title = "Event Notification - " + eventName;
+                                                        String message = "Congratulations, you have been selected!";
+
+                                                        // Create and send the notification document
+                                                        Notification notification = new Notification(title, message, userId);
+                                                        db.collection("notifications").add(notification)
+                                                                .addOnSuccessListener(documentReference -> {
+                                                                    Log.d("LotteryWorker", "Notification sent to user " + userId);
+                                                                })
+                                                                .addOnFailureListener(e -> {
+                                                                    Log.e("LotteryWorker", "Error sending notification", e);
+                                                                });
+                                                    })
+                                                    .addOnFailureListener(e -> {
+                                                        Log.e("LotteryWorker", "Error updating status to Winner", e);
+                                                    });
+                                        } else {
+                                            Log.e("LotteryWorker", "User's eventId does not match the selected eventId.");
+                                        }
+                                    } else {
+                                        Log.d("LotteryWorker", "No users found in the waiting list for the event.");
+                                    }
+                                })
+                                .addOnFailureListener(e -> Log.e("LotteryWorker", "Error retrieving registered users", e));
+                    } else {
+                        Log.e("LotteryWorker", "Event document does not exist.");
+                    }
+                })
+                .addOnFailureListener(e -> Log.e("LotteryWorker", "Error retrieving event name", e));
+    }
+
+
+
+
 }
