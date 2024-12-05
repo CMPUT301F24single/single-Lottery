@@ -59,6 +59,7 @@ dependencies {
     implementation(libs.recyclerview)
     implementation(libs.play.services.maps.v1900)
     implementation(libs.play.services.location)
+    implementation(libs.play.services.gcm)
     implementation(libs.core.v341)
     implementation("com.journeyapps:zxing-android-embedded:4.3.0")
     implementation(libs.firebase.appcheck.debug)

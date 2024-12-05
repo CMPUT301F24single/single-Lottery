@@ -122,6 +122,7 @@ public class ProfileFragment extends Fragment {
         nameTextView.setText(userName);
         emailTextView.setText(userEmail);
         phoneTextView.setText(userPhone);
+        generateLetterAvatar(userName);
     }
 
     private void updateImage(String profileImageUrl) {

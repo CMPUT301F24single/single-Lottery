@@ -11,6 +11,7 @@ import com.journeyapps.barcodescanner.CaptureActivity;
  * Activity for scanning QR codes using device camera.
  * Extends CaptureActivity to provide QR code scanning functionality
  * with custom back navigation.
+ * https://github.com/journeyapps/zxing-android-embedded
  *
  * @author [Haorui Gao]
  * @version 1.0
